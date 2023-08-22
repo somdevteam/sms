@@ -1,7 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
-
-@Entity()
-export class Subject  extends BaseEntity{
+import {BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique} from "typeorm";
+@Entity('subject')
+export class Subject extends BaseEntity{
     @PrimaryGeneratedColumn()
     sectionid:number;
     @Column()

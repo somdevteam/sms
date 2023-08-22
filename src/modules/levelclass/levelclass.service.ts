@@ -9,9 +9,8 @@ import { BranchService } from '../branch/branch.service';
 export class LevelclassService {
 
   constructor(
-    @Inject(BranchService) private branchService :BranchService,
-    @InjectRepository(Levelclass)
-    private levelRepository: Repository<Levelclass>,
+    @InjectRepository(Levelclass) private levelRepository: Repository<Levelclass>,
+    private readonly branchService :BranchService,
   ) {}
   
   async create(payload: CreateLevelclassDto) {

@@ -7,6 +7,11 @@ import {AuthModule} from "./modules/auth/auth.module";
 import {BranchModule} from "./modules/branch/branch.module";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import configuration from "./config/configuration";
+import {ClassModule} from "./modules/class/class.module";
+import {SubjectModule} from "./modules/subject/subject.module";
+import {LevelModule} from "./modules/level/level.module";
+import {LevelclassModule} from "./modules/levelclass/levelclass.module";
+import {AcademicModule} from "./modules/academic/academic.module";
 
 
 @Module({
@@ -25,11 +30,12 @@ import configuration from "./config/configuration";
         database: configService.get<string>('database.name'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         logging: configService.get('database.logging'),
-        synchronize: false,
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
-    UserModule, AuthModule, BranchModule],
+    UserModule, AuthModule, BranchModule,
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule],
   controllers: [AppController],
   providers: [AppService],
 })

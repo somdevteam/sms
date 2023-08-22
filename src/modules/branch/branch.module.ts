@@ -8,6 +8,7 @@ import {Branch} from "./branch.entity";
 @Module({
   imports:[TypeOrmModule.forFeature([Branch])],
   controllers: [BranchController],
-  providers: [BranchService,Branch]
+  providers: [BranchService,Branch],
+  exports:[BranchService]
 })
 export class BranchModule {}
