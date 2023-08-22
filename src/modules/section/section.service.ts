@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSectionDto } from './dto/create-section.dto';
-import { UpdateSectionDto } from './dto/update-section.dto';
 
 @Injectable()
 export class SectionService {
@@ -16,7 +15,7 @@ export class SectionService {
     return `This action returns a #${id} section`;
   }
 
-  update(id: number, updateSectionDto: UpdateSectionDto) {
+  update(id: number, updateSectionDto) {
     return `This action updates a #${id} section`;
   }
 

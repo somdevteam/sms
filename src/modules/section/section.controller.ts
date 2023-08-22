@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SectionService } from './section.service';
 import { CreateSectionDto } from './dto/create-section.dto';
-import { UpdateSectionDto } from './dto/update-section.dto';
 
 @Controller('section')
 export class SectionController {
@@ -23,7 +22,7 @@ export class SectionController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSectionDto: UpdateSectionDto) {
+  update(@Param('id') id: string, @Body() updateSectionDto) {
     return this.sectionService.update(+id, updateSectionDto);
   }
 

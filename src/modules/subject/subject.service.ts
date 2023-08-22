@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
 
 @Injectable()
 export class SubjectService {
@@ -16,7 +15,7 @@ export class SubjectService {
     return `This action returns a #${id} subject`;
   }
 
-  update(id: number, updateSubjectDto: UpdateSubjectDto) {
+  update(id: number, updateSubjectDto) {
     return `This action updates a #${id} subject`;
   }
 

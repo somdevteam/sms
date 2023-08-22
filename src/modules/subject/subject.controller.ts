@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
 
 @Controller('subject')
 export class SubjectController {
@@ -23,7 +22,7 @@ export class SubjectController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
+  update(@Param('id') id: string, @Body() updateSubjectDto) {
     return this.subjectService.update(+id, updateSubjectDto);
   }
 

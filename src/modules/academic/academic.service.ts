@@ -47,7 +47,7 @@ export class AcademicService {
   }
 
   findAll() {
-    return `This action returns all academic`;
+    return this.academicRepository.find();
   }
 
   findOne(id: number) {
