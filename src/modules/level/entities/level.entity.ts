@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Level extends BaseEntity {
@@ -10,6 +11,8 @@ export class Level extends BaseEntity {
     datecreated: Date;
     @Column({default: true})
     isactive: boolean;
+    @OneToMany(() => Levelclass, levelclass => levelclass.level)
+    levelclass: Levelclass
 
 }
 

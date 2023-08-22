@@ -1,5 +1,7 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique} from "typeorm";
+import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
 import {isEmail, IsNotEmpty} from "class-validator";
+import { Level } from "../level/entities/level.entity";
+import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
 
 @Entity('branch')
 export class Branch extends BaseEntity {
@@ -18,5 +20,7 @@ export class Branch extends BaseEntity {
     datecreated: Date;
     @Column({default: true})
     isactive: boolean;
+    @OneToMany(() => Levelclass, levelclass => levelclass.branch)
+    levelclass: Levelclass
 
 }

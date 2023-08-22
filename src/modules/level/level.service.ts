@@ -14,6 +14,10 @@ export class LevelService {
   getByLevelname(levelname: string): Promise<Level> {
     return this.levelRepository.findOne({ where: { levelname } });
   }
+
+  getById(id: number): Promise<Level> {
+    return this.levelRepository.findOne({where: {levelid: id}})
+}
   
   create(payload: CreateLevelDto) {
     let classname = this.getByLevelname(payload.levelname);

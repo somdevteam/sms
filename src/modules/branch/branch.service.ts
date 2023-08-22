@@ -16,6 +16,11 @@ import {BranchDTO} from "./dto/branch.dto";
 export class BranchService {
     constructor(@InjectRepository(Branch) private branchRepository:Repository<Branch>) {
     }
+
+    getById(id: number): Promise<Branch> {
+        return this.branchRepository.findOne({where: {branchid: id}})
+    }
+
     getAllBranches() {
         return this.branchRepository.find();
     }

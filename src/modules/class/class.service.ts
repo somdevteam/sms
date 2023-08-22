@@ -20,6 +20,10 @@ export class ClassService {
     return this.classRepository.findOne({ where: { classname } });
   }
 
+  getById(id: number): Promise<Class> {
+    return this.classRepository.findOne({where: {classid: id}})
+}
+
   create(payload: CreateClassDto) {
     let classname = this.getByClassname(payload.classname);
     if (classname) {
