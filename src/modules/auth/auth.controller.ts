@@ -4,14 +4,19 @@ import {AuthGuard} from "@nestjs/passport";
 import {LocalAuthGuard} from "./local-auth.guard";
 import {AuthService} from "./auth.service";
 import {JwtAuthGuard} from "./jwt-auth.guard";
+import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 
 @Controller('auth')
+@ApiTags('authentication')
 export class AuthController {
     constructor(
         private authService: AuthService
     ) {
     }
 
+    @ApiResponse({status: 200, description: 'Login Completed'})
+    @ApiResponse({status: 400, description: 'Bad Request'})
+    @ApiResponse({status: 401, description: 'Unauthorized'})
     @Post('/login')
     async login(@Body() loginDto: LoginDto): Promise<any> {
         const user = await this.authService.validateUser(
