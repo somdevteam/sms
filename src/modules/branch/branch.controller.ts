@@ -13,7 +13,7 @@ export class BranchController {
 
     @UseGuards(JwtAuthGuard)
     @Get('/')
-    getAllUsers() {
+    getAllBranches() {
         return this.branchService.getAllBranches();
     }
 
@@ -21,6 +21,11 @@ export class BranchController {
     @Post("/")
     createUser(@Body() branchDTO: BranchDTO) {
         return this.branchService.create(branchDTO);
+    }
+
+    @Patch("/")
+    async updateBranh(@Body() branchDto: BranchDTO) {
+        return  await this.branchService.update(branchDto);
     }
 
 

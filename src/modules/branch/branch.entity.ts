@@ -12,9 +12,9 @@ export class Branch extends BaseEntity {
     branchname: string;
     @Column()
     branchlocation: string;
-    @Column()
+    @Column({nullable:true})
     branchlogo: string;
-    @Column()
+    @Column({nullable: true})
     coverlogo: string;
     @Column()
     datecreated: Date;

@@ -30,11 +30,9 @@ export class BranchService {
         console.log(branchData);
         if (branchData) {
             throw new NotAcceptableException(
-                'The account with the provided branch currently exists. Please choose another one.',
+                `the ${payload.branchName} branch currently exists`,
             );
         }
-
-
 
         let branch = new Branch();
         branch.branchname = payload.branchName;
@@ -53,6 +51,39 @@ export class BranchService {
             }
             throw new InternalServerErrorException('An error occurred while creating the branch.');
         }
+    }
+
+    async update(payload: BranchDTO) :Promise<any>{
+
+        const foundBranch = await this.branchRepository.findOneBy({branchid: payload.branchId});
+
+
+        if (!foundBranch) {
+            throw new NotFoundException("Branch Not found");
+        }
+
+        try {
+
+            let branchid = payload.branchId;
+
+        
+
+        // return branchid;
+        foundBranch.branchname = payload.branchName;
+        foundBranch.branchlocation = payload.branchLocation;
+        // foundBranch.branchlogo = payload.branchLogo;
+        // foundBranch.coverlogo = payload.coverLogo;
+
+        return await this.branchRepository.update({branchid},foundBranch);
+
+        }catch(error) {
+            if (error) {
+                throw new NotAcceptableException(error);
+            }
+            return 'an error occured';
+        }
+
+        
     }
     
     async  getBranchByName(branchName: string): Promise<Branch> {
