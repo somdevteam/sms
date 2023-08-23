@@ -21,9 +21,9 @@ export class ClassController {
     return this.classService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClassDto) {
-    return this.classService.update(+id, updateClassDto);
+  @Patch()
+  update(@Body() updateClassDto) {
+    return this.classService.update(updateClassDto);
   }
 
   @Delete(':id')

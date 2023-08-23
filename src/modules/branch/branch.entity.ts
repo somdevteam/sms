@@ -2,6 +2,7 @@ import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique} f
 import {isEmail, IsNotEmpty} from "class-validator";
 import { Level } from "../level/entities/level.entity";
 import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
+import { ClassSubject } from "../class-subject/entities/class-subject.entity";
 
 @Entity('branch')
 export class Branch extends BaseEntity {
@@ -22,5 +23,7 @@ export class Branch extends BaseEntity {
     isactive: boolean;
     @OneToMany(() => Levelclass, levelclass => levelclass.branch)
     levelclass: Levelclass
+    @OneToMany(() => ClassSubject, clssub => clssub.branch)
+    classSubject: ClassSubject
 
 }

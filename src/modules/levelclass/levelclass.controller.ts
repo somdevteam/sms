@@ -22,8 +22,8 @@ export class LevelclassController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLevelclassDto) {
-    return this.levelclassService.update(+id, updateLevelclassDto);
+  update(@Body() updateLevelclassDto) {
+    return this.levelclassService.update(updateLevelclassDto);
   }
 
   @Delete(':id')

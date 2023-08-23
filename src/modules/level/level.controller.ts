@@ -24,9 +24,9 @@ export class LevelController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLevelDto) {
-    return this.levelService.update(+id, updateLevelDto);
+  @Patch()
+  update(@Body() updateLevelDto) {
+    return this.levelService.update(updateLevelDto);
   }
 
   @UseGuards(JwtAuthGuard)

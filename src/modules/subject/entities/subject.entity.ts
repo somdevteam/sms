@@ -1,4 +1,5 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique} from "typeorm";
+import { ClassSubject } from "src/modules/class-subject/entities/class-subject.entity";
+import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
 @Entity('subject')
 export class Subject extends BaseEntity{
     @PrimaryGeneratedColumn()
@@ -10,4 +11,6 @@ export class Subject extends BaseEntity{
     datecreated: Date;
     @Column({default: true})
     isactive: boolean;
+    @OneToMany(() => ClassSubject, clsSub => clsSub.subject)
+    classSubject: ClassSubject
 }
