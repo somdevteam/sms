@@ -2,10 +2,10 @@ import {BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique} from "typeor
 @Entity('subject')
 export class Subject extends BaseEntity{
     @PrimaryGeneratedColumn()
-    sectionid:number;
+    subjectid:number;
     @Column()
     @Unique(['sectionname'])
-    sectionname:string;
+    subjectname:string;
     @Column()
     datecreated: Date;
     @Column({default: true})

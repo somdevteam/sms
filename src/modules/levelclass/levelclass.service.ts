@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateLevelclassDto } from './dto/create-levelclass.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Levelclass } from './entities/levelclass.entity';
@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { BranchService } from '../branch/branch.service';
 import { LevelService } from '../level/level.service';
 import { ClassService } from '../class/class.service';
+import { UpdateLevelclassDto } from './dto/update-levelclass.dto';
 
 @Injectable()
 export class LevelclassService {
@@ -16,6 +17,10 @@ export class LevelclassService {
     private readonly levelService :LevelService,
     private readonly classService :ClassService,
   ) {}
+
+  getById(id: number): Promise<Levelclass> {
+    return this.levelclassRepository.findOne({ where: { levelclassid: id } });
+  }
   
   async create(payload: CreateLevelclassDto) {
    const branch = await this.branchService.getById(payload.branchid);
@@ -49,11 +54,47 @@ export class LevelclassService {
     return `This action returns a #${id} levelclass`;
   }
 
-  update(id: number, updateLevelclassDto) {
-    return `This action updates a #${id} levelclass`;
+ async update( payload: UpdateLevelclassDto) {
+    const foundclasslevel = await this.getById(payload.levelclassid);
+    if (!foundclasslevel) {
+      throw new NotFoundException(`level class with id ${payload.levelclassid} not found`);
+    }
+
+    const branch = await this.branchService.getById(payload.branchid);
+    if (!branch) {
+     throw new NotFoundException(`branch with ID ${payload.branchid} not found`)
+    }
+ 
+    const level = await this.levelService.getById(payload.levelid);
+    if (!level) {
+     throw new NotFoundException(`level with ID ${payload.levelid} not found`)
+    }
+ 
+    const clas = await this.classService.getById(payload.classid);
+    if (!clas) {
+     throw new NotFoundException(`class with ID ${payload.classid} not found`)
+    }
+
+    try {
+      foundclasslevel.branch = branch;
+      foundclasslevel.level = level;
+      foundclasslevel.class = clas;
+      return await this.levelclassRepository.update(foundclasslevel.levelclassid,foundclasslevel);
+    }catch(error) {
+      if (error) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(
+        'An error occurred while creating the user.',
+      );
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} levelclass`;
+ async remove(id: number) {
+    const foundclasslevel = await this.getById(id);
+    if (!foundclasslevel) {
+      throw new NotFoundException(`level class with id ${id} not found`);
+    }
+    return await this.levelclassRepository.delete(id);
   }
 }

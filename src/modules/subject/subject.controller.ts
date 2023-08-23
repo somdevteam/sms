@@ -21,9 +21,9 @@ export class SubjectController {
     return this.subjectService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto) {
-    return this.subjectService.update(+id, updateSubjectDto);
+  @Patch('/')
+  update(@Body() updateSubjectDto) {
+    return this.subjectService.update(updateSubjectDto);
   }
 
   @Delete(':id')

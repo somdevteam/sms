@@ -1,8 +1,15 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLevelDto } from './dto/create-level.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Level } from './entities/level.entity';
 import { Repository } from 'typeorm';
+import { UpdateLevelDto } from './dto/update-level.dto';
 
 @Injectable()
 export class LevelService {
@@ -16,9 +23,9 @@ export class LevelService {
   }
 
   getById(id: number): Promise<Level> {
-    return this.levelRepository.findOne({where: {levelid: id}})
-}
-  
+    return this.levelRepository.findOne({ where: { levelid: id } });
+  }
+
   create(payload: CreateLevelDto) {
     let classname = this.getByLevelname(payload.levelname);
     if (classname) {
@@ -51,11 +58,32 @@ export class LevelService {
     return `This action returns a #${id} level`;
   }
 
-  update(id: number, updateLevelDto) {
-    return `This action updates a #${id} level`;
+  async update(payload: UpdateLevelDto) {
+    let foundLevel = await this.getById(payload.levelid);
+
+    if (!foundLevel) {
+      throw new NotFoundException('level not found');
+    }
+
+    try {
+      foundLevel.levelname = payload.levelname;
+      return await this.levelRepository.update(foundLevel.levelid, foundLevel);
+    } catch (error) {
+      if (error) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(
+        'An error occurred while creating the user.',
+      );
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} level`;
+  async remove(id: number) {
+    let foundlevel = await this.getById(id);
+
+    if (!foundlevel) {
+      throw new NotFoundException('level not found');
+    }
+    return await this.levelRepository.delete(id);
   }
 }

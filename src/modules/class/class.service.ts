@@ -3,11 +3,13 @@ import {
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateClassDto } from './dto/create-class.dto';
 import { Class } from './entities/class.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateClassDto } from './dto/update-class.dto';
 
 @Injectable()
 export class ClassService {
@@ -32,10 +34,10 @@ export class ClassService {
       );
     }
 
-    let clas = new Class();
-    clas.classname = payload.classname;
-    clas.datecreated = new Date();
     try {
+      let clas = new Class();
+      clas.classname = payload.classname;
+      clas.datecreated = new Date();
       const savedClass = this.classRepository.save(clas);
       return savedClass;
     } catch (error) {
@@ -56,11 +58,38 @@ export class ClassService {
     return `This action returns a #${id} class`;
   }
 
-  update(id: number, updateClassDto) {
-    return `This action updates a #${id} class`;
+  async update(payload:UpdateClassDto) {
+    let foundClass = await this.getById(payload.classid);
+
+    if (!foundClass) {
+      throw new NotFoundException('class not found');
+    }
+
+    try {
+
+      foundClass.classname = payload.classname;
+      return await this.classRepository.update(foundClass.classid,foundClass);
+
+    }catch(error) {
+      if (error) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(
+        'An error occurred while creating the user.',
+      );
+    }
+    
+
+
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} class`;
+ async remove(id: number) {
+    let foundClass = await this.getById(id);
+
+    if (!foundClass) {
+      throw new NotFoundException('class not found');
+    }
+    return await this.classRepository.delete(id);
   }
 }

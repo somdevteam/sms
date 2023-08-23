@@ -1,6 +1,7 @@
 import { IsNotEmpty } from "class-validator";
 
-export class CreateSubjectDto {
+export class UpdateSubjectDto {
+    @IsNotEmpty()
     subjectid:number;
     @IsNotEmpty()
     subjectname:string;

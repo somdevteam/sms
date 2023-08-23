@@ -21,9 +21,9 @@ export class SectionController {
     return this.sectionService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSectionDto) {
-    return this.sectionService.update(+id, updateSectionDto);
+  @Patch('/')
+  update(@Body() updateSectionDto) {
+    return this.sectionService.update( updateSectionDto);
   }
 
   @Delete(':id')
