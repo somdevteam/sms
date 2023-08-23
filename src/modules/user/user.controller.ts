@@ -4,8 +4,10 @@ import {UserDto} from "./Dto/user.dto";
 import {UserEntity} from "./user.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
+import {ApiTags} from "@nestjs/swagger";
 
 @Controller('user')
+@ApiTags('User Apis')
 export class UserController {
     constructor(private userService: UserService) {
     }

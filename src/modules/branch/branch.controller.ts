@@ -8,7 +8,7 @@ import {BranchDTO} from "./dto/branch.dto";
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 
 @Controller('branch')
-@ApiTags('branch')
+@ApiTags('Branch Apis')
 export class BranchController {
     constructor(private branchService: BranchService) {
     }
@@ -20,7 +20,7 @@ export class BranchController {
         return this.branchService.getAllBranches();
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Create User', description: 'Returns Created Users.' })
     @Post("/")
     createUser(@Body() branchDTO: BranchDTO) {
