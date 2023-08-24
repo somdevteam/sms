@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,Request } from '@nestjs/common';
 import { LevelclassService } from './levelclass.service';
 import { CreateLevelclassDto } from './dto/create-levelclass.dto';
 
@@ -37,5 +37,12 @@ export class LevelclassController {
     return this.levelclassService.remove(+id);
   }
 
+  @Get('/class/:branchId')
+ async findClassesByBranchId(@Param('branchId') branchId: number):Promise<any> {
+    const user = null;
+    console.log("user is reached"+branchId);
+    console.log(branchId);
+    return await this.levelclassService.fetchClassesByBranchId(branchId);
+  }
   
 }

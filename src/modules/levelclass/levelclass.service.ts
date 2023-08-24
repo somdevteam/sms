@@ -1,12 +1,12 @@
-import { ConflictException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateLevelclassDto } from './dto/create-levelclass.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Levelclass } from './entities/levelclass.entity';
-import { Repository } from 'typeorm';
-import { BranchService } from '../branch/branch.service';
-import { LevelService } from '../level/level.service';
-import { ClassService } from '../class/class.service';
-import { UpdateLevelclassDto } from './dto/update-levelclass.dto';
+import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from '@nestjs/common';
+import {CreateLevelclassDto} from './dto/create-levelclass.dto';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Levelclass} from './entities/levelclass.entity';
+import {Repository} from 'typeorm';
+import {BranchService} from '../branch/branch.service';
+import {LevelService} from '../level/level.service';
+import {ClassService} from '../class/class.service';
+import {UpdateLevelclassDto} from './dto/update-levelclass.dto';
 
 @Injectable()
 export class LevelclassService {
@@ -108,4 +108,19 @@ export class LevelclassService {
       .getMany();
       
   }
+
+    async fetchClassesByBranchId(branchId: number) :Promise<any>{
+        return await this.levelclassRepository
+            .createQueryBuilder('levelClass')
+            .leftJoinAndSelect('levelClass.branch', 'branch')
+            .leftJoinAndSelect('levelClass.class', 'class')
+            .where('levelClass.branch = :branchId', {branchId})
+            .select([
+                'class.classid',
+                'class.classname',
+                'class.datecreated',
+                'class.isactive',
+            ])
+            .getRawMany();
+    }
 }
