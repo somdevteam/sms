@@ -110,11 +110,15 @@ export class LevelclassService {
   }
 
     async fetchClassesByBranchId(branchId: number) :Promise<any>{
+      const levelId = 1;
         return await this.levelclassRepository
             .createQueryBuilder('levelClass')
             .leftJoinAndSelect('levelClass.branch', 'branch')
             .leftJoinAndSelect('levelClass.class', 'class')
+            .leftJoinAndSelect('levelClass.level', 'level')
             .where('levelClass.branch = :branchId', {branchId})
+            .andWhere('level.levelid = :levelId', {levelId})
+            .andWhere('class.isactive = :isActive', {isActive:true})
             .select([
                 'class.classid',
                 'class.classname',
