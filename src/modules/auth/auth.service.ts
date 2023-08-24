@@ -3,6 +3,7 @@ import {UserService} from "../user/user.service";
 import {JwtService} from "@nestjs/jwt";
 import {LoginDto} from "./Dto/login.dto";
 import {UserEntity} from "../user/user.entity";
+import {Loginhistories} from "./loginhistories.entity";
 
 @Injectable()
 export class AuthService {
@@ -29,5 +30,19 @@ export class AuthService {
             );
         }
         return user;
+    }
+
+    async getUserInfo(request: any, user: any): Promise<Loginhistories> {
+        const userAgent = request.headers['user-agent'];
+        const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+
+        const loginHistoryInfo = {
+            ip,
+            browser: userAgent,
+            userId: user.userId,
+        }
+        const loginHistoryId = await this.usersService.addLoginHisotry(loginHistoryInfo, user);
+
+        return loginHistoryId;
     }
 }

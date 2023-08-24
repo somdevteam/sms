@@ -12,11 +12,13 @@ import {UserDto} from "./Dto/user.dto";
 import * as crypto from 'crypto';
 import {UserProfile} from "./userprofile.entity";
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
+import {Loginhistories} from "../auth/loginhistories.entity";
 
 @Injectable()
 export class UserService {
     constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-                @InjectRepository(UserProfile) private userProfileRepository: Repository<UserProfile>) {
+                @InjectRepository(UserProfile) private userProfileRepository: Repository<UserProfile>,
+                @InjectRepository(Loginhistories) private loginRepository: Repository<Loginhistories>) {
     }
 
     private readonly users: any[] = [];
@@ -150,4 +152,26 @@ export class UserService {
         });
     }
 
+    async addLoginHisotry(payload, user) {
+
+        const loginHistory = new Loginhistories();
+        const currentDate = new Date();
+        loginHistory.ip = payload.ip;
+        loginHistory.browser = payload.browser.toString();
+        loginHistory.user = user;
+        loginHistory.loginDate = currentDate;
+        loginHistory.logoutDate = null;
+
+
+        try {
+            const savedLoginHistory = await this.loginRepository.save(loginHistory); // Step 1: Save UserEntity
+
+            return savedLoginHistory;
+        } catch (error) {
+            if (error) {
+                throw new ConflictException(error.message);
+            }
+            throw new InternalServerErrorException('An error occurred while creating the user.');
+        }
+    }
 }

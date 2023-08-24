@@ -1,4 +1,4 @@
-import {Body, Controller, Get, NotFoundException, Post, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, NotFoundException, Post, UseGuards, Request, Req} from '@nestjs/common';
 import {LoginDto} from "./Dto/login.dto";
 import {AuthGuard} from "@nestjs/passport";
 import {LocalAuthGuard} from "./local-auth.guard";
@@ -18,7 +18,7 @@ export class AuthController {
     @ApiResponse({status: 400, description: 'Bad Request'})
     @ApiResponse({status: 401, description: 'Unauthorized'})
     @Post('/login')
-    async login(@Body() loginDto: LoginDto): Promise<any> {
+    async login(@Body() loginDto: LoginDto, @Req() req: Request): Promise<any> {
         const user = await this.authService.validateUser(
             loginDto.username,
             loginDto.password,
@@ -27,8 +27,14 @@ export class AuthController {
         if (!user){
             return "user not found";
         }
+        var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
         const token = this.authService.createToken(user);
+        this.getrequest(req);
         return token;
+    }
+
+    getrequest (req){
+        console.log(req);
     }
 
 }
