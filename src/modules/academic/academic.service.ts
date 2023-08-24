@@ -16,6 +16,10 @@ export class AcademicService {
     private academicRepository: Repository<AcademicEntity>,
   ) {}
 
+  getById(id: number): Promise<AcademicEntity> {
+    return this.academicRepository.findOne({ where: { academicid: id } });
+  }
+
   getByUsername(academicname: string): Promise<AcademicEntity> {
     return this.academicRepository.findOne({ where: { academicname } });
   }

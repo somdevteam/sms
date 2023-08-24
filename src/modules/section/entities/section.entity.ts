@@ -1,3 +1,4 @@
+import { ClassSection } from "src/modules/class-section/entities/class-section.entity";
 import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
@@ -12,4 +13,7 @@ export class Section extends BaseEntity {
     datecreated: Date;
     @Column({default: true})
     isactive: boolean;
+
+    @OneToMany(() => ClassSection, clsSec => clsSec.section)
+    classSection: ClassSection
 }

@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { ClassSection } from "src/modules/class-section/entities/class-section.entity";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity()
 export class AcademicEntity extends BaseEntity {
@@ -10,5 +11,8 @@ export class AcademicEntity extends BaseEntity {
     datecreated: Date;
     @Column({default: true})
     isactive: boolean;
+
+    @OneToMany(() => ClassSection, clsSec => clsSec.academic)
+    classSection: ClassSection
 
 }

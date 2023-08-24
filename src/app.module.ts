@@ -12,7 +12,9 @@ import {SubjectModule} from "./modules/subject/subject.module";
 import {LevelModule} from "./modules/level/level.module";
 import {LevelclassModule} from "./modules/levelclass/levelclass.module";
 import {AcademicModule} from "./modules/academic/academic.module";
-import { TestModule } from './test/test.module';
+import { ClassSubjectModule } from './modules/class-subject/class-subject.module';
+import { ClassSectionModule } from './modules/class-section/class-section.module';
+import { SectionModule } from './modules/section/section.module';
 
 
 @Module({
@@ -36,7 +38,7 @@ import { TestModule } from './test/test.module';
       inject: [ConfigService],
     }),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, TestModule],
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule],
   controllers: [AppController],
   providers: [AppService],
 })
