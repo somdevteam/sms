@@ -28,13 +28,9 @@ export class AuthController {
             return "user not found";
         }
         var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
-        const token = this.authService.createToken(user);
-        this.getrequest(req);
+        const token = this.authService.createToken(user, loginHistoryInfo.loginHistoryId);
         return token;
     }
 
-    getrequest (req){
-        console.log(req);
-    }
 
 }

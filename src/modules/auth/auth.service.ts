@@ -11,8 +11,9 @@ export class AuthService {
                 private jwtService: JwtService) {
     }
 
-    async createToken(user: any) {
-        const data = await this.usersService.fetchSpecificUserData(user.userId);
+    async createToken(user: any, loginHistoryId:number) {
+        const data = await this.usersService.fetchSpecificUserData(user.userId,loginHistoryId);
+       // data.loginHistory = loginHistoryId;
         const payload = {user: data};
         return {
             access_token: this.jwtService.sign(payload),

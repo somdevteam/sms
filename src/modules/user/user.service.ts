@@ -43,11 +43,12 @@ export class UserService {
         return await this.userRepository.findOne({where: {email}});
     }
 
-    async fetchSpecificUserData(userId: number) {
+    async fetchSpecificUserData(userId: number, loginHistoryId: number) {
         return await this.userRepository
             .createQueryBuilder('user')
             .leftJoinAndSelect('user.profile', 'profile')
-            .where('user.userId = :userId', {userId})
+            .leftJoinAndSelect('user.loginHistory', 'loginHistory')
+            .where('user.userId = :userId and loginHistory.loginHistoryId = :loginHistoryId', { userId, loginHistoryId })
             .select([
                 'user.userId',
                 'user.email',
@@ -57,6 +58,9 @@ export class UserService {
                 'profile.mobile',
                 'profile.branchId',
                 'profile.userProfileId',
+                'loginHistory.loginHistoryId',
+                'loginHistory.userId',
+                'loginHistory.loginDate'
             ])
             .getOne();
     }
