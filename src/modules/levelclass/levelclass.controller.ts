@@ -16,6 +16,12 @@ export class LevelclassController {
     return this.levelclassService.findAll();
   }
 
+  @Get('/lvl/:id')
+  findLevelByclass(@Param('id') id: string) {
+    // return 'yes works' + id;
+    return this.levelclassService.getLevelClassesWithLevel(+id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.levelclassService.findOne(+id);
@@ -30,4 +36,6 @@ export class LevelclassController {
   remove(@Param('id') id: string) {
     return this.levelclassService.remove(+id);
   }
+
+  
 }

@@ -18,16 +18,16 @@ export class ClassService {
     private classRepository: Repository<Class>,
   ) {}
 
-  getByClassname(classname: string): Promise<Class> {
-    return this.classRepository.findOne({ where: { classname } });
+  getByClassname(name: string): Promise<Class> {
+    return this.classRepository.findOne({ where: {  classname: name } });
   }
 
   getById(id: number): Promise<Class> {
     return this.classRepository.findOne({where: {classid: id}})
 }
 
-  create(payload: CreateClassDto) {
-    let classname = this.getByClassname(payload.classname);
+ async create(payload: CreateClassDto) {
+    let classname = await this.getByClassname(payload.classname);
     if (classname) {
       throw new NotAcceptableException(
         'The class name currently exists. Please choose another one.',
@@ -51,7 +51,7 @@ export class ClassService {
   }
 
   findAll() {
-    return `This action returns all class`;
+    return this.classRepository.find();
   }
 
   findOne(id: number) {

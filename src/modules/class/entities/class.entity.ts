@@ -14,7 +14,7 @@ export class Class extends BaseEntity {
     @Column({default: true})
     isactive: boolean;
     @OneToMany(() => Levelclass, levelclass => levelclass.class)
-    levelclass: Levelclass
+    levelclass: Levelclass[]
 
     @OneToMany(() => ClassSubject, clsSub => clsSub.class)
     classSubject: ClassSubject

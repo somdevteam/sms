@@ -18,16 +18,16 @@ export class LevelService {
     private levelRepository: Repository<Level>,
   ) {}
 
-  getByLevelname(levelname: string): Promise<Level> {
-    return this.levelRepository.findOne({ where: { levelname } });
+  getByLevelname(name: string): Promise<Level> {
+    return this.levelRepository.findOne({ where: { levelname: name } });
   }
 
   getById(id: number): Promise<Level> {
     return this.levelRepository.findOne({ where: { levelid: id } });
   }
 
-  create(payload: CreateLevelDto) {
-    let classname = this.getByLevelname(payload.levelname);
+ async create(payload: CreateLevelDto) {
+    let classname = await this.getByLevelname(payload.levelname);
     if (classname) {
       throw new NotAcceptableException(
         'The level name currently exists. Please choose another one.',

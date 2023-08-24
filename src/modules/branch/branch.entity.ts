@@ -23,7 +23,7 @@ export class Branch extends BaseEntity {
     @Column({default: true})
     isactive: boolean;
     @OneToMany(() => Levelclass, levelclass => levelclass.branch)
-    levelclass: Levelclass
+    levelclass: Levelclass[]
     @OneToMany(() => ClassSubject, clssub => clssub.branch)
     classSubject: ClassSubject
     @OneToMany(() => ClassSection, clsSec => clsSec.branch)

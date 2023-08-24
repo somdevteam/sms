@@ -97,4 +97,15 @@ export class LevelclassService {
     }
     return await this.levelclassRepository.delete(id);
   }
+
+  async getLevelClassesWithLevel(levelId: number) {
+    return await this.levelclassRepository
+      .createQueryBuilder('Levelclass')
+      .innerJoin('Levelclass.level', 'level')
+      .innerJoinAndSelect('Levelclass.class', 'class')
+      .innerJoin('Levelclass.branch', 'branch')
+      .where('level.levelid = :levelId', { levelId })
+      .getMany();
+      
+  }
 }

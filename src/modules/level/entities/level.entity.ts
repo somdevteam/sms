@@ -12,7 +12,7 @@ export class Level extends BaseEntity {
     @Column({default: true})
     isactive: boolean;
     @OneToMany(() => Levelclass, levelclass => levelclass.level)
-    levelclass: Levelclass
+    levelclass: Levelclass[]
 
 }
 
