@@ -4,6 +4,7 @@ import {JwtService} from "@nestjs/jwt";
 import {LoginDto} from "./Dto/login.dto";
 import {UserEntity} from "../user/user.entity";
 import {Loginhistories} from "./loginhistories.entity";
+import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 
 @Injectable()
 export class AuthService {
@@ -15,9 +16,9 @@ export class AuthService {
         const data = await this.usersService.fetchSpecificUserData(user.userId,loginHistoryId);
        // data.loginHistory = loginHistoryId;
         const payload = {user: data};
-        return {
+        return new ApiBaseResponse('success', 200, {
             access_token: this.jwtService.sign(payload),
-        };
+        })
     }
 
     async validateUser(username:string, password:string): Promise<UserEntity> {
@@ -27,8 +28,7 @@ export class AuthService {
         );
         if (!user) {
             throw new UnauthorizedException(
-                'Could not authenticate. Please try again.',
-            );
+                new ApiBaseResponse('Could not authenticate. Please try again.',4001, null));
         }
         return user;
     }
