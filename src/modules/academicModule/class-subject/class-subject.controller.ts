@@ -3,8 +3,10 @@ import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { ClassSubjectService } from './class-subject.service';
 import { CreateClassSubjectDto } from './dto/create-class-subject.dto';
 import { UpdateClassSubjectDto } from './dto/update-class-subject.dto';
+import {ApiTags} from "@nestjs/swagger";
 
 @Controller('class-subject')
+@ApiTags('Class Subject Controller')
 export class ClassSubjectController {
   constructor(private readonly classSubjectService: ClassSubjectService) {}
 

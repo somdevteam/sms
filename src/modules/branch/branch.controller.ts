@@ -9,7 +9,7 @@ import { UpdateBranchDTO } from './dto/update-branch.dto';
 import {ApiTags} from "@nestjs/swagger";
 
 @Controller('branch')
-@ApiTags('BranchApis')
+@ApiTags('Branch Apis')
 export class BranchController {
     constructor(private branchService: BranchService) {
     }

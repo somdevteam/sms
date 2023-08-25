@@ -2,11 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { LevelService } from './level.service';
 import { CreateLevelDto } from './dto/create-level.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import {ApiTags} from "@nestjs/swagger";
 
 @Controller('level')
+@ApiTags('Level Apis')
 export class LevelController {
   constructor(private readonly levelService: LevelService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createLevelDto: CreateLevelDto) {
     return this.levelService.create(createLevelDto);
@@ -18,6 +21,7 @@ export class LevelController {
     return this.levelService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.levelService.findOne(+id);
