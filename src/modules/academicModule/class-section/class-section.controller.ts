@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ClassSectionService } from './class-section.service';
 import { CreateClassSectionDto } from './dto/create-class-section.dto';
+import { SectionByClassDto } from './dto/SectionByClas.dto';
 import { UpdateClassSectionDto } from './dto/update-class-section.dto';
 
 @Controller('class-section')
@@ -12,9 +13,9 @@ export class ClassSectionController {
     return this.classSectionService.create(createClassSectionDto);
   }
 
-  @Get()
-  findAll() {
-    return this.classSectionService.findAll();
+  @Post('section')
+  findSectionByClass(@Body() payload:SectionByClassDto) {
+    return this.classSectionService.fetchSectionByClassId(payload);
   }
 
   @Get(':id')

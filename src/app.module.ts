@@ -7,14 +7,14 @@ import {AuthModule} from "./modules/auth/auth.module";
 import {BranchModule} from "./modules/branch/branch.module";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import configuration from "./config/configuration";
-import {ClassModule} from "./modules/class/class.module";
-import {SubjectModule} from "./modules/subject/subject.module";
-import {LevelModule} from "./modules/level/level.module";
-import {LevelclassModule} from "./modules/levelclass/levelclass.module";
-import {AcademicModule} from "./modules/academic/academic.module";
-import { ClassSubjectModule } from './modules/class-subject/class-subject.module';
-import { ClassSectionModule } from './modules/class-section/class-section.module';
-import { SectionModule } from './modules/section/section.module';
+import {ClassModule} from "./modules/academicModule/class/class.module";
+import {SubjectModule} from "./modules/academicModule/subject/subject.module";
+import {LevelModule} from "./modules/academicModule/level/level.module";
+import {LevelclassModule} from "./modules/academicModule/levelclass/levelclass.module";
+import {AcademicModule} from "./modules/academicModule/academic/academic.module";
+import { ClassSubjectModule } from './modules/academicModule/class-subject/class-subject.module';
+import { ClassSectionModule } from './modules/academicModule/class-section/class-section.module';
+import { SectionModule } from './modules/academicModule/section/section.module';
 
 
 @Module({

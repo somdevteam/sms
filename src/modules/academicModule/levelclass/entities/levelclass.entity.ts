@@ -1,6 +1,6 @@
 import { Branch } from "src/modules/branch/branch.entity";
-import { Class } from "src/modules/class/entities/class.entity";
-import { Level } from "src/modules/level/entities/level.entity";
+import { Class } from "src/modules/academicModule/class/entities/class.entity";
+import { Level } from "src/modules/academicModule/level/entities/level.entity";
 import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Levelclass extends BaseEntity {

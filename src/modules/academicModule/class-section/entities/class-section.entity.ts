@@ -1,7 +1,7 @@
-import { AcademicEntity } from "src/modules/academic/entities/academic.entity";
+import { AcademicEntity } from "src/modules/academicModule/academic/entities/academic.entity";
 import { Branch } from "src/modules/branch/branch.entity";
-import { Class } from "src/modules/class/entities/class.entity";
-import { Section } from "src/modules/section/entities/section.entity";
+import { Class } from "src/modules/academicModule/class/entities/class.entity";
+import { Section } from "src/modules/academicModule/section/entities/section.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

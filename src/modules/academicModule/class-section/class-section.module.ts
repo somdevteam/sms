@@ -3,7 +3,7 @@ import { ClassSectionService } from './class-section.service';
 import { ClassSectionController } from './class-section.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassSection } from './entities/class-section.entity';
-import { BranchModule } from '../branch/branch.module';
+import { BranchModule } from '../../branch/branch.module';
 import { ClassModule } from '../class/class.module';
 import { SectionModule } from '../section/section.module';
 import { AcademicModule } from '../academic/academic.module';

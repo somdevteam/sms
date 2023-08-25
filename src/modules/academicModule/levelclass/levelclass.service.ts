@@ -3,10 +3,10 @@ import {CreateLevelclassDto} from './dto/create-levelclass.dto';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Levelclass} from './entities/levelclass.entity';
 import {Repository} from 'typeorm';
-import {BranchService} from '../branch/branch.service';
-import {LevelService} from '../level/level.service';
-import {ClassService} from '../class/class.service';
 import {UpdateLevelclassDto} from './dto/update-levelclass.dto';
+import { BranchService } from 'src/modules/branch/branch.service';
+import { LevelService } from '../level/level.service';
+import { ClassService } from '../class/class.service';
 
 @Injectable()
 export class LevelclassService {

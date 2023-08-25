@@ -1,6 +1,6 @@
 import { Branch } from "src/modules/branch/branch.entity";
-import { Class } from "src/modules/class/entities/class.entity";
-import { Subject } from "src/modules/subject/entities/subject.entity";
+import { Class } from "src/modules/academicModule/class/entities/class.entity";
+import { Subject } from "src/modules/academicModule/subject/entities/subject.entity";
 import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

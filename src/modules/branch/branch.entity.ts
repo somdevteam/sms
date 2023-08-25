@@ -1,9 +1,9 @@
 import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
 import {isEmail, IsNotEmpty} from "class-validator";
-import { Level } from "../level/entities/level.entity";
-import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
-import { ClassSubject } from "../class-subject/entities/class-subject.entity";
-import { ClassSection } from "../class-section/entities/class-section.entity";
+import { Level } from "../academicModule/level/entities/level.entity";
+import { Levelclass } from "src/modules/academicModule/levelclass/entities/levelclass.entity";
+import { ClassSubject } from "../academicModule/class-subject/entities/class-subject.entity";
+import { ClassSection } from "../academicModule/class-section/entities/class-section.entity";
 
 @Entity('branch')
 export class Branch extends BaseEntity {

@@ -1,5 +1,4 @@
-import { ClassSection } from "src/modules/class-section/entities/class-section.entity";
-import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
+import { ClassSection } from "src/modules/academicModule/class-section/entities/class-section.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity()

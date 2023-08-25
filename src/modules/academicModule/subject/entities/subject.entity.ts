@@ -1,4 +1,4 @@
-import { ClassSubject } from "src/modules/class-subject/entities/class-subject.entity";
+import { ClassSubject } from "src/modules/academicModule/class-subject/entities/class-subject.entity";
 import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
 @Entity('subject')
 export class Subject extends BaseEntity{

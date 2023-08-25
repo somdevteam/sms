@@ -2,12 +2,13 @@ import { ConflictException, Injectable, InternalServerErrorException, NotFoundEx
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AcademicService } from '../academic/academic.service';
-import { BranchService } from '../branch/branch.service';
+import { BranchService } from '../../branch/branch.service';
 import { ClassService } from '../class/class.service';
 import { SectionService } from '../section/section.service';
 import { CreateClassSectionDto } from './dto/create-class-section.dto';
 import { UpdateClassSectionDto } from './dto/update-class-section.dto';
 import { ClassSection } from './entities/class-section.entity';
+import { SectionByClassDto } from './dto/SectionByClas.dto';
 
 @Injectable()
 export class ClassSectionService {
@@ -116,5 +117,32 @@ async  create(payload: CreateClassSectionDto) {
       throw new NotFoundException('Branch Not found');
     }
     return this.classSectionRepository.delete(id);
+  }
+
+  async fetchSectionByClassId(payload:SectionByClassDto) :Promise<any>{
+    const classId = payload.classid;
+    const branchId = payload.branchid;
+    const academicId = payload.academicid;
+    const data =  await this.classSectionRepository
+          .createQueryBuilder('classSection')
+          .leftJoinAndSelect('classSection.branch', 'branch')
+          .leftJoinAndSelect('classSection.class', 'class')
+          .leftJoinAndSelect('classSection.section', 'section')
+          .leftJoinAndSelect('classSection.academic', 'academic')
+          .where('branch.branchid = :branchId', {branchId})
+          .andWhere('class.classid = :classId', {classId})
+          .andWhere('class.isactive = :isActive', {isActive:true})
+          .select([
+              'section.sectionid',
+              'section.sectionname',
+              'section.datecreated',
+              'section.isactive',
+          ]);
+    if(academicId) {
+      data.andWhere('academic.academicid = :academicId', {academicId});
+    }
+
+    return data.getRawMany();
+      
   }
   }

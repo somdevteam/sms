@@ -3,7 +3,7 @@ import { ClassSubjectService } from './class-subject.service';
 import { ClassSubjectController } from './class-subject.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassSubject } from './entities/class-subject.entity';
-import { BranchModule } from '../branch/branch.module';
+import { BranchModule } from '../../branch/branch.module';
 import { SubjectModule } from '../subject/subject.module';
 import { ClassModule } from '../class/class.module';
 

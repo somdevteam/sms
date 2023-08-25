@@ -1,7 +1,7 @@
-import { ClassSection } from "src/modules/class-section/entities/class-section.entity";
+import { ClassSection } from "src/modules/academicModule/class-section/entities/class-section.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
-@Entity()
+@Entity('academic')
 export class AcademicEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     academicid: number;

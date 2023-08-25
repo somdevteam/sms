@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BranchService } from '../branch/branch.service';
+import { BranchService } from '../../branch/branch.service';
 import { ClassService } from '../class/class.service';
 import { SubjectService } from '../subject/subject.service';
 import { CreateClassSubjectDto } from './dto/create-class-subject.dto';

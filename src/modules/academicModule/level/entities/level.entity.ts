@@ -1,4 +1,4 @@
-import { Levelclass } from "src/modules/levelclass/entities/levelclass.entity";
+import { Levelclass } from "src/modules/academicModule/levelclass/entities/levelclass.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
