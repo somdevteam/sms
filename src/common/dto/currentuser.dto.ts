@@ -6,13 +6,21 @@ export class CurrentUser {
     userId: string;
 
     email:string;
-    profile: Profile
+    profile: Profile;
+    loginHistory: LoginHistory[]
   }
 
-  export class Profile {
+   class Profile {
     userProfileId: string;
     firstName: string;
     middleName: string;
     mobile: string;
     branchId: string;
+}
+
+ class LoginHistory {
+  loginHistoryId: string;
+  firstName: string;
+  userId: string;
+  loginDate: Date;
 }
