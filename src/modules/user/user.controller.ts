@@ -1,9 +1,7 @@
 import {Body, Controller, Get, Patch, Post, UseGuards, Request} from '@nestjs/common';
 import {UserService} from "./user.service";
 import {UserDto} from "./Dto/user.dto";
-import {UserEntity} from "./user.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 import {ApiTags} from "@nestjs/swagger";
 
 @Controller('user')
@@ -23,6 +21,7 @@ export class UserController {
         return this.userService.create(userDto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch("/")
     async updateUser(@Body() userDto: UserDto): Promise<any> {
         const user = await this.userService.update(userDto);
