@@ -13,7 +13,6 @@ import * as crypto from 'crypto';
 import {UserProfile} from "./userprofile.entity";
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import {Loginhistories} from "../auth/loginhistories.entity";
-import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 
 @Injectable()
 export class UserService {
@@ -32,9 +31,8 @@ export class UserService {
         return this.userRepository.findOne({where: {userId: id}})
     }
 
-    async getAllUser(currentUser: CurrentUser) {
-        var allUsers = await this.userRepository.find();
-        return new ApiBaseResponse('success', 200, allUsers);
+    getAllUser(currentUser: CurrentUser) {
+        return this.userRepository.find();
     }
 
     async getByMobile(mobile: number): Promise<UserProfile | null> {
@@ -71,20 +69,16 @@ export class UserService {
         const username = await this.getByUsername(payload.username);
         if (username) {
             throw new NotAcceptableException(
-                new ApiBaseResponse('The account with the provided username currently exists. Please choose another one.', 6001, null)
+                'The account with the provided username currently exists. Please choose another one.',
             );
         }
         const existingUserWithMobile = await this.getByMobile(payload.mobile);
         if (existingUserWithMobile) {
-            throw new ConflictException(
-                new ApiBaseResponse('The provided mobile number is already associated with an account.', 6001, null)
-            );
+            throw new ConflictException('The provided mobile number is already associated with an account.');
         }
         const existingUserWithEmail = await this.getByEmail(payload.email);
         if (existingUserWithEmail) {
-            throw new ConflictException(
-                new ApiBaseResponse('The provided Email  is already associated with an account.', 6001, null)
-            );
+            throw new ConflictException('The provided Email  is already associated with an account.');
         }
 
         const user = new UserEntity();
@@ -113,16 +107,12 @@ export class UserService {
             await this.userProfileRepository.save(userProfile);
 
 
-            return new ApiBaseResponse('success', 200, savedUser);
+            return savedUser;
         } catch (error) {
             if (error) {
-                throw new ConflictException(
-                    new ApiBaseResponse(error.message, 6001, null)
-                );
+                throw new ConflictException(error.message);
             }
-            throw new InternalServerErrorException(
-                new ApiBaseResponse('An error occurred while creating the user.', 6001, null)
-            );
+            throw new InternalServerErrorException('An error occurred while creating the user.');
         }
     }
 
@@ -131,9 +121,7 @@ export class UserService {
         const foundUser = await this.userRepository.findOneBy({userId: payload.userId});
 
         if (!foundUser) {
-            throw new NotFoundException(
-                new ApiBaseResponse('The User Not found', 6006, null)
-            );
+            throw new NotFoundException("User Not found");
         }
         const currentDate = new Date();
         const userId = payload.userId;
@@ -153,7 +141,7 @@ export class UserService {
 
        const updatedUser =  await this.userRepository.update({userId}, foundUser);
        const updateUserProfile = await this.userProfileRepository.update({user:{userId:foundUser.userId}},existingUserProfile);
-       return new ApiBaseResponse('success', 200, updatedUser);
+       return updatedUser;
 
     }
 
