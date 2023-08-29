@@ -12,7 +12,7 @@ export class CreateResponsibleDto {
      responsiblename: string;
 
      @IsNotEmpty()
-    phone:number;
+    phone:string;
 
 
 }

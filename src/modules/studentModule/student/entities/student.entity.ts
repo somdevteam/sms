@@ -1,5 +1,6 @@
-import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Responsible} from "../../../academicModule/responsible/entities/responsible.entity";
+import {UserEntity} from "../../../user/user.entity";
 
 @Entity()
 
@@ -19,7 +20,7 @@ export class Student extends BaseEntity {
     dob: Date;
     @Column()
     bob: string;
-    @OneToMany(() => Responsible, responsible => responsible.responsibleid)
+    @ManyToOne(() => Responsible, responsible => responsible.student)
+    @JoinColumn({name:'responsibleid'})
     responsible: Responsible[]
-
 }

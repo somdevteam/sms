@@ -8,5 +8,6 @@ import {Responsible} from "./entities/responsible.entity";
   imports: [TypeOrmModule.forFeature([Responsible])],
   controllers: [ResponsibleController],
   providers: [ResponsibleService, Responsible],
+  exports: [ResponsibleService]
 })
 export class ResponsibleModule {}

@@ -11,6 +11,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Responsible} from "./entities/responsible.entity";
 import {Repository} from "typeorm";
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
+import {AcademicEntity} from "../academic/entities/academic.entity";
 
 @Injectable()
 export class ResponsibleService {
@@ -19,13 +20,17 @@ export class ResponsibleService {
       private ResponsibleRepository: Repository<Responsible>
   ) {}
 
+  async getByPhone(resphone: string): Promise<Responsible> {
+    return await this.ResponsibleRepository.findOne({where: {phone:resphone}});
+  }
+
 
 
   async create(payload:CreateResponsibleDto) {
-    let responsibleid = await this.findOne(payload.responsibleid)
-    if(responsibleid){
+    let responsiblePhone = await this.getByPhone(payload.phone)
+    if(responsiblePhone){
       throw new NotAcceptableException(
-          new ApiBaseResponse("this responsible is already exists",6006,responsibleid));
+          new ApiBaseResponse(`this responsible with this phone ${payload.phone}  is already exists`,6006,responsiblePhone));
     }
 
     try {
@@ -33,7 +38,7 @@ export class ResponsibleService {
      resp.responsiblename =payload.responsiblename;
      resp.phone =payload.phone;
        const  savedResponsible =  this.ResponsibleRepository.save(resp);
-      return 'new Responsible has been created!' +savedResponsible;
+      return new ApiBaseResponse('new Responsible has been created!',6006,resp);
     } catch (error){
       if(error){
         throw  new ConflictException(error.message)
@@ -49,10 +54,10 @@ export class ResponsibleService {
     return this.ResponsibleRepository.find();
   }
 
-  findOne(id: number): Promise <Responsible> {
+  async findOne(id: number): Promise <Responsible> {
 
-    return this.ResponsibleRepository.findOne({where:{responsibleid: id}})
-    //return `This action returns a #${id} responsible`;
+    return await this.ResponsibleRepository.findOne({where:{responsibleid: id}})
+
   }
 
   async update( id: number, payload:UpdateResponsibleDto) {
@@ -83,7 +88,13 @@ export class ResponsibleService {
   }
 
 
-  remove(id: number) {
-    return `This action removes a #${id} responsible`;
+
+ async remove(id: number) {
+   let responsibleToRemove = await this.ResponsibleRepository.findOne({where:{responsibleid:id}});
+   if(!responsibleToRemove){
+     throw  new NotFoundException(new ApiBaseResponse('Responsible not found',6006,null))
+   }
+   await  this.ResponsibleRepository.delete(id);
+    return new ApiBaseResponse('Deleted success',6006,`Responsible with id: ${id} deleted`);
   }
 }
