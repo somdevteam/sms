@@ -1,7 +1,7 @@
 // studentClass.controller.ts
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { StudentClassService } from './studentclass.service';
-import { StudentClass } from './entities/studentclass.entities';
+import { StudentClass } from './entities/studentclass.entity';
 import {InjectRepository} from "@nestjs/typeorm";
 import {StudentclassDto} from "./dto/studentclass.dto";
 
