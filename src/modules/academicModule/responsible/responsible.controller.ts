@@ -8,25 +8,25 @@ import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
 export class ResponsibleController {
   constructor(private readonly responsibleService: ResponsibleService) {}
 
-  @Post('addResp')
+  @Post('create')
   create(@Body() CreateResponsibleDto:CreateResponsibleDto ) {
     return this.responsibleService.create(CreateResponsibleDto);
   }
 
-  @Get('allRes')
+  @Get('getAllResponsible')
   findAll() {
     return this.responsibleService.findAll();
   }
 
-  @Get(':id')
+  @Get('getResponsibleById/:id')
   findOne(@Param('id') id: string) {
     return this.responsibleService.findOne(+id);
   }
 
   //@UseGuards(JwtAuthGuard)
-  @Post(':id')
+  @Post('update/:id')
   update( @Param('id') id: number, @Body() updateResponsibleDto) {
-    //console.log(updateResponsibleDto);
+    console.log(updateResponsibleDto);
     return this.responsibleService.update(+id,updateResponsibleDto);
   }
 

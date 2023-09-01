@@ -1,5 +1,4 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {OneToMany} from "typeorm/browser";
+import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {Student} from "../../../studentModule/student/entities/student.entity";
 
 @Entity()

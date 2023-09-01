@@ -22,5 +22,5 @@ export class Student extends BaseEntity {
     bob: string;
     @ManyToOne(() => Responsible, responsible => responsible.student)
     @JoinColumn({name:'responsibleid'})
-    responsible: Responsible[]
+    responsible: Responsible
 }
