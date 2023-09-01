@@ -15,7 +15,9 @@ import {AcademicModule} from "./modules/academicModule/academic/academic.module"
 import { ClassSubjectModule } from './modules/academicModule/class-subject/class-subject.module';
 import { ClassSectionModule } from './modules/academicModule/class-section/class-section.module';
 import { SectionModule } from './modules/academicModule/section/section.module';
-import { StudentclassModule } from "./modules/academicModule/studentclass/studentclass.module";
+import {StudentModule} from "./modules/studentModule/student/student.module";
+import {ResponsibleModule} from "./modules/academicModule/responsible/responsible.module";
+import {StudentclassModule} from "./modules/academicModule/studentclass/studentclass.module";
 
 
 @Module({
@@ -39,7 +41,7 @@ import { StudentclassModule } from "./modules/academicModule/studentclass/studen
       inject: [ConfigService],
     }),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule, StudentclassModule],
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule],
   controllers: [AppController],
   providers: [AppService],
 })
