@@ -1,7 +1,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BaseEntity, ManyToOne, JoinColumn} from 'typeorm';
-import {Student} from "../../../studentModule/student/entities/student.entity";
-import {ClassSection} from "../../class-section/entities/class-section.entity";
-import {Class} from "../../class/entities/class.entity";
+import {Student} from "../../student/entities/student.entity";
+import {ClassSection} from "../../../academicModule/class-section/entities/class-section.entity";
+import {Class} from "../../../academicModule/class/entities/class.entity";
 
 @Entity()
 export class StudentClass extends BaseEntity{

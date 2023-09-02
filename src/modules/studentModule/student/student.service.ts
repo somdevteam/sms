@@ -11,10 +11,10 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Student} from "./entities/student.entity";
 import {Repository} from "typeorm";
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
-import {ResponsibleService} from "../../academicModule/responsible/responsible.service";
-import {Responsible} from "../../academicModule/responsible/entities/responsible.entity";
-import {StudentClass} from "../../academicModule/studentclass/entities/studentclass.entity";
-import {StudentClassService} from "../../academicModule/studentclass/studentclass.service";
+import {ResponsibleService} from "../responsible/responsible.service";
+import {Responsible} from "../responsible/entities/responsible.entity";
+import {StudentClass} from "../studentclass/entities/studentclass.entity";
+import {StudentClassService} from "../studentclass/studentclass.service";
 import {ClassService} from "../../academicModule/class/class.service";
 import {ClassSectionService} from "../../academicModule/class-section/class-section.service";
 
