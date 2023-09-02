@@ -3,11 +3,11 @@ import { StudentService } from './student.service';
 import { StudentController } from './student.controller';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Student} from "./entities/student.entity";
-import {ResponsibleService} from "../../academicModule/responsible/responsible.service";
 import {ResponsibleModule} from "../../academicModule/responsible/responsible.module";
+import {StudentclassModule} from "../../academicModule/studentclass/studentclass.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Student]), ResponsibleModule],
+  imports: [ResponsibleModule, TypeOrmModule,TypeOrmModule.forFeature([Student]),StudentclassModule],
   controllers: [StudentController],
   providers: [StudentService],
 

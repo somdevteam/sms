@@ -25,9 +25,20 @@ export class CreateStudentDto {
     @IsString()
     bob:string;
 
+    @ApiProperty({
+        required: true,
+    })
     @IsNotEmpty()
-    @IsNumber()
-    responsibleId:number;
+    @IsString()
+    responsiblename: string;
+
+    @IsNotEmpty()
+    resPhone:string;
+
+    // @IsNotEmpty()
+    // @IsNumber()
+    // responsibleId:number;
+
 
 
 

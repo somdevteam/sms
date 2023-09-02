@@ -13,8 +13,8 @@ export class StudentClassService {
 
     async create(studentClassData: StudentclassDto): Promise<StudentClass> {
         const studentClass =  new StudentClass();
-        studentClass.studentId = studentClassData.studentId;
-        studentClass.classSectionId = studentClassData.classSectionId;
+     //   studentClass.student = studentClassData.studentId;
+       // studentClass.classSection = studentClassData.classSectionId;
         studentClass.dateCreated = new Date();
         // await this.studentClassRepository.create(studentClass);
         return await this.studentClassRepository.save(studentClass);

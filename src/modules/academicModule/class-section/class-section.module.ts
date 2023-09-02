@@ -9,8 +9,8 @@ import { SectionModule } from '../section/section.module';
 import { AcademicModule } from '../academic/academic.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([ClassSection]),BranchModule,ClassModule,SectionModule,AcademicModule],
+  imports:[TypeOrmModule.forFeature([ClassSection]),BranchModule,ClassModule,SectionModule,AcademicModule,],
   controllers: [ClassSectionController],
-  providers: [ClassSectionService,ClassSection]
+  providers: [ClassSectionService],
 })
 export class ClassSectionModule {}

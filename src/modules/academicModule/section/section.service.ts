@@ -20,8 +20,8 @@ export class SectionService {
     return this.sectionRepository.findOne({ where: { sectionid: id } });
   }
 
-  create(payload: CreateSectionDto) {
-    let sectionname = this.getBySectionname(payload.sectionname);
+  async create(payload: CreateSectionDto) :Promise<Section> {
+    let sectionname = await this.getBySectionname(payload.sectionname);
     if (sectionname) {
       throw new NotAcceptableException(
         'The level name currently exists. Please choose another one.',

@@ -2,7 +2,8 @@ import { AcademicEntity } from "src/modules/academicModule/academic/entities/aca
 import { Branch } from "src/modules/branch/branch.entity";
 import { Class } from "src/modules/academicModule/class/entities/class.entity";
 import { Section } from "src/modules/academicModule/section/entities/section.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {StudentClass} from "../../studentclass/entities/studentclass.entity";
 
 @Entity()
 export class ClassSection {
@@ -24,4 +25,7 @@ export class ClassSection {
     academic: AcademicEntity;
     @Column()
     dateCreated: Date
+    @OneToMany(()=>StudentClass,studentClass =>studentClass.classSection)
+    @JoinColumn({name: 'studentClassId'})
+    studentClass:StudentClass;
 }

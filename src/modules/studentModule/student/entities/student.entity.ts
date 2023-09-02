@@ -1,6 +1,7 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Responsible} from "../../../academicModule/responsible/entities/responsible.entity";
 import {UserEntity} from "../../../user/user.entity";
+import {StudentClass} from "../../../academicModule/studentclass/entities/studentclass.entity";
 
 @Entity()
 
@@ -23,4 +24,6 @@ export class Student extends BaseEntity {
     @ManyToOne(() => Responsible, responsible => responsible.student)
     @JoinColumn({name:'responsibleid'})
     responsible: Responsible
+    @OneToMany(() => StudentClass, studentClass => studentClass.student)
+    studentClass: StudentClass[];
 }
