@@ -3,6 +3,7 @@ import {UserService} from "./user.service";
 import {UserDto} from "./Dto/user.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ApiTags} from "@nestjs/swagger";
+import { ApiBaseResponse } from "../../common/dto/apiresponses.dto";
 
 @Controller('user')
 @ApiTags('User Apis')
@@ -12,25 +13,27 @@ export class UserController {
 
     @UseGuards(JwtAuthGuard)
     @Get('/')
-    getAllUsers(@Request() req) {
-        return this.userService.getAllUser(req.user.user);
+   async getAllUsers(@Request() req) {
+        const allUsers = await this.userService.getAllUser(req.user.user);
+        return new ApiBaseResponse('success', 200, allUsers);
     }
 
     @Post("/")
-    createUser(@Body() userDto: UserDto) {
-        return this.userService.create(userDto);
+   async createUser(@Body() userDto: UserDto) {
+        const newUser = await this.userService.create(userDto);
+        return new ApiBaseResponse('success', 200, newUser);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch("/")
     async updateUser(@Body() userDto: UserDto): Promise<any> {
         const user = await this.userService.update(userDto);
-        console.log(user);
+        return new ApiBaseResponse('success', 200, user);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get('/loggedInUser')
     getUser(@Request() req) {
-        return "user " + JSON.stringify(req.user.user);
+        return "user " + JSON.stringify(req.user.user); //TODO: I think this is for testing
     }
 }

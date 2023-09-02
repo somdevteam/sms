@@ -7,6 +7,7 @@ import {BranchService} from "./branch.service";
 import {BranchDTO} from "./dto/branch.dto";
 import { UpdateBranchDTO } from './dto/update-branch.dto';
 import {ApiTags} from "@nestjs/swagger";
+import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 
 @Controller('branch')
 @ApiTags('Branch Apis')
@@ -16,26 +17,30 @@ export class BranchController {
 
     @UseGuards(JwtAuthGuard)
     @Get('/')
-    getAllBranches() {
-        return this.branchService.getAllBranches();
+   async getAllBranches() {
+       const allBranches = await this.branchService.getAllBranches();
+        return new ApiBaseResponse('success', 200, allBranches);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post("/")
-    createUser(@Body() branchDTO: BranchDTO) {
-        return this.branchService.create(branchDTO);
+   async createUser(@Body() branchDTO: BranchDTO) {
+        const newBranch = await this.branchService.create(branchDTO);
+        return new ApiBaseResponse('successfully Created', 200, newBranch);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch("/")
     async updateBranch(@Body() branchDto: UpdateBranchDTO) {
-        return  await this.branchService.update(branchDto);
+        const updateBranch = await this.branchService.update(branchDto);
+        return  new ApiBaseResponse('successfully Updated', 200, updateBranch);
     }
     
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
-    remove(@Param('id') id: string) {
-    return this.branchService.remove(+id);
+    async remove(@Param('id') id: string) {
+      const deletedBranch = await this.branchService.remove(+id);
+    return new ApiBaseResponse('successfully Deleted', 200, deletedBranch);
 }
 
 

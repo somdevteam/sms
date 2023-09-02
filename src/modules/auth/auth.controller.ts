@@ -5,6 +5,7 @@ import {LocalAuthGuard} from "./local-auth.guard";
 import {AuthService} from "./auth.service";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import { ApiBaseResponse } from "../../common/dto/apiresponses.dto";
 
 @Controller('auth')
 @ApiTags('Authentication Apis')
@@ -24,13 +25,14 @@ export class AuthController {
             loginDto.password,
         );
 
-        if (!user){
-            return "user not found";
+        if (!user.isActive) {
+            return new ApiBaseResponse( 'User not found', 401, null);
         }
-        var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
-        const token = this.authService.createToken(user, loginHistoryInfo.loginHistoryId);
-        return token;
+        const loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
+        const token = await this.authService.createToken(user, loginHistoryInfo.loginHistoryId);
+        if (!token) {
+            return new ApiBaseResponse( 'Unauthorized', 401, null);
+        }
+        return new ApiBaseResponse( 'Successfully Login', 200, token);
     }
-
-
 }
