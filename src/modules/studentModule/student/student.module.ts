@@ -5,9 +5,10 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {Student} from "./entities/student.entity";
 import {ResponsibleModule} from "../responsible/responsible.module";
 import {StudentclassModule} from "../studentclass/studentclass.module";
+import {ClassSectionModule} from "../../academicModule/class-section/class-section.module";
 
 @Module({
-  imports: [ResponsibleModule, TypeOrmModule,TypeOrmModule.forFeature([Student]),StudentclassModule],
+  imports: [ResponsibleModule, TypeOrmModule,TypeOrmModule.forFeature([Student]),StudentclassModule, ClassSectionModule],
   controllers: [StudentController],
   providers: [StudentService],
 
