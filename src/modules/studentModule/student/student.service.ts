@@ -15,7 +15,6 @@ import {ResponsibleService} from "../../academicModule/responsible/responsible.s
 import {Responsible} from "../../academicModule/responsible/entities/responsible.entity";
 import {StudentClass} from "../../academicModule/studentclass/entities/studentclass.entity";
 import {StudentClassService} from "../../academicModule/studentclass/studentclass.service";
-import {ClassService} from "../../academicModule/class/class.service";
 import {ClassSectionService} from "../../academicModule/class-section/class-section.service";
 
 @Injectable()
@@ -25,25 +24,22 @@ export class StudentService {
         @InjectRepository(Responsible) private responsibleRepository: Repository<Responsible>,
         private readonly responsibleService: ResponsibleService,
         @InjectRepository(StudentClass) private studentClassRepository: Repository<StudentClass>,
-        private readonly studentClassService : StudentClassService
+        private readonly studentClassService: StudentClassService,
+        private readonly classSectionService: ClassSectionService
     ) {
     }
 
 
-    async create(payload: CreateStudentDto): Promise<Student |null> {
-        const responsible = await this.responsibleService.getByPhone(payload.resPhone);
-        if(responsible){
-             throw new NotFoundException("The responsible you selected exist")
-        }
-
+    async create(payload: CreateStudentDto): Promise<Student | null> {
 
         try {
-            const newResponsible = new Responsible();
-            newResponsible.responsiblename = payload.responsiblename;
-            newResponsible.phone =payload.resPhone;
-            const savedResponsible = await this.responsibleRepository.save(newResponsible);
-            if (!savedResponsible){
-                throw new InternalServerErrorException("An error occurred while creating the responsible");
+            let savedResponsible = null;
+            const responsible = await this.responsibleService.getByPhone(payload.resPhone);
+            if (!responsible) {
+                const newResponsible = new Responsible();
+                newResponsible.responsiblename = payload.responsiblename;
+                newResponsible.phone = payload.resPhone;
+                savedResponsible = await this.responsibleRepository.save(newResponsible);
             }
 
             let student = new Student();
@@ -53,19 +49,20 @@ export class StudentService {
             student.Sex = payload.sex;
             student.dob = new Date();
             student.bob = payload.bob;
-            student.responsible = responsible;
+            student.responsible = responsible ? responsible : savedResponsible;
             const savedStudent = await this.StudentRepository.save(student);
 
-            if (!savedStudent){
+            if (!savedStudent) {
                 throw new InternalServerErrorException("An error occurred while creating the responsible ");
             }
-           //const classSection = this.classSectionService.fetchSectionByClassId(payload)
+            const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId);
 
-          const studentClass = new StudentClass();
-           studentClass.student = savedStudent;
-           studentClass.classSection
-
-            return  null;
+            const studentClass = new StudentClass();
+            studentClass.student = savedStudent;
+            studentClass.classSection =classSection;
+            studentClass.dateCreated = new Date();
+            const savedStudentClass = await this.studentClassRepository.save(studentClass);
+            return savedStudent;
         } catch (error) {
             if (error) {
                 throw new ConflictException(error.message);
@@ -94,7 +91,7 @@ export class StudentService {
         }
         const responsible = await this.responsibleService.findOne(payload.responsibleId);
         if (!responsible) {
-             throw new NotFoundException("The responsible you selected does not exist")
+            throw new NotFoundException("The responsible you selected does not exist")
         }
         try {
             studentToUpdate.firstname = payload.firstname;
@@ -103,7 +100,7 @@ export class StudentService {
             studentToUpdate.Sex = payload.sex;
             studentToUpdate.dob = new Date();
             studentToUpdate.bob = payload.bob;
-           // studentToUpdate.responsible = responsible;
+            // studentToUpdate.responsible = responsible;
 
             await this.StudentRepository.update(studentToUpdate.studentid, studentToUpdate);
             return 'Updated success';

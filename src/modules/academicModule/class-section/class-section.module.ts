@@ -12,5 +12,6 @@ import { AcademicModule } from '../academic/academic.module';
   imports:[TypeOrmModule.forFeature([ClassSection]),BranchModule,ClassModule,SectionModule,AcademicModule,],
   controllers: [ClassSectionController],
   providers: [ClassSectionService],
+  exports : [ClassSectionService]
 })
 export class ClassSectionModule {}

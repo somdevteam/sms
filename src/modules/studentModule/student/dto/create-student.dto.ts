@@ -38,6 +38,8 @@ export class CreateStudentDto {
     // @IsNotEmpty()
     // @IsNumber()
     // responsibleId:number;
+    classId: number;
+    sectionId: number;
 
 
 

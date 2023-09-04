@@ -145,4 +145,14 @@ async  create(payload: CreateClassSectionDto) {
     return data.getRawMany();
       
   }
+
+    async getSectionIdByClassIdAndSectionId(classId: number, sectionId: number): Promise<ClassSection> {
+        return await this.classSectionRepository
+            .createQueryBuilder()
+            .where(
+                "(classid = :classId AND sectionid=:sectionId)",
+                {classId: classId, sectionId: sectionId},
+            )
+            .getOne();
+    }
   }
