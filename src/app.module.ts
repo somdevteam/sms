@@ -16,8 +16,8 @@ import { ClassSubjectModule } from './modules/academicModule/class-subject/class
 import { ClassSectionModule } from './modules/academicModule/class-section/class-section.module';
 import { SectionModule } from './modules/academicModule/section/section.module';
 import {StudentModule} from "./modules/studentModule/student/student.module";
-import {ResponsibleModule} from "./modules/academicModule/responsible/responsible.module";
-import {StudentclassModule} from "./modules/academicModule/studentclass/studentclass.module";
+import {ResponsibleModule} from "./modules/studentModule/responsible/responsible.module";
+import {StudentclassModule} from "./modules/studentModule/studentclass/studentclass.module";
 
 
 @Module({

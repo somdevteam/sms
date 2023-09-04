@@ -1,7 +1,7 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
-import {Responsible} from "../../../academicModule/responsible/entities/responsible.entity";
+import {Responsible} from "../../responsible/entities/responsible.entity";
 import {UserEntity} from "../../../user/user.entity";
-import {StudentClass} from "../../../academicModule/studentclass/entities/studentclass.entity";
+import {StudentClass} from "../../studentclass/entities/studentclass.entity";
 
 @Entity()
 
