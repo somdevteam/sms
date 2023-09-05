@@ -35,6 +35,10 @@ export class StudentService {
 
         try {
             let savedResponsible = null;
+           const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId);
+           if (!classSection) {
+            throw new NotFoundException('Class With this section not found');
+           }
             const responsible = await this.responsibleService.getByPhone(payload.resPhone);
             if (!responsible) {
                 const newResponsible = new Responsible();
@@ -56,7 +60,6 @@ export class StudentService {
             if (!savedStudent) {
                 throw new InternalServerErrorException("An error occurred while creating the responsible ");
             }
-            const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId);
 
             const studentClass = new StudentClass();
             studentClass.student = savedStudent;
@@ -67,6 +70,7 @@ export class StudentService {
         } catch (error) {
             if (error) {
                 throw new ConflictException(error.message);
+                
             }
             throw new InternalServerErrorException(
                 "An error occurred while creating student");

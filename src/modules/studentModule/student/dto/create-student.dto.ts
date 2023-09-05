@@ -35,10 +35,11 @@ export class CreateStudentDto {
     @IsNotEmpty()
     resPhone:string;
 
-    // @IsNotEmpty()
-    // @IsNumber()
-    // responsibleId:number;
+    @IsNotEmpty()
+    @IsNumber()
     classId: number;
+    @IsNotEmpty()
+    @IsNumber()
     sectionId: number;
 
 
