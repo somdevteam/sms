@@ -9,7 +9,10 @@ export class StudentController {
 
   @Post('add')
   create(@Body() createStudentDto:CreateStudentDto) {
-    return this.studentService.create(createStudentDto);
+    // const data = this.studentService.getStudentsByClassIdAndSectionId(createStudentDto.classId,createStudentDto.sectionId);
+    // console.log(data);
+    // return data;
+     return this.studentService.create(createStudentDto);
   }
 
   @Get('allstudents')

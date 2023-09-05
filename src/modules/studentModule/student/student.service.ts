@@ -129,4 +129,21 @@ export class StudentService {
         await this.StudentRepository.delete(id);
         return `Deleted success`;
     }
+
+    async getStudentsByClassIdAndSectionId(classId: number, sectionId:number):Promise<Student[]>{
+        return await this.StudentRepository.
+        createQueryBuilder('student')
+            .leftJoinAndSelect('student.studentClass','studentclass')
+            .leftJoinAndSelect('studentclass.classSection','classSection')
+            .leftJoinAndSelect('classSection.class','class')
+            .where('classSection.classId =:classId and classSection.sectionId=:sectionId',{classId,sectionId})
+            .select([
+                'student.studentid',
+                'student.firstname',
+                'student.middlename',
+                'student.responsibleid',
+                'student.bob'
+            ]
+            ).getMany();
+    }
 }
