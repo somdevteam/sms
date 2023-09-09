@@ -42,22 +42,6 @@ export class StudentClassService {
         await this.studentClassRepository.delete(studentClassId);
     }
 
-    // async promoteStudents(studentClassData: StudentclassDto): Promise<any> {
-    //     const existingStudent = await this.studentService.findOne(studentClassData.studentId);
-    //     if (!existingStudent){
-    //         throw new NotFoundException('student not found');
-    //     }
-    //     const existingClassSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(studentClassData.classId,studentClassData.sectionId);
-    //
-    //
-    //     const studentClass =  new StudentClass();
-    //     studentClass.student = existingStudent;
-    //     studentClass.classSection = existingClassSection;
-    //     studentClass.dateCreated = new Date();
-    //     await this.studentClassRepository.create(studentClass);
-    //     return await this.studentClassRepository.save(studentClass);
-    // }
-
     async promoteStudents(studentClassDataArray: StudentclassDto[]): Promise<StudentClass[]> {
         const studentClasses: StudentClass[] = [];
 

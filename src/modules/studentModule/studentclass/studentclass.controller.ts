@@ -37,11 +37,6 @@ export class StudentClassController {
         return this.studentClassService.remove(id);
     }
 
-    // @Post('/promotestudents')
-    // promotion(@Body() studentClassData: StudentclassDto): Promise<StudentClass> {
-    //     return this.studentClassService.promoteStudents(studentClassData);
-    // }
-
     @Post('/promotestudents')
     promotion(@Body() studentClassData: StudentclassArrayDto): Promise<StudentClass[]> {
         return this.studentClassService.promoteStudents(studentClassData.students);
