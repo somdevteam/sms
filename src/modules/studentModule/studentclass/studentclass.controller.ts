@@ -4,11 +4,11 @@ import { StudentClassService } from './studentclass.service';
 import { StudentClass } from './entities/studentclass.entity';
 import {InjectRepository} from "@nestjs/typeorm";
 import {StudentclassDto} from "./dto/studentclass.dto";
+import {Batch} from "typeorm";
 
 @Controller('studentclass')
 export class StudentClassController {
     constructor(
-        @InjectRepository(StudentClass)
         private studentClassService: StudentClassService
     ) {}
 
@@ -35,5 +35,10 @@ export class StudentClassController {
     @Delete('/deletestudentclass/:id')
     remove(@Param('id') id: number): Promise<void> {
         return this.studentClassService.remove(id);
+    }
+
+    @Post('/promotestudents')
+    promotion(@Body() studentClassData: StudentclassDto): Promise<StudentClass> {
+        return this.studentClassService.promoteStudents(studentClassData);
     }
 }

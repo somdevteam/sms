@@ -1,5 +1,5 @@
 import {
-    ConflictException,
+    ConflictException, forwardRef, Inject,
     Injectable,
     InternalServerErrorException,
     NotAcceptableException,
@@ -25,6 +25,7 @@ export class StudentService {
         @InjectRepository(Responsible) private responsibleRepository: Repository<Responsible>,
         private readonly responsibleService: ResponsibleService,
         @InjectRepository(StudentClass) private studentClassRepository: Repository<StudentClass>,
+        @Inject(forwardRef(() => StudentClassService))
         private readonly studentClassService: StudentClassService,
         private readonly classSectionService: ClassSectionService
     ) {
@@ -131,19 +132,23 @@ export class StudentService {
     }
 
     async getStudentsByClassIdAndSectionId(classId: number, sectionId:number):Promise<Student[]>{
-        return await this.StudentRepository.
-        createQueryBuilder('student')
-            .leftJoinAndSelect('student.studentClass','studentclass')
-            .leftJoinAndSelect('studentclass.classSection','classSection')
-            .leftJoinAndSelect('classSection.class','class')
-            .where('classSection.classId =:classId and classSection.sectionId=:sectionId',{classId,sectionId})
-            .select([
-                'student.studentid',
-                'student.firstname',
-                'student.middlename',
-                'student.responsibleid',
-                'student.bob'
-            ]
-            ).getMany();
+     const result = (await this.StudentRepository.createQueryBuilder('student')
+         .leftJoinAndSelect('student.studentClass', 'studentclass')
+         .leftJoinAndSelect('studentclass.classSection', 'classSection')
+         .leftJoinAndSelect('classSection.class', 'class')
+         .leftJoinAndSelect('classSection.academic', 'academic')
+         .where('classSection.classId =:classId and classSection.sectionId=:sectionId', {classId, sectionId})
+         .andWhere('academic.academicname =:academicName', {academicName: '2024-2025'})
+         .select([
+                 'student.studentid as studentid',
+                 'student.firstname as firstname',
+                 'student.middlename as lastname',
+                 'student.responsibleid as responsibleid',
+                 'student.bob as pob',
+                 'academic.academicname as academicname'
+             ]
+         ).getRawMany())
+
+     return result;
     }
 }

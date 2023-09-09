@@ -15,4 +15,7 @@ export class StudentclassDto {
 
     @IsNotEmpty()
     dateCreated: string;
+
+    classId : number;
+    sectionId : number;
 }

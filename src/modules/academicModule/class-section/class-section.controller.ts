@@ -14,6 +14,7 @@ export class ClassSectionController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createClassSectionDto: CreateClassSectionDto) {
+   // return this.classSectionService.getAcademicByClassAndSectionId(createClassSectionDto.classid,createClassSectionDto.sectionid);
     return this.classSectionService.create(createClassSectionDto);
   }
 
