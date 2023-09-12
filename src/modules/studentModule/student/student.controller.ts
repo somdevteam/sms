@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { StudentsByClassSectionDto } from './dto/class-section.dto';
+import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 
 @Controller('student')
 export class StudentController {
@@ -9,12 +11,18 @@ export class StudentController {
 
   @Post('add')
   create(@Body() createStudentDto:CreateStudentDto) {
-    //const data = this.studentService.getStudentsByClassIdAndSectionId(createStudentDto.classId,createStudentDto.sectionId);
-   // console.log(data);
-   // return data;
      return this.studentService.create(createStudentDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('getStudentByClassAndSection')
+  findStudentByClassAndSection(@Body() createStudentDto:StudentsByClassSectionDto) {
+    const data = this.studentService.getStudentsByClassIdAndSectionId(createStudentDto.classId,createStudentDto.sectionId);
+    console.log(data);
+    return data;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('allstudents')
   findAll() {
     return this.studentService.findAll();
@@ -25,6 +33,7 @@ export class StudentController {
     return this.studentService.findOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('update/:id')
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(+id, updateStudentDto);
