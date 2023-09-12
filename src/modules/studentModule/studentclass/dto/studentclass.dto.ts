@@ -20,6 +20,16 @@ export class StudentclassDto {
 }
 
 export class StudentclassArrayDto {
+    @IsNotEmpty()
+    academicYearId:number
+    @IsNotEmpty()
+    fromClass:number
+    @IsNotEmpty()
+    fromSection:number
+    @IsNotEmpty()
+    toClass: number;
+    @IsNotEmpty()
+    toSection: number;
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => StudentclassDto)
