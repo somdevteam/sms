@@ -28,7 +28,7 @@ export class StudentLeaveService {
 
        let studentLeave = new StudentLeave();
       studentLeave.reason = payload.reason;
-      //studentLeave.dateLeave = new  Date();
+      studentLeave.dateLeave = new  Date();
       studentLeave.dateCreated = new Date();
       studentLeave.studentClass = payload.studentclassid;
       studentLeave.student = studentLeave.student;
@@ -54,7 +54,7 @@ export class StudentLeaveService {
   async findOne(id: number) {
 
     let value = await  this.studentLeaveRepository.findOne({where:{studentLeaveID:id}});
-    //let testID = value.studentLeaveID;
+    let testID = value.studentLeaveID;
     return value;
   }
 

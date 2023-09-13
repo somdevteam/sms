@@ -16,6 +16,8 @@ export class StudentLeave {
     @Column()
     reason: string;
     @Column('date')
+    dateLeave: Date;
+    @Column('date')
     dateCreated: Date;
 }
 
