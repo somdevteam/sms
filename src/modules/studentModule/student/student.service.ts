@@ -17,6 +17,8 @@ import {Responsible} from "../responsible/entities/responsible.entity";
 import {ResponsibleService} from "../responsible/responsible.service";
 import {StudentClass} from "../studentclass/entities/studentclass.entity";
 import {StudentClassService} from "../studentclass/studentclass.service";
+import { StudentsByClassSectionDto } from './dto/class-section.dto';
+import { CurrentUser } from 'src/common/dto/currentuser.dto';
 
 @Injectable()
 export class StudentService {
@@ -131,14 +133,21 @@ export class StudentService {
         return `Deleted success`;
     }
 
-    async getStudentsByClassIdAndSectionId(classId: number, sectionId:number):Promise<Student[]>{
+    async getStudentsByClassIdAndSectionId(payload:StudentsByClassSectionDto,currentUser:CurrentUser):Promise<Student[]>{
+        
+        if (payload.branchId == null && currentUser.profile.branchId == null) {
+            throw new NotFoundException('branchId is required');
+        }
+        const branchId = payload.branchId ? payload.branchId : currentUser.profile.branchId;
+
      const result = (await this.StudentRepository.createQueryBuilder('student')
          .leftJoinAndSelect('student.studentClass', 'studentclass')
          .leftJoinAndSelect('studentclass.classSection', 'classSection')
          .leftJoinAndSelect('classSection.class', 'class')
          .leftJoinAndSelect('classSection.academic', 'academic')
-         .where('classSection.classId =:classId and classSection.sectionId=:sectionId', {classId, sectionId})
-         .andWhere('academic.academicname =:academicName', {academicName: '2024-2025'})
+         .leftJoinAndSelect('classSection.branch', 'branch')
+         .where('classSection.classId =:classId and classSection.sectionId=:sectionId', {classId :payload.classId,sectionId: payload.sectionId})
+         .andWhere('academic.academicid =:academicId and branch.branchid =:branchId', {academicId: payload.academicId,branchId})
          .select([
                  'student.studentid as studentid',
                  'student.firstname as firstname',

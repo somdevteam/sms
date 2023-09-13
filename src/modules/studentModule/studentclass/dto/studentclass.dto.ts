@@ -22,6 +22,7 @@ export class StudentclassDto {
 export class StudentclassArrayDto {
     @IsNotEmpty()
     academicYearId:number
+    branchId:number
     @IsNotEmpty()
     fromClass:number
     @IsNotEmpty()

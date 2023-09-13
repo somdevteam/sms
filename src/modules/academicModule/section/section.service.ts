@@ -45,7 +45,7 @@ export class SectionService {
   }
 
   findAll() {
-    return `This action returns all level`;
+    return this.sectionRepository.find();
   }
 
   findOne(id: number) {

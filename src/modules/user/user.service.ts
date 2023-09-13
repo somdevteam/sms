@@ -161,7 +161,7 @@ export class UserService {
         const loginHistory = new Loginhistories();
         const currentDate = new Date();
         loginHistory.ip = payload.ip;
-        loginHistory.browser = payload.browser.toString();
+        loginHistory.browser = payload.browser;
         loginHistory.user = user;
         loginHistory.loginDate = currentDate;
         loginHistory.logoutDate = null;

@@ -1,10 +1,9 @@
 // studentClass.controller.ts
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { StudentClassService } from './studentclass.service';
 import { StudentClass } from './entities/studentclass.entity';
-import {InjectRepository} from "@nestjs/typeorm";
 import {StudentclassArrayDto, StudentclassDto} from "./dto/studentclass.dto";
-import {Batch} from "typeorm";
+
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 
 @Controller('studentclass')
@@ -42,9 +41,11 @@ export class StudentClassController {
         return this.studentClassService.remove(id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post('/promotestudents')
-    promotion(@Body() studentClassData: StudentclassArrayDto): Promise<StudentClass[]> {
-        return this.studentClassService.promoteStudents(studentClassData.students);
+    promotion(@Request() req,@Body() studentClassData: StudentclassArrayDto): Promise<StudentClass[]> {
+
+        return this.studentClassService.promoteStudents(studentClassData,req.user.user);
     }
 
 }

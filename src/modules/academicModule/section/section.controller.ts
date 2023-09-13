@@ -16,7 +16,7 @@ export class SectionController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('/all')
   findAll() {
     return this.sectionService.findAll();
   }

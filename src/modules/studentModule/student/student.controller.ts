@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -16,8 +16,8 @@ export class StudentController {
 
   @UseGuards(JwtAuthGuard)
   @Post('getStudentByClassAndSection')
-  findStudentByClassAndSection(@Body() createStudentDto:StudentsByClassSectionDto) {
-    const data = this.studentService.getStudentsByClassIdAndSectionId(createStudentDto.classId,createStudentDto.sectionId);
+  findStudentByClassAndSection(@Request() req,@Body() createStudentDto:StudentsByClassSectionDto) {
+    const data = this.studentService.getStudentsByClassIdAndSectionId(createStudentDto,req.user.user);
     console.log(data);
     return data;
   }
