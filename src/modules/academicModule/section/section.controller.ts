@@ -9,7 +9,7 @@ import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
 export class SectionController {
   constructor(private readonly sectionService: SectionService) {}
 
-  @UseGuards(JwtAuthGuard)
+ // @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createSectionDto: CreateSectionDto) {
     return this.sectionService.create(createSectionDto);

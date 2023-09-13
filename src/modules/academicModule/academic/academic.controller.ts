@@ -9,13 +9,13 @@ import {ApiTags} from "@nestjs/swagger";
 export class AcademicController {
   constructor(private readonly academicService: AcademicService) {}
 
-  @UseGuards(JwtAuthGuard)
+ // @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createAcademicDto: CreateAcademicDto) {
     return this.academicService.create(createAcademicDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+ // @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.academicService.findAll();

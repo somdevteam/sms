@@ -11,6 +11,7 @@ import {ClassSectionModule} from "../../academicModule/class-section/class-secti
   imports: [ResponsibleModule, TypeOrmModule,TypeOrmModule.forFeature([Student]),StudentclassModule, ClassSectionModule],
   controllers: [StudentController],
   providers: [StudentService],
+  exports : [StudentService]
 
 })
 export class StudentModule {}
