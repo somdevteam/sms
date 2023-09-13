@@ -13,22 +13,22 @@ export class StudentLeaveService {
   constructor(
       @InjectRepository(StudentLeave)
       private readonly studentLeaveRepository: Repository<StudentLeave>,
-      // @InjectRepository(Student) private StudentRepository:Repository<StudentService>,
-      // private readonly studentService: StudentService
+
+      private readonly studentService: StudentService
   ) {}
 
 
 
   async create(payload: CreateStudentLeaveDto) {
-    // let studentLeave = await this.findOne(payload.studentclassid)
-    // if(studentLeave){
-    //   new ApiBaseResponse('student leave already exists',6006,null);
-    // }
+    let studentid = await this.studentService.findOne(payload.studentid)
+    if(!studentid){
+        throw new ConflictException(`This student with a #${studentid} does not exist`)
+      //new ApiBaseResponse('student leave already exists',6006,null);
+    }
     try {
 
        let studentLeave = new StudentLeave();
       studentLeave.reason = payload.reason;
-      studentLeave.dateLeave = new  Date();
       studentLeave.dateCreated = new Date();
       studentLeave.studentClass = payload.studentclassid;
       studentLeave.student = studentLeave.student;
