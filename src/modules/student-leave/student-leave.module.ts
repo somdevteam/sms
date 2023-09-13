@@ -9,7 +9,7 @@ import {StudentModule} from "../studentModule/student/student.module";
 @Module({
   imports: [
     TypeOrmModule.forFeature([StudentLeave]),
-    //StudentModule,
+
   ],
   controllers: [StudentLeaveController],
   providers: [StudentLeaveService,],  //StudentService],
