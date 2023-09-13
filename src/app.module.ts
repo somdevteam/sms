@@ -19,6 +19,7 @@ import {StudentModule} from "./modules/studentModule/student/student.module";
 import {ResponsibleModule} from "./modules/studentModule/responsible/responsible.module";
 import {StudentclassModule} from "./modules/studentModule/studentclass/studentclass.module";
 import {MenusModule} from "./modules/menus/menus.module";
+import {TabsModule} from "./modules/tabs/tabs.module";
 
 
 @Module({
@@ -42,7 +43,7 @@ import {MenusModule} from "./modules/menus/menus.module";
       inject: [ConfigService],
     }),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule, MenusModule],
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule, MenusModule, TabsModule],
   controllers: [AppController],
   providers: [AppService],
 })
