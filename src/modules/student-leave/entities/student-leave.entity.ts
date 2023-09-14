@@ -7,7 +7,7 @@ import {Student} from "../../studentModule/student/entities/student.entity";
 export class StudentLeave {
     @PrimaryGeneratedColumn()
     studentLeaveID: number;
-    @ManyToOne(() => StudentClass, { eager: true }) // Define the many-to-one relationship
+    @ManyToOne(() => StudentClass, { eager: true })
     @JoinColumn({ name: 'studentClassID' })
     studentClass: number;
     @ManyToOne(() => Student)

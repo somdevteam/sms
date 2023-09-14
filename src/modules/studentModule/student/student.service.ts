@@ -82,8 +82,11 @@ export class StudentService {
         return this.StudentRepository.find();
     }
 
-    findOne(id: number): Promise<Student> {
-        return this.StudentRepository.findOne({where: {studentid: id}})
+    findOne(id: number) {
+       const studentid = this.StudentRepository.findOne({where: {studentid: id}})
+        if(!studentid)
+            throw new NotFoundException("student not found");
+        return studentid;
     }
 
     async update(id: number, payload: UpdateStudentDto) {
