@@ -26,30 +26,26 @@ export class StudentLeaveService {
 
 
   async create(payload: CreateStudentLeaveDto) {
-    let studentid = await this.studentService.findOne(payload.studentid)
-    if(!studentid){
-        throw new NotFoundException(`Student with ID ${payload.studentid} has already taken a leave`)
-    }
+      const studentId: number = payload.studentid;
+      const student: Student | undefined = await this.studentService.findOne(studentId);
+      if (!student) {  throw new NotFoundException('Student not found'); }
+
       // Check if the student has already taken a leave
       const existingLeave = await this.studentLeaveRepository.findOne({
-          where: {
-              //student: studentid,
-              student: studentid as any,
-          },
+          where: {   student: student as any,},
       } as FindOneOptions<StudentLeave>);
 
       if (existingLeave) {
           throw new NotAcceptableException(`Student with ID ${payload.studentid} has already taken a leave.`);
       }
     try {
-
        let studentLeave = new StudentLeave();
-      studentLeave.reason = payload.reason;
-      studentLeave.dateCreated = new Date();
-      studentLeave.studentClass = payload.studentclassid;
-      studentLeave.student = payload.studentid;
-      await  this.studentLeaveRepository.save(studentLeave);
-      return studentLeave;
+       studentLeave.reason = payload.reason;
+       studentLeave.dateCreated = new Date();
+       studentLeave.studentClass = payload.studentclassid;
+       studentLeave.student = student;
+       await  this.studentLeaveRepository.save(studentLeave);
+       return studentLeave;
     }
     catch (error) {
       if (error) {
