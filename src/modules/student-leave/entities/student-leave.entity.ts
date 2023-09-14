@@ -12,7 +12,7 @@ export class StudentLeave {
     studentClass: number;
     @ManyToOne(() => Student)
     @JoinColumn({ name: 'studentID' })
-    student: Student;
+    student: number;
     @Column()
     reason: string;
     @Column('date')

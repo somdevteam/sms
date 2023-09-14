@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { StudentLeaveService } from './student-leave.service';
 import { CreateStudentLeaveDto } from './dto/create-student-leave.dto';
 import { UpdateStudentLeaveDto } from './dto/update-student-leave.dto';
+import {ApiResponse} from "@nestjs/swagger";
+import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 
 @Controller('student-leave')
 export class StudentLeaveController {
@@ -9,7 +11,9 @@ export class StudentLeaveController {
 
   @Post('create')
   create(@Body() createStudentLeaveDto: CreateStudentLeaveDto) {
-    return this.studentLeaveService.create(createStudentLeaveDto);
+    const result = this.studentLeaveService.create(createStudentLeaveDto);
+   // console.log("Leave created successfully!",result)
+    return new ApiBaseResponse('Student-Leave created successfully!',6006,result);
   }
 
   @Get()
@@ -24,11 +28,13 @@ export class StudentLeaveController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStudentLeaveDto: UpdateStudentLeaveDto) {
-    return this.studentLeaveService.update(+id, updateStudentLeaveDto);
+    let result = this.studentLeaveService.update(+id, updateStudentLeaveDto);
+    return new ApiBaseResponse('Record Updated successfully!',6006,result);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.studentLeaveService.remove(+id);
+     let result = this.studentLeaveService.remove(+id);
+     return new ApiBaseResponse('Deleted success!',6006,result)
   }
 }

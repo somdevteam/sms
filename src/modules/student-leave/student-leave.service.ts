@@ -30,29 +30,26 @@ export class StudentLeaveService {
     if(!studentid){
         throw new NotFoundException(`Student with ID ${payload.studentid} has already taken a leave`)
     }
-
       // Check if the student has already taken a leave
       const existingLeave = await this.studentLeaveRepository.findOne({
           where: {
-              student: studentid,
+              //student: studentid,
+              student: studentid as any,
           },
       } as FindOneOptions<StudentLeave>);
 
       if (existingLeave) {
           throw new NotAcceptableException(`Student with ID ${payload.studentid} has already taken a leave.`);
       }
-
-
-
     try {
 
        let studentLeave = new StudentLeave();
       studentLeave.reason = payload.reason;
       studentLeave.dateCreated = new Date();
       studentLeave.studentClass = payload.studentclassid;
-      studentLeave.student = studentLeave.student;
+      studentLeave.student = payload.studentid;
       await  this.studentLeaveRepository.save(studentLeave);
-      return new ApiBaseResponse('saved success',6006, null);
+      return studentLeave;
     }
     catch (error) {
       if (error) {
@@ -73,26 +70,23 @@ export class StudentLeaveService {
   async findOne(id: number) {
 
     let value = await  this.studentLeaveRepository.findOne({where:{studentLeaveID:id}});
-    let testID = value.studentLeaveID;
+    //let testID = value.studentLeaveID;
     return value;
   }
 
    async update(id: number, payload) {
-    // return `This action updates a #${id} studentLeave`;
       let studentLeaveToUpdate = await this.studentLeaveRepository.findOne({where:{studentLeaveID:id}});
       if(!studentLeaveToUpdate.studentLeaveID){
-          throw new NotFoundException( 'This student-leave does not exist');
-      }
+          throw new NotFoundException( 'This student-leave does not exist');}
         try {
                studentLeaveToUpdate = new StudentLeave();
                studentLeaveToUpdate.studentLeaveID =id;
                 studentLeaveToUpdate.reason =payload.reason;
-              //  studentLeaveToUpdate.dateLeave = new Date();
                 studentLeaveToUpdate.dateCreated = new Date()
-          await  this.studentLeaveRepository.update(studentLeaveToUpdate.studentLeaveID,studentLeaveToUpdate);
-            console.log(studentLeaveToUpdate);
-                return new ApiBaseResponse('Updated success',6006,studentLeaveToUpdate);
-
+               studentLeaveToUpdate.student =payload.studentid;
+          await this.studentLeaveRepository.update(studentLeaveToUpdate.studentLeaveID,studentLeaveToUpdate);
+           // console.log(studentLeaveToUpdate);
+                return studentLeaveToUpdate;
         }
 catch (error) {
     if (error) {
@@ -111,7 +105,7 @@ catch (error) {
       try {
 
           await this.studentLeaveRepository.delete(id)
-          return new ApiBaseResponse('Deleted success!',6006,studentleaveToDelete)
+          return id;
 
       }
       catch (error){
