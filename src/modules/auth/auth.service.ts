@@ -26,9 +26,7 @@ export class AuthService {
             password,
         );
         if (!user) {
-            throw new UnauthorizedException(
-                'Could not authenticate. Please try again.',
-            );
+         throw new UnauthorizedException("Unauthorized. please try again.")
         }
         return user;
     }

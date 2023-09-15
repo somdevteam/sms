@@ -9,7 +9,7 @@ async function bootstrap() {
       AppModule,
       new FastifyAdapter(),
       );
-      app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe());
     const logger = new Logger('Bootstrap');
     // Swagger configuration
@@ -21,6 +21,10 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
+    app.enableCors({
+        origin: '*',
+        credentials: true,
+    });
 
   await app.listen(3000, '0.0.0.0',(err, address) => {
       if (err) {
