@@ -40,7 +40,7 @@ export class AuthController {
         role : 'Admin',
         token: token.access_token
         }
-        return new ApiBaseResponse("Login Successfully",HttpStatus.NOT_FOUND,users);
+        return new ApiBaseResponse("Login Successfully",HttpStatus.OK,users);
     }
 
 

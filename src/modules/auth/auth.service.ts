@@ -1,4 +1,4 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {UserService} from "../user/user.service";
 import {JwtService} from "@nestjs/jwt";
 import {LoginDto} from "./Dto/login.dto";
@@ -26,7 +26,7 @@ export class AuthService {
             password,
         );
         if (!user) {
-         throw new UnauthorizedException("Unauthorized. please try again.")
+         throw new NotFoundException("Unauthorized. please try again ok.")
         }
         return user;
     }

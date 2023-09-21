@@ -4,6 +4,23 @@ import {ApiProperty} from "@nestjs/swagger";
 export class UserDto {
     userId: number;
 
+    @ApiProperty({
+        required: true,
+    })
+    @IsNotEmpty()
+    firstName: string;
+
+    @ApiProperty({
+        required: true,
+    })
+    @IsNotEmpty()
+    middleName: string;
+
+    @ApiProperty({
+        required: true,
+    })
+    @IsNotEmpty()
+    lastName: string;
 
     @ApiProperty({
         required: true,
@@ -22,6 +39,12 @@ export class UserDto {
         required: true,
     })
     @IsNotEmpty()
+    mobile: number;
+
+    @ApiProperty({
+        required: true,
+    })
+    
     password: string;
 
     @ApiProperty({
@@ -34,29 +57,6 @@ export class UserDto {
     })
     datecreated: Date;
 
-    @ApiProperty({
-        required: true,
-    })
-    @IsNotEmpty()
-    firstName: string;
-
-    @ApiProperty({
-        required: true,
-    })
-    @IsNotEmpty()
-    lastName: string;
-
-    @ApiProperty({
-        required: true,
-    })
-    @IsNotEmpty()
-    middleName: string;
-
-    @ApiProperty({
-        required: true,
-    })
-    @IsNotEmpty()
-    mobile: number;
 
     @ApiProperty({
         required: true,

@@ -32,7 +32,9 @@ export class UserService {
     }
 
     getAllUser(currentUser: CurrentUser) {
-        return this.userRepository.find();
+        // return this.userRepository.find();
+        const id = currentUser.userId;
+        return  this.fetchUsersFullData();
     }
 
     async getByMobile(mobile: number): Promise<UserProfile | null> {
@@ -41,6 +43,25 @@ export class UserService {
 
     async getByEmail(email: string): Promise<UserEntity | null> {
         return await this.userRepository.findOne({where: {email}});
+    }
+
+    async fetchUsersFullData(userId?:number) {
+        const usersList = await this.userRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.profile', 'profile')
+            .select([
+                'user.userId as userId',
+                'user.email as email',
+                'user.username as username',
+                'profile.firstName as firstName',
+                'profile.middleName as middleName',
+                'profile.lastName as lastName',
+                'profile.mobile as mobile',
+                'profile.branchId as branchId',
+                'profile.userProfileId as userProfileId',
+            ])
+            if (userId) usersList.where('user.userId = :userId', { userId });
+          return usersList.getRawMany();
     }
 
     async fetchSpecificUserData(userId: number, loginHistoryId: number) {
@@ -117,8 +138,8 @@ export class UserService {
     }
 
 
-    async update(payload: UserDto) :Promise<any>{
-        const foundUser = await this.userRepository.findOneBy({userId: payload.userId});
+    async update(id:number,payload: UserDto) :Promise<any>{
+        const foundUser = await this.userRepository.findOneBy({userId: id});
 
         if (!foundUser) {
             throw new NotFoundException("User Not found");
@@ -126,7 +147,6 @@ export class UserService {
         const currentDate = new Date();
         const userId = payload.userId;
         foundUser.email = payload.email;
-        foundUser.password = crypto.createHmac('sha256', payload.password).digest('hex');
         foundUser.username = payload.username;
         foundUser.isActive = payload.isActive;
         foundUser.dateModified = currentDate;
@@ -139,7 +159,7 @@ export class UserService {
         existingUserProfile.branchId = payload.branchId;
         existingUserProfile.dateModified =currentDate;
 
-       const updatedUser =  await this.userRepository.update({userId}, foundUser);
+       const updatedUser =  await this.userRepository.update(foundUser.userId, foundUser);
        const updateUserProfile = await this.userProfileRepository.update({user:{userId:foundUser.userId}},existingUserProfile);
        return updatedUser;
 
