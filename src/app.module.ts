@@ -20,6 +20,8 @@ import {ResponsibleModule} from "./modules/studentModule/responsible/responsible
 import {StudentclassModule} from "./modules/studentModule/studentclass/studentclass.module";
 import {MenusModule} from "./modules/menus/menus.module";
 import {TabsModule} from "./modules/tabs/tabs.module";
+import {PermissionsModule} from './modules/permissions/permissions.module';
+import {TabPermission} from './modules/tabPermissions/entities/tabPermissions.entity';
 
 
 @Module({
@@ -43,7 +45,8 @@ import {TabsModule} from "./modules/tabs/tabs.module";
       inject: [ConfigService],
     }),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule, MenusModule, TabsModule],
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
+    MenusModule, TabsModule,PermissionsModule, TabPermission],
   controllers: [AppController],
   providers: [AppService],
 })

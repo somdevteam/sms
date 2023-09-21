@@ -26,12 +26,11 @@ export class AuthService {
             password,
         );
         if (!user) {
-            throw new UnauthorizedException(
-                'Could not authenticate. Please try again.',
-            );
+         throw new UnauthorizedException("Unauthorized. please try again.")
         }
         return user;
     }
+    
 
     async getUserInfo(request: any, user: any): Promise<Loginhistories> {
         const userAgent = request.headers['user-agent'];
@@ -39,7 +38,7 @@ export class AuthService {
 
         const loginHistoryInfo = {
             ip,
-            browser: userAgent,
+            browser: userAgent != null ? userAgent : '',
             userId: user.userId,
         }
         const loginHistoryId = await this.usersService.addLoginHisotry(loginHistoryInfo, user);

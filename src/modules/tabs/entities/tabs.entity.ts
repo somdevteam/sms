@@ -1,5 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    ManyToOne,
+    JoinColumn,
+    ManyToMany,
+    JoinTable,
+    RelationOptions,
+} from 'typeorm';
 import { Menus } from '../../menus/entities/menus.entity';
+import { Permission } from '../../permissions/entities/permissions.entity';
 
 @Entity()
 export class Tab {
@@ -27,4 +37,8 @@ export class Tab {
     @ManyToOne(() => Menus, (Menus) => Menus.tabs)
     @JoinColumn({ name: 'menuId' })
     Menus: Menus;
+
+    @ManyToMany(() => Permission, (permission) => permission.tabPermissions)
+    @JoinTable({ name: 'tabpermissions', joinColumn: { name: 'TABID' }, inverseJoinColumn: { name: 'PERMISSIONID' } })
+    permissions: Permission[];
 }
