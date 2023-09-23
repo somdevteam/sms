@@ -34,7 +34,7 @@ export class BranchService {
       return await this.findAllByBranchId(+branchId)
     }
     const constantData: any[] = [
-      { branchid: null, branchname: 'All Branches' }
+      { branchid: 0, branchname: 'All Branches' }
     ];
     const branchData = await this.branchRepository.find();
     if (!branchData) {

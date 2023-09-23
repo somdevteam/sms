@@ -18,7 +18,7 @@ export class UserProfile {
 
     @Column()
     @Unique(['mobile'])
-    mobile: number;
+    mobile: string;
 
     @Column({nullable:true})
     branchId: number;

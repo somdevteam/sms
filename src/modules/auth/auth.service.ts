@@ -26,7 +26,7 @@ export class AuthService {
             password,
         );
         if (!user) {
-         throw new NotFoundException("Unauthorized. please try again ok.")
+         throw new NotFoundException("Unauthorized. please try again")
         }
         return user;
     }

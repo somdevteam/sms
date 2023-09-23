@@ -1,226 +1,249 @@
 import {
-    ConflictException,
-    Injectable,
-    InternalServerErrorException,
-    NotAcceptableException,
-    NotFoundException
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+  NotFoundException,
 } from '@nestjs/common';
-import {InjectRepository} from "@nestjs/typeorm";
-import {UserEntity} from "./user.entity";
-import {Repository} from "typeorm";
-import {UserDto} from "./Dto/user.dto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './user.entity';
+import { Repository } from 'typeorm';
+import { UserDto } from './Dto/user.dto';
 import * as crypto from 'crypto';
-import {UserProfile} from "./userprofile.entity";
+import { UserProfile } from './userprofile.entity';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
-import {Loginhistories} from "../auth/loginhistories.entity";
+import { Loginhistories } from '../auth/loginhistories.entity';
 import { UserFilterDto } from './Dto/search-user.dto';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-                @InjectRepository(UserProfile) private userProfileRepository: Repository<UserProfile>,
-                @InjectRepository(Loginhistories) private loginRepository: Repository<Loginhistories>) {
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+    @InjectRepository(UserProfile)
+    private userProfileRepository: Repository<UserProfile>,
+    @InjectRepository(Loginhistories)
+    private loginRepository: Repository<Loginhistories>,
+  ) {}
+
+  private readonly users: any[] = [];
+
+  getByUsername(username: string): Promise<UserEntity> {
+    return this.userRepository.findOne({ where: { username } });
+  }
+
+  getById(id: number): Promise<UserEntity> {
+    return this.userRepository.findOne({ where: { userId: id } });
+  }
+
+  getAllUser(currentUser: CurrentUser) {
+    // return this.userRepository.find();
+    const id = currentUser.userId;
+    return this.fetchUsersFullData();
+  }
+
+  async getByMobile(mobile: any): Promise<UserProfile | null> {
+    return await this.userProfileRepository.findOne({ where: { mobile } });
+  }
+
+  async getByEmail(email: string): Promise<UserEntity | null> {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
+  async fetchUsersByBranch(data: UserFilterDto) {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .where('user.isActive = :isActive', { isActive: data.isActive })
+      .select([
+        'user.userId as userId',
+        'user.email as email',
+        'user.username as username',
+        'profile.firstName as firstName',
+        'profile.middleName as middleName',
+        'profile.lastName as lastName',
+        'profile.mobile as mobile',
+        'profile.branchId as branchId',
+        'profile.userProfileId as userProfileId',
+      ]);
+
+    if (data.branchId !== 0 && data.branchId !== null) {
+      query.andWhere('profile.branchId = :branchId', {
+        branchId: data.branchId,
+      });
     }
 
-    private readonly users: any[] = [];
+    return query.getRawMany();
+  }
 
-    getByUsername(username: string): Promise<UserEntity> {
-        return this.userRepository.findOne({where: {username}});
+  async fetchUsersFullData(userId?: number) {
+    const usersList = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .select([
+        'user.userId as userId',
+        'user.email as email',
+        'user.username as username',
+        'profile.firstName as firstName',
+        'profile.middleName as middleName',
+        'profile.lastName as lastName',
+        'profile.mobile as mobile',
+        'profile.branchId as branchId',
+        'profile.userProfileId as userProfileId',
+      ]);
+    if (userId) usersList.where('user.userId = :userId', { userId });
+    return usersList.getRawMany();
+  }
+
+  async fetchSpecificUserData(userId: number, loginHistoryId: number) {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.loginHistory', 'loginHistory')
+      .where(
+        'user.userId = :userId and loginHistory.loginHistoryId = :loginHistoryId',
+        { userId, loginHistoryId },
+      )
+      .select([
+        'user.userId',
+        'user.email',
+        'user.username',
+        'profile.firstName',
+        'profile.middleName',
+        'profile.mobile',
+        'profile.branchId',
+        'profile.userProfileId',
+        'loginHistory.loginHistoryId',
+        'loginHistory.userId',
+        'loginHistory.loginDate',
+      ])
+      .getOne();
+  }
+
+  async create(payload: UserDto) {
+    const username = await this.getByUsername(payload.username);
+    if (username) {
+      throw new NotAcceptableException(
+        'The account with the provided username currently exists. Please choose another one.',
+      );
+    }
+    const existingUserWithMobile = await this.getByMobile(payload.mobile);
+    if (existingUserWithMobile) {
+      throw new ConflictException(
+        'The provided mobile number is already associated with an account.',
+      );
+    }
+    const existingUserWithEmail = await this.getByEmail(payload.email);
+    if (existingUserWithEmail) {
+      throw new ConflictException(
+        'The provided Email  is already associated with an account.',
+      );
     }
 
-    getById(id: number): Promise<UserEntity> {
-        return this.userRepository.findOne({where: {userId: id}})
+    const user = new UserEntity();
+    user.isActive = payload.isActive;
+    user.password = crypto.createHmac('sha256', payload.password).digest('hex');
+    user.username = payload.username;
+    user.email = payload.email;
+    const currentDate = new Date();
+    user.datecreated = currentDate;
+    user.dateModified = currentDate;
+
+    try {
+      const savedUser = await this.userRepository.save(user); // Step 1: Save UserEntity
+
+      const userProfile = new UserProfile();
+      userProfile.firstName = payload.firstName;
+      userProfile.lastName = payload.lastName;
+      userProfile.middleName = payload.middleName;
+      userProfile.mobile = payload.mobile;
+      userProfile.branchId = payload.branchId > 0 ? payload.branchId : null;
+      userProfile.user = savedUser; // Step 2: Associate UserProfile with UserEntity
+
+      userProfile.datecreated = currentDate;
+      userProfile.dateModified = currentDate;
+
+      await this.userProfileRepository.save(userProfile);
+
+      return savedUser;
+    } catch (error) {
+      if (error) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(
+        'An error occurred while creating the user.',
+      );
     }
+  }
 
-    getAllUser(currentUser: CurrentUser) {
-        // return this.userRepository.find();
-        const id = currentUser.userId;
-        return  this.fetchUsersFullData();
+  async update(id: number, payload: UserDto): Promise<any> {
+    const foundUser = await this.userRepository.findOneBy({ userId: id });
+
+    if (!foundUser) {
+      throw new NotFoundException('User Not found');
     }
+    const currentDate = new Date();
+    const userId = payload.userId;
+    foundUser.email = payload.email;
+    foundUser.username = payload.username;
+    foundUser.isActive = payload.isActive;
+    foundUser.dateModified = currentDate;
 
-    async getByMobile(mobile: number): Promise<UserProfile | null> {
-        return await this.userProfileRepository.findOne({where: {mobile}});
+    const existingUserProfile = await this.userProfileRepository.findOneBy({
+      user: { userId: foundUser.userId },
+    });
+    existingUserProfile.firstName = payload.firstName;
+    existingUserProfile.middleName = payload.middleName;
+    existingUserProfile.lastName = payload.lastName;
+    existingUserProfile.mobile = payload.mobile;
+    existingUserProfile.branchId = payload.branchId;
+    existingUserProfile.dateModified = currentDate;
+
+    const updatedUser = await this.userRepository.update(
+      foundUser.userId,
+      foundUser,
+    );
+    const updateUserProfile = await this.userProfileRepository.update(
+      { user: { userId: foundUser.userId } },
+      existingUserProfile,
+    );
+    return updatedUser;
+  }
+
+  async getByUsernameAndPass(
+    username: string,
+    password: string,
+  ): Promise<UserEntity> {
+    const hashedPassword = crypto.createHmac('sha256', password).digest('hex');
+
+    return this.userRepository.findOne({
+      where: {
+        username,
+        password: hashedPassword,
+      },
+    });
+  }
+
+  async addLoginHisotry(payload, user) {
+    const loginHistory = new Loginhistories();
+    const currentDate = new Date();
+    loginHistory.ip = payload.ip;
+    loginHistory.browser = payload.browser;
+    loginHistory.user = user;
+    loginHistory.loginDate = currentDate;
+    loginHistory.logoutDate = null;
+
+    try {
+      const savedLoginHistory = await this.loginRepository.save(loginHistory); // Step 1: Save UserEntity
+
+      return savedLoginHistory;
+    } catch (error) {
+      if (error) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(
+        'An error occurred while creating the user.',
+      );
     }
-
-    async getByEmail(email: string): Promise<UserEntity | null> {
-        return await this.userRepository.findOne({where: {email}});
-    }
-
-    async fetchUsersByBranch(data:UserFilterDto) {
-        const usersList = await this.userRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.profile', 'profile');
-            if (data.branchId) {
-                usersList.where('profile.branchId = :branchId', { branchId: data.branchId })
-            }
-            if (data.isActive != null) {
-                usersList.where('user.isActive = :isActive', { isActive: data.isActive })
-            }
-            usersList.select([
-                'user.userId as userId',
-                'user.email as email',
-                'user.username as username',
-                'profile.firstName as firstName',
-                'profile.middleName as middleName',
-                'profile.lastName as lastName',
-                'profile.mobile as mobile',
-                'profile.branchId as branchId',
-                'profile.userProfileId as userProfileId',
-            ])
-          return usersList.getRawMany();
-    }
-
-    async fetchUsersFullData(userId?:number) {
-        const usersList = await this.userRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.profile', 'profile')
-            .select([
-                'user.userId as userId',
-                'user.email as email',
-                'user.username as username',
-                'profile.firstName as firstName',
-                'profile.middleName as middleName',
-                'profile.lastName as lastName',
-                'profile.mobile as mobile',
-                'profile.branchId as branchId',
-                'profile.userProfileId as userProfileId',
-            ])
-            if (userId) usersList.where('user.userId = :userId', { userId });
-          return usersList.getRawMany();
-    }
-
-    async fetchSpecificUserData(userId: number, loginHistoryId: number) {
-        return await this.userRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.profile', 'profile')
-            .leftJoinAndSelect('user.loginHistory', 'loginHistory')
-            .where('user.userId = :userId and loginHistory.loginHistoryId = :loginHistoryId', { userId, loginHistoryId })
-            .select([
-                'user.userId',
-                'user.email',
-                'user.username',
-                'profile.firstName',
-                'profile.middleName',
-                'profile.mobile',
-                'profile.branchId',
-                'profile.userProfileId',
-                'loginHistory.loginHistoryId',
-                'loginHistory.userId',
-                'loginHistory.loginDate'
-            ])
-            .getOne();
-    }
-
-    async create(payload: UserDto) {
-        const username = await this.getByUsername(payload.username);
-        if (username) {
-            throw new NotAcceptableException(
-                'The account with the provided username currently exists. Please choose another one.',
-            );
-        }
-        const existingUserWithMobile = await this.getByMobile(payload.mobile);
-        if (existingUserWithMobile) {
-            throw new ConflictException('The provided mobile number is already associated with an account.');
-        }
-        const existingUserWithEmail = await this.getByEmail(payload.email);
-        if (existingUserWithEmail) {
-            throw new ConflictException('The provided Email  is already associated with an account.');
-        }
-
-        const user = new UserEntity();
-        user.isActive = payload.isActive;
-        user.password = crypto.createHmac('sha256', payload.password).digest('hex');
-        user.username = payload.username;
-        user.email = payload.email;
-        const currentDate = new Date();
-        user.datecreated = currentDate;
-        user.dateModified = currentDate;
-
-        try {
-            const savedUser = await this.userRepository.save(user); // Step 1: Save UserEntity
-
-            const userProfile = new UserProfile();
-            userProfile.firstName = payload.firstName;
-            userProfile.lastName = payload.lastName;
-            userProfile.middleName = payload.middleName;
-            userProfile.mobile = payload.mobile;
-            userProfile.branchId = payload.branchId > 0 ? payload.branchId : null;
-            userProfile.user = savedUser; // Step 2: Associate UserProfile with UserEntity
-
-            userProfile.datecreated = currentDate;
-            userProfile.dateModified = currentDate;
-
-            await this.userProfileRepository.save(userProfile);
-
-
-            return savedUser;
-        } catch (error) {
-            if (error) {
-                throw new ConflictException(error.message);
-            }
-            throw new InternalServerErrorException('An error occurred while creating the user.');
-        }
-    }
-
-
-    async update(id:number,payload: UserDto) :Promise<any>{
-        const foundUser = await this.userRepository.findOneBy({userId: id});
-
-        if (!foundUser) {
-            throw new NotFoundException("User Not found");
-        }
-        const currentDate = new Date();
-        const userId = payload.userId;
-        foundUser.email = payload.email;
-        foundUser.username = payload.username;
-        foundUser.isActive = payload.isActive;
-        foundUser.dateModified = currentDate;
-
-        const existingUserProfile = await this.userProfileRepository.findOneBy({ user: { userId: foundUser.userId } });
-        existingUserProfile.firstName = payload.firstName;
-        existingUserProfile.middleName = payload.middleName;
-        existingUserProfile.lastName = payload.lastName;
-        existingUserProfile.mobile =payload.mobile;
-        existingUserProfile.branchId = payload.branchId;
-        existingUserProfile.dateModified =currentDate;
-
-       const updatedUser =  await this.userRepository.update(foundUser.userId, foundUser);
-       const updateUserProfile = await this.userProfileRepository.update({user:{userId:foundUser.userId}},existingUserProfile);
-       return updatedUser;
-
-    }
-
-    async getByUsernameAndPass(username: string, password: string): Promise<UserEntity> {
-        const hashedPassword = crypto.createHmac('sha256', password).digest('hex')
-
-        return this.userRepository.findOne({
-            where: {
-                username,
-                password: hashedPassword
-            }
-        });
-    }
-
-    async addLoginHisotry(payload, user) {
-
-        const loginHistory = new Loginhistories();
-        const currentDate = new Date();
-        loginHistory.ip = payload.ip;
-        loginHistory.browser = payload.browser;
-        loginHistory.user = user;
-        loginHistory.loginDate = currentDate;
-        loginHistory.logoutDate = null;
-
-
-        try {
-            const savedLoginHistory = await this.loginRepository.save(loginHistory); // Step 1: Save UserEntity
-
-            return savedLoginHistory;
-        } catch (error) {
-            if (error) {
-                throw new ConflictException(error.message);
-            }
-            throw new InternalServerErrorException('An error occurred while creating the user.');
-        }
-    }
+  }
 }

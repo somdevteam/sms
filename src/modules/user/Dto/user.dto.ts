@@ -39,12 +39,13 @@ export class UserDto {
         required: true,
     })
     @IsNotEmpty()
-    mobile: number;
+    mobile: string;
 
     @ApiProperty({
         required: true,
     })
     
+    @IsNotEmpty()
     password: string;
 
     @ApiProperty({

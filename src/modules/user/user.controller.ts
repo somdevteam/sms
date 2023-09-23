@@ -21,16 +21,18 @@ export class UserController {
     }
     
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Post("/")
-    createUser(@Body() userDto: UserDto) {
-        return this.userService.create(userDto);
+    async createUser(@Body() userDto: UserDto): Promise<ApiBaseResponse> {
+        const users = await this.userService.create(userDto);
+        return new ApiBaseResponse('user created successfully',HttpStatus.OK,null)
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post("/usersByFilter")
-    getUsersByFilter(@Body() userDto: UserFilterDto) {
-        return this.userService.fetchUsersByBranch(userDto);
+    @Post("usersByFilter")
+    async getUsersByFilter(@Body() userDto: UserFilterDto): Promise<ApiBaseResponse> {
+        const usersList = await  this.userService.fetchUsersByBranch(userDto);
+        return new ApiBaseResponse('users list',HttpStatus.OK,usersList);
     }
 
     @UseGuards(JwtAuthGuard)
