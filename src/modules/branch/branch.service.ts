@@ -12,6 +12,7 @@ import { Branch } from './branch.entity';
 import { Repository } from 'typeorm';
 import { BranchDTO } from './dto/branch.dto';
 import { UpdateBranchDTO } from './dto/update-branch.dto';
+import { CurrentUser } from 'src/common/dto/currentuser.dto';
 
 @Injectable()
 export class BranchService {
@@ -19,11 +20,28 @@ export class BranchService {
     @InjectRepository(Branch) private branchRepository: Repository<Branch>,
   ) {}
 
-  getById(id: number): Promise<Branch> {
-    return this.branchRepository.findOne({ where: { branchid: id } });
+ async getById(id: number): Promise<Branch> {
+    return await this.branchRepository.findOne({ where: { branchid: id } });
   }
-  getAllBranches() {
-    return this.branchRepository.find();
+
+  async findAllByBranchId(branchId: number): Promise<Branch[]> {
+    return this.branchRepository.find({ where: { branchid: branchId } });
+  }
+
+  async getAllBranches(currentuser:CurrentUser) {
+    const branchId = currentuser.profile.branchId;
+    if (branchId) {
+      return await this.findAllByBranchId(+branchId)
+    }
+    const constantData: any[] = [
+      { branchid: null, branchname: 'All Branches' }
+    ];
+    const branchData = await this.branchRepository.find();
+    if (!branchData) {
+      return branchData;
+    }
+    const combinedData = constantData.concat(branchData);
+    return combinedData;
   }
 
   async getBranchByName(branchName: string): Promise<Branch> {

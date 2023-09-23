@@ -13,6 +13,7 @@ import * as crypto from 'crypto';
 import {UserProfile} from "./userprofile.entity";
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import {Loginhistories} from "../auth/loginhistories.entity";
+import { UserFilterDto } from './Dto/search-user.dto';
 
 @Injectable()
 export class UserService {
@@ -43,6 +44,30 @@ export class UserService {
 
     async getByEmail(email: string): Promise<UserEntity | null> {
         return await this.userRepository.findOne({where: {email}});
+    }
+
+    async fetchUsersByBranch(data:UserFilterDto) {
+        const usersList = await this.userRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.profile', 'profile');
+            if (data.branchId) {
+                usersList.where('profile.branchId = :branchId', { branchId: data.branchId })
+            }
+            if (data.isActive != null) {
+                usersList.where('user.isActive = :isActive', { isActive: data.isActive })
+            }
+            usersList.select([
+                'user.userId as userId',
+                'user.email as email',
+                'user.username as username',
+                'profile.firstName as firstName',
+                'profile.middleName as middleName',
+                'profile.lastName as lastName',
+                'profile.mobile as mobile',
+                'profile.branchId as branchId',
+                'profile.userProfileId as userProfileId',
+            ])
+          return usersList.getRawMany();
     }
 
     async fetchUsersFullData(userId?:number) {

@@ -4,6 +4,7 @@ import {UserDto} from "./Dto/user.dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ApiTags} from "@nestjs/swagger";
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
+import { UserFilterDto } from './Dto/search-user.dto';
 
 @Controller('user')
 @ApiTags('User Apis')
@@ -24,6 +25,12 @@ export class UserController {
     @Post("/")
     createUser(@Body() userDto: UserDto) {
         return this.userService.create(userDto);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post("/usersByFilter")
+    getUsersByFilter(@Body() userDto: UserFilterDto) {
+        return this.userService.fetchUsersByBranch(userDto);
     }
 
     @UseGuards(JwtAuthGuard)
