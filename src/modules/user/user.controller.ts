@@ -5,6 +5,7 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ApiTags} from "@nestjs/swagger";
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 import { UserFilterDto } from './Dto/search-user.dto';
+import { ResetPasswordDto } from './Dto/reset-password.dto';
 
 @Controller('user')
 @ApiTags('User Apis')
@@ -33,6 +34,13 @@ export class UserController {
     async getUsersByFilter(@Body() userDto: UserFilterDto): Promise<ApiBaseResponse> {
         const usersList = await  this.userService.fetchUsersByBranch(userDto);
         return new ApiBaseResponse('users list',HttpStatus.OK,usersList);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch("resetpassword/:id")
+    async resetPassword(@Param('id') id,@Body() payload: ResetPasswordDto): Promise<ApiBaseResponse> {
+        const data = await  this.userService.resetPassword(id,payload);
+        return new ApiBaseResponse('reset password success',HttpStatus.OK,null);
     }
 
     @UseGuards(JwtAuthGuard)

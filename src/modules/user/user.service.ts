@@ -14,6 +14,7 @@ import { UserProfile } from './userprofile.entity';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { Loginhistories } from '../auth/loginhistories.entity';
 import { UserFilterDto } from './Dto/search-user.dto';
+import { ResetPasswordDto } from './Dto/reset-password.dto';
 
 @Injectable()
 export class UserService {
@@ -32,8 +33,8 @@ export class UserService {
     return this.userRepository.findOne({ where: { username } });
   }
 
-  getById(id: number): Promise<UserEntity> {
-    return this.userRepository.findOne({ where: { userId: id } });
+  async getById(id: number): Promise<UserEntity> {
+    return await this.userRepository.findOne({ where: { userId: id } });
   }
 
   getAllUser(currentUser: CurrentUser) {
@@ -48,6 +49,18 @@ export class UserService {
 
   async getByEmail(email: string): Promise<UserEntity | null> {
     return await this.userRepository.findOne({ where: { email } });
+  }
+
+  async resetPassword(id:number,payload: ResetPasswordDto): Promise<any> {
+    const foundedUser = await this.getById(id);
+    if(!foundedUser) {
+      throw new NotFoundException('this user not exists');
+    }
+
+    foundedUser.password = crypto.createHmac('sha256', payload.password).digest('hex');
+
+   return await this.userRepository.update(foundedUser.userId,foundedUser);
+
   }
 
   async fetchUsersByBranch(data: UserFilterDto) {
