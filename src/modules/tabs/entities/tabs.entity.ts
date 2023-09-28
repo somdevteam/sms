@@ -38,7 +38,7 @@ export class Tab {
     @JoinColumn({ name: 'menuId' })
     Menus: Menus;
 
-    @ManyToMany(() => Permission, (permission) => permission.tabPermissions)
-    @JoinTable({ name: 'tabpermissions', joinColumn: { name: 'TABID' }, inverseJoinColumn: { name: 'PERMISSIONID' } })
-    permissions: Permission[];
+    // @ManyToMany(() => Permission, (permission) => permission.tabPermissions)
+    // @JoinTable({ name: 'tabpermissions', joinColumn: { name: 'TABID' }, inverseJoinColumn: { name: 'PERMISSIONID' } })
+    // permissions: Permission[];
 }

@@ -29,7 +29,7 @@ export class Permission extends BaseEntity{
     @Column({ name: 'ISACTIVE' })
     isActive: string;
 
-    @ManyToMany(() => Tab, (tab) => tab.permissions)
+    // @ManyToMany(() => Tab, (tab) => tab.permissions)
     @JoinTable({ name: 'tabpermissions', joinColumn: { name: 'PERMISSIONID' }, inverseJoinColumn: { name: 'TABID' } })
     tabPermissions: Tab[];
 }

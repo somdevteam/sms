@@ -7,7 +7,7 @@ export class TabPermission {
     @PrimaryGeneratedColumn({ name: 'TABIDPERMISSION' })
     tabPermissionId: number;
 
-    @ManyToOne(() => Tab, (tab) => tab.tabPermissions)
+    // @ManyToOne(() => Tab, (tab) => tab.tabPermissions)
     tab: Tab;
 
     @ManyToOne(() => Permission, (permission) => permission.tabPermissions)
