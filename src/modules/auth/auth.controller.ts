@@ -14,6 +14,7 @@ export class AuthController {
         private authService: AuthService
     ) {
     }
+    
 
     @ApiResponse({status: 200, description: 'Login Completed'})
     @ApiResponse({status: 400, description: 'Bad Request'})
@@ -25,9 +26,8 @@ export class AuthController {
             loginDto.password,
         );
 
-        if (!user){
-            return new ApiBaseResponse("User not found",HttpStatus.NOT_FOUND,null);
-        }
+        const userInfo = await this.authService.getSinleUserInfo(user.userId);
+
         var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
         const token = await this.authService.createToken(user, loginHistoryInfo.loginHistoryId);
         const users = {
@@ -35,9 +35,10 @@ export class AuthController {
         img: null,
         username: user.username,
         password :user.password,
-        firstName: user.username,
-        lastName: user.username,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
         role : 'Admin',
+        branch: userInfo.branchId,
         token: token.access_token
         }
         return new ApiBaseResponse("Login Successfully",HttpStatus.OK,users);

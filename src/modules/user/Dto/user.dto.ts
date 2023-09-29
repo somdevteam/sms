@@ -45,7 +45,7 @@ export class UserDto {
         required: true,
     })
     
-    @IsNotEmpty()
+    // @IsNotEmpty()
     password: string;
 
     @ApiProperty({
