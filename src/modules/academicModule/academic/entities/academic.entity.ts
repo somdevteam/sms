@@ -1,4 +1,5 @@
 import { ClassSection } from "src/modules/academicModule/class-section/entities/class-section.entity";
+import { BranchAcademic } from "src/modules/branch-academic/entities/branch-academic.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity('academic')
@@ -12,7 +13,9 @@ export class AcademicEntity extends BaseEntity {
     @Column({default: true})
     isactive: boolean;
 
-    @OneToMany(() => ClassSection, clsSec => clsSec.academic)
-    classSection: ClassSection
+    // @OneToMany(() => BranchAcademic, (branchAcademic) => branchAcademic.academic)
+    // branchAcademics: BranchAcademic[];
+    @OneToMany(() => BranchAcademic, (branchAcademic) => branchAcademic.academic)
+    branchAcademics: BranchAcademic[];
 
 }

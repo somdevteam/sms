@@ -50,10 +50,10 @@ async  create(payload: CreateClassSectionDto) {
      try {
   
       let classSection = new ClassSection();
-      classSection.branch = branch;
+      // classSection.branch = branch;
       classSection.class = clas;
       classSection.section = section;
-      classSection.academic = academic;
+      // classSection.academic = academic;
       classSection.dateCreated = new Date();
   
       return await this.classSectionRepository.save(classSection);
@@ -102,10 +102,10 @@ async  create(payload: CreateClassSectionDto) {
      }
 
      const foundClassSection = await this.getById(payload.classSectionId);
-     foundClassSection.branch = branch;
+    //  foundClassSection.branch = branch;
      foundClassSection.class = clas;
      foundClassSection.section = section;
-     foundClassSection.academic = academic;
+    //  foundClassSection.academic = academic;
 
      return await this.classSectionRepository.update(foundClassSection.classSectionId,foundClassSection);
   }
@@ -155,6 +155,7 @@ async  create(payload: CreateClassSectionDto) {
             )
             .getOne();
     }
+    
 
     // async getAcademicByClassAndSectionId(classId:number,sectionId:number):Promise<any>{
     //   return await this.classSectionRepository.createQueryBuilder('classSection')

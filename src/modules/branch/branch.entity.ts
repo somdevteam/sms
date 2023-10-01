@@ -4,6 +4,7 @@ import { Level } from "../academicModule/level/entities/level.entity";
 import { Levelclass } from "src/modules/academicModule/levelclass/entities/levelclass.entity";
 import { ClassSubject } from "../academicModule/class-subject/entities/class-subject.entity";
 import { ClassSection } from "../academicModule/class-section/entities/class-section.entity";
+import { BranchAcademic } from "../branch-academic/entities/branch-academic.entity";
 
 @Entity('branch')
 export class Branch extends BaseEntity {
@@ -26,7 +27,10 @@ export class Branch extends BaseEntity {
     levelclass: Levelclass[]
     @OneToMany(() => ClassSubject, clssub => clssub.branch)
     classSubject: ClassSubject
-    @OneToMany(() => ClassSection, clsSec => clsSec.branch)
-    classSection: ClassSection
+    // @OneToMany(() => BranchAcademic, (branchAcademic) => branchAcademic.branch)
+    // branchAcademics: BranchAcademic[];
+
+    @OneToMany(() => BranchAcademic, (branchAcademic) => branchAcademic.branch)
+  branchAcademics: BranchAcademic[];
 
 }

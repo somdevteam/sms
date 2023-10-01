@@ -18,6 +18,7 @@ import { SectionModule } from './modules/academicModule/section/section.module';
 import {StudentModule} from "./modules/studentModule/student/student.module";
 import {ResponsibleModule} from "./modules/studentModule/responsible/responsible.module";
 import {StudentclassModule} from "./modules/studentModule/studentclass/studentclass.module";
+import { BranchAcademicModule } from './modules/branch-academic/branch-academic.module';
 
 
 @Module({
@@ -41,7 +42,11 @@ import {StudentclassModule} from "./modules/studentModule/studentclass/studentcl
       inject: [ConfigService],
     }),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule],
+  ClassModule, SubjectModule, LevelModule, 
+  LevelclassModule, AcademicModule, ClassSubjectModule,
+  SectionModule,ClassSectionModule,StudentModule,
+  ResponsibleModule, StudentclassModule,BranchAcademicModule
+],
   controllers: [AppController],
   providers: [AppService],
 })

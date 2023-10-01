@@ -21,6 +21,11 @@ export class ClassController {
     return this.classService.findAll();
   }
 
+  @Get('allsections')
+  async getClassWithSections() {
+    return this.classService.getClassWithSections();
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {

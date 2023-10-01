@@ -92,4 +92,20 @@ export class ClassService {
     }
     return await this.classRepository.delete(id);
   }
+
+  async getClassWithSections() {
+    const classes = await this.classRepository
+      .createQueryBuilder('class')
+      .leftJoinAndSelect('class.classSection', 'ClassSection')
+      .leftJoinAndSelect('ClassSection.section', 'Section')
+      .getMany();
+      return classes;
+      // const result = classes.map((clazz) => ({ 
+      //   classname: clazz.classname,
+      //   section: clazz.classSection.map((classSection) => ({
+      //     [`section`]: classSection.section.sectionname,
+      //   })),
+      // }));
+      // return result;
+  }
 }
