@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
+import {RolePermissionsEntity} from "../../rolePermissions/entities/rolePermissions.entity";
+import {UserTypePermissions} from "../../usertypepermissions/usertypepermissions.entity";
 
 @Entity('usertypes')
 export class UserTypesEntity {
@@ -7,4 +9,6 @@ export class UserTypesEntity {
 
     @Column({ length: 500 })
     description: string;
+    @OneToMany(() => UserTypePermissions, userTypePermissions => userTypePermissions.userType)
+    userTypePermissions: UserTypePermissions
 }
