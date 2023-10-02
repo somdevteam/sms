@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
-import { RolePermissionsService } from './role-permissions.service';
-import { RolePermissionsEntity } from './role-permissions.entity';
+import {RolePermissionsEntity} from "./entities/rolePermissions.entity";
+import {RolePermissionsService} from "./rolePermissions.service";
+
 
 @Controller('rolePermissions')
 export class RolePermissionsController {

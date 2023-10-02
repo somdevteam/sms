@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
+import {ClassSection} from "../../academicModule/class-section/entities/class-section.entity";
+import {RolePermissionsEntity} from "../../rolePermissions/entities/rolePermissions.entity";
 
 @Entity('roles')
 export class RolesEntity {
@@ -19,4 +21,6 @@ export class RolesEntity {
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateCreated: Date;
+    @OneToMany(() => RolePermissionsEntity, rolePermissions => rolePermissions.role)
+    rolePermissions: RolePermissionsEntity
 }

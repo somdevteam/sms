@@ -35,7 +35,7 @@ export class UserService {
         return this.userRepository.find();
     }
 
-    async getByMobile(mobile: number): Promise<UserProfile | null> {
+    async getByMobile(mobile: string): Promise<UserProfile | null> {
         return await this.userProfileRepository.findOne({where: {mobile}});
     }
 

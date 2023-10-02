@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RolePermissionsEntity } from './role-permissions.entity';
+import {RolePermissionsEntity} from "./entities/rolePermissions.entity";
+
 
 @Injectable()
 export class RolePermissionsService {
@@ -20,7 +21,7 @@ export class RolePermissionsService {
     }
 
     async findRolePermissionById(rolePermissionId: number): Promise<RolePermissionsEntity | undefined> {
-        return await this.rolePermissionsRepository.findOne(rolePermissionId);
+        return await this.rolePermissionsRepository.findOne({where:{rolePermissionId}});
     }
 
     async updateRolePermission(

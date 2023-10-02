@@ -5,9 +5,11 @@ import {
     CreateDateColumn,
     BaseEntity,
     RelationOptions,
-    ManyToMany, JoinTable,
+    ManyToMany, JoinTable, OneToMany,
 } from 'typeorm';
 import { Tab } from '../../tabs/entities/tabs.entity';
+import {ClassSection} from "../../academicModule/class-section/entities/class-section.entity";
+import {RolePermissionsEntity} from "../../rolePermissions/entities/rolePermissions.entity";
 
 @Entity('permissions')
 export class Permission extends BaseEntity{
@@ -32,4 +34,6 @@ export class Permission extends BaseEntity{
     // @ManyToMany(() => Tab, (tab) => tab.permissions)
     @JoinTable({ name: 'tabpermissions', joinColumn: { name: 'PERMISSIONID' }, inverseJoinColumn: { name: 'TABID' } })
     tabPermissions: Tab[];
+    @OneToMany(() => RolePermissionsEntity, rolePermissions => rolePermissions.role)
+    rolePermissions: RolePermissionsEntity
 }
