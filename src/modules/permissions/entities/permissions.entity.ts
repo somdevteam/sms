@@ -12,6 +12,7 @@ import {ClassSection} from "../../academicModule/class-section/entities/class-se
 import {RolePermissionsEntity} from "../../rolePermissions/entities/rolePermissions.entity";
 import {UserTypePermissions} from "../../usertypepermissions/usertypepermissions.entity";
 import {UserPermissions} from "../../userpermissions/userpermissions.entity";
+import {TabPermission} from "../../tabPermissions/entities/tabPermissions.entity";
 
 @Entity('permissions')
 export class Permission extends BaseEntity {
@@ -24,18 +25,18 @@ export class Permission extends BaseEntity {
     @Column({name: 'DESCRIPTION', length: 200})
     description: string;
 
-    @Column({name: 'CREATEDBY'})
+    @Column({name: 'CREATEDBY', nullable:true})
     createdBy: number;
 
-    @CreateDateColumn({name: 'DATECREATED'})
+    @CreateDateColumn({name: 'DATECREATED',nullable:true})
     dateCreated: Date;
 
     @Column({name: 'ISACTIVE'})
     isActive: string;
 
     // @ManyToMany(() => Tab, (tab) => tab.permissions)
-    @JoinTable({name: 'tabpermissions', joinColumn: {name: 'PERMISSIONID'}, inverseJoinColumn: {name: 'TABID'}})
-    tabPermissions: Tab[];
+    // @JoinTable({name: 'tabpermissions', joinColumn: {name: 'PERMISSIONID'}, inverseJoinColumn: {name: 'TABID'}})
+    // tabPermissions: Tab[];
     @OneToMany(() => RolePermissionsEntity, rolePermissions => rolePermissions.role)
     rolePermissions: RolePermissionsEntity
     @OneToMany(() => UserTypePermissions, userTypePermission => userTypePermission.permission)
@@ -43,4 +44,7 @@ export class Permission extends BaseEntity {
 
     @OneToMany(() => UserPermissions, userPermissions => userPermissions.permission)
     userPermissions: UserPermissions
+
+    @OneToMany(() => TabPermission, (tabPermission) => tabPermission.permission)
+    tabPermission: TabPermission;
 }

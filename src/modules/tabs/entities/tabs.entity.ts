@@ -6,10 +6,11 @@ import {
     JoinColumn,
     ManyToMany,
     JoinTable,
-    RelationOptions,
+    RelationOptions, OneToMany,
 } from 'typeorm';
 import { Menus } from '../../menus/entities/menus.entity';
 import { Permission } from '../../permissions/entities/permissions.entity';
+import {TabPermission} from "../../tabPermissions/entities/tabPermissions.entity";
 
 @Entity()
 export class Tab {
@@ -38,7 +39,6 @@ export class Tab {
     @JoinColumn({ name: 'menuId' })
     Menus: Menus;
 
-    // @ManyToMany(() => Permission, (permission) => permission.tabPermissions)
-    // @JoinTable({ name: 'tabpermissions', joinColumn: { name: 'TABID' }, inverseJoinColumn: { name: 'PERMISSIONID' } })
-    // permissions: Permission[];
+    @OneToMany(() => TabPermission, (tabPermission) => tabPermission.tab)
+    tabPermission: TabPermission;
 }
