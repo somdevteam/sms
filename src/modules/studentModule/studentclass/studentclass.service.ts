@@ -115,6 +115,7 @@ export class StudentClassService {
     await this.classSectionService.getSectionIdByClassIdAndSectionId(
       payload.toClass,
       payload.toSection,
+      null
     );
 
   if (!existingClassSection) {

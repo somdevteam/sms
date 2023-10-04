@@ -9,9 +9,10 @@ import { AcademicModule } from 'src/modules/academicModule/academic/academic.mod
 import { BranchModule } from 'src/modules/branch/branch.module';
 import { ClassModule } from 'src/modules/academicModule/class/class.module';
 import { SectionModule } from 'src/modules/academicModule/section/section.module';
+import { BranchAcademicModule } from 'src/modules/branch-academic/branch-academic.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([StudentClass]), ClassSectionModule,AcademicModule,BranchModule,ClassModule,SectionModule, forwardRef(()=>StudentModule)],
+  imports:[TypeOrmModule.forFeature([StudentClass]), ClassSectionModule,AcademicModule,BranchModule,ClassModule,SectionModule,BranchAcademicModule, forwardRef(()=>StudentModule)],
   controllers: [StudentClassController],
   providers: [StudentClassService,StudentClass],
   exports: [StudentClassService,TypeOrmModule]

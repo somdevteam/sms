@@ -4,7 +4,7 @@ import { Class } from "src/modules/academicModule/class/entities/class.entity";
 import { Section } from "src/modules/academicModule/section/entities/section.entity";
 import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {StudentClass} from "../../../studentModule/studentclass/entities/studentclass.entity";
-import { BranchAcademic } from "src/modules/branch-academic/entities/branch-academic.entity";
+import { AcademicBranch } from "src/modules/branch-academic/entities/branch-academic.entity";
 
 @Entity()
 export class ClassSection {
@@ -12,11 +12,11 @@ export class ClassSection {
     classSectionId:number;
 
     @ManyToOne(() => Class, cls => cls.classSection)
-    @JoinColumn({name: 'classid'}) // Specify the foreign key column
+    @JoinColumn({name: 'classId'}) // Specify the foreign key column
     class: Class;
 
     @ManyToOne(() => Section, sec => sec.classSection)
-    @JoinColumn({name: 'sectionid'}) // Specify the foreign key column
+    @JoinColumn({name: 'sectionId'}) // Specify the foreign key column
     section: Section;
     @Column()
     dateCreated: Date
@@ -24,8 +24,8 @@ export class ClassSection {
     @JoinColumn({name: 'studentClassId'})
     studentClass:StudentClass;
 
-    @ManyToOne(() => BranchAcademic, (branchAcademic) => branchAcademic.classSections)
+    @ManyToOne(() => AcademicBranch, (branchAcademic) => branchAcademic.classSections)
     @JoinColumn({ name: 'branchAcademicId' }) // Specify the foreign key column name
-    branchAcademic: BranchAcademic;
+    branchAcademic: AcademicBranch;
 
 }

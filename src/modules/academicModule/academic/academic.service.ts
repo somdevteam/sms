@@ -17,11 +17,11 @@ export class AcademicService {
   ) {}
 
   getById(id: number): Promise<AcademicEntity> {
-    return this.academicRepository.findOne({ where: { academicid: id } });
+    return this.academicRepository.findOne({ where: { academicId: id } });
   }
 
-  getByUsername(academicname: string): Promise<AcademicEntity> {
-    return this.academicRepository.findOne({ where: { academicname } });
+  getByUsername(academicName: string): Promise<AcademicEntity> {
+    return this.academicRepository.findOne({ where: { academicName } });
   }
 
   async create(payload: CreateAcademicDto) {
@@ -33,7 +33,7 @@ export class AcademicService {
     }
     
     let academic = new AcademicEntity();
-    academic.academicname = payload.academicname;
+    academic.academicName = payload.academicname;
     academic.datecreated = new Date();
     
     try {

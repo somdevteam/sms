@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UpdateBranchAcademicDto } from './dto/update-branch-academic.dto';
 import { BranchAcademicDto } from './dto/create-branch-academic.dto';
-import { BranchAcademic } from './entities/branch-academic.entity';
+import { AcademicBranch } from './entities/branch-academic.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AcademicService } from '../academicModule/academic/academic.service';
@@ -11,26 +11,38 @@ import { BranchService } from '../branch/branch.service';
 export class BranchAcademicService {
 
   constructor(
-    @InjectRepository(BranchAcademic) private branchAcademicRepository: Repository<BranchAcademic>,
+    @InjectRepository(AcademicBranch) private branchAcademicRepository: Repository<AcademicBranch>,
     private readonly branchService :BranchService,
     private readonly academicService :AcademicService,
   ) {}
 
-
-  async findByBranchIdAndAcademicId(branchId: any, academicId: any): Promise<BranchAcademic | null> {
-    const branchAcademic = await this.branchAcademicRepository.findOne({
-      where: {
-        branch: branchId,
-        academic: academicId,
-      },
+  async findAcademicBranchIdByBranchAndAcademic(branchId: number, academicId: number): Promise<AcademicBranch | null> {
+    const academicBranch = await this.branchAcademicRepository.findOne({
+      where: { branch: { branchId }, academic: { academicId } },
     });
-  
-    if (!branchAcademic) {
-      throw new NotFoundException('BranchAcademic not found');
+
+    if (!academicBranch) {
+      throw new NotFoundException('academic with this branch not found');
     }
-  
+
+    return academicBranch;
+  }
+
+  async findLatestActiveBranchAcademic(branchId: number): Promise<AcademicBranch> {
+    const branchAcademic = await  this.branchAcademicRepository.findOne({
+      where: {
+        branch :  { branchId },
+        isActive: true,
+      }, relations: ['academic', 'branch'], 
+    });
+
+    if (!branchAcademic) {
+      throw new NotFoundException('academic with this branch not found');
+    }
+
     return branchAcademic;
   }
+
   
   
   
@@ -49,7 +61,7 @@ export class BranchAcademicService {
 
     try {
 
-      const branchAcademic = new BranchAcademic();
+      const branchAcademic = new AcademicBranch();
       branchAcademic.branch = branch;
       branchAcademic.academic = academic;
   

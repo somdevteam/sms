@@ -1,32 +1,27 @@
+
 import { AcademicEntity } from 'src/modules/academicModule/academic/entities/academic.entity';
 import { ClassSection } from 'src/modules/academicModule/class-section/entities/class-section.entity';
 import { Branch } from 'src/modules/branch/branch.entity';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Column } from 'typeorm';
 
+
 @Entity()
-export class BranchAcademic {
+export class AcademicBranch {
   @PrimaryGeneratedColumn()
-  branchAcademicId: number;
+  academicBranchId: number;
 
-  // @ManyToOne(() => Branch, (branch) => branch.branchAcademics)
-  // @JoinColumn({name: 'branchId'}) 
-  // branch: Branch;
-
-  // @ManyToOne(() => AcademicEntity, (academic) => academic.branchAcademics)
-  // @JoinColumn({name: 'academicId'}) 
-  // academic: AcademicEntity;
-
-  @ManyToOne(() => Branch, (branch) => branch.branchAcademics)
-  branch: Branch;
-
-  @ManyToOne(() => AcademicEntity, (academic) => academic.branchAcademics)
+  @ManyToOne(() => AcademicEntity, (academic) => academic.academicBranches)
+  @JoinColumn({ name: 'academicId' })
   academic: AcademicEntity;
 
-  @Column({default: true})
-  isActive:boolean
-
+  @ManyToOne(() => Branch, (branch) => branch.academicBranches)
+  @JoinColumn({ name: 'branchId' })
+  branch: Branch;
 
   @OneToMany(() => ClassSection, (classSection) => classSection.branchAcademic)
   classSections: ClassSection; // Define the reverse relationship
-  
+
+  @Column({default: true})
+  isActive:boolean
 }
+

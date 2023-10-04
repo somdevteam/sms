@@ -11,7 +11,6 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Responsible} from "./entities/responsible.entity";
 import {Repository} from "typeorm";
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
-import {AcademicEntity} from "../../academicModule/academic/entities/academic.entity";
 
 @Injectable()
 export class ResponsibleService {

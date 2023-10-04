@@ -14,15 +14,7 @@ export class BranchAcademicController {
 
   @Get()
   findAll() {
-    return this.branchAcademicService.findAll();
-  }
-
-  @Get('me')
-  findByBranchIdAndAcademicId(
-    // @Param('branchId') branchId: number,
-    // @Param('academicId') academicId: number,
-  ) {
-    return this.branchAcademicService.findByBranchIdAndAcademicId(1, 1);
+    return this.branchAcademicService.findLatestActiveBranchAcademic(1);
   }
 
   @Get(':id')
