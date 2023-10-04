@@ -4,16 +4,14 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
-    ManyToMany,
-    JoinTable,
-    RelationOptions, OneToMany,
+    OneToMany,
+    BaseEntity,
 } from 'typeorm';
 import { Menus } from '../../menus/entities/menus.entity';
-import { Permission } from '../../permissions/entities/permissions.entity';
-import {TabPermission} from "../../tabPermissions/entities/tabPermissions.entity";
+import { TabPermissions } from '../../tabPermissions/entities/tabPermissions.entity';
 
 @Entity()
-export class Tab {
+export class Tab extends BaseEntity {
     @PrimaryGeneratedColumn()
     tabId: number;
 
@@ -39,6 +37,6 @@ export class Tab {
     @JoinColumn({ name: 'menuId' })
     Menus: Menus;
 
-    @OneToMany(() => TabPermission, (tabPermission) => tabPermission.tab)
-    tabPermission: TabPermission;
+    @OneToMany(() => TabPermissions, (tabPermission) => tabPermission.tab)
+    tabPermission: TabPermissions[];
 }

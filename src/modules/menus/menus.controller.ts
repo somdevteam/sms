@@ -7,7 +7,7 @@ import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 export class MenusController {
     constructor(private readonly MenusService: MenusService) {}
 
-    @Get('user/:userId')
+    @Get()
     async getUserMenus(@Param('userId') userId: number): Promise<ApiBaseResponse> {
         const menus = await this.MenusService.getUserMenus(userId);
         return new ApiBaseResponse('success', 200, menus);

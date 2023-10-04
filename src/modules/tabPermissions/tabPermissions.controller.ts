@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { TabPermissionsService } from './tabPermissions.service';
-import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
+import { ApiBaseResponse } from '../../common/dto/apiresponses.dto';
 
-@Controller('permissions')
+@Controller('tabpermissions')
 export class TabPermissionsController {
     constructor(private readonly tabPermissionsService: TabPermissionsService) {}
 

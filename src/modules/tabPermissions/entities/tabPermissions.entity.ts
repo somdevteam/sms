@@ -1,14 +1,14 @@
-import {Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import { Tab } from '../../tabs/entities/tabs.entity'; // Import the Tab entity
-import { Permission } from '../../permissions/entities/permissions.entity'; // Import the Permission entity
+import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Tab } from '../../tabs/entities/tabs.entity';
+import { Permission } from '../../permissions/entities/permissions.entity';
 
 @Entity('tabpermissions')
-export class TabPermission {
+export class TabPermissions extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'tabpermissionid' })
     tabPermissionId: number;
 
     @ManyToOne(() => Tab, (tab) => tab.tabPermission)
-    @JoinColumn({name:'tabid'})
+    @JoinColumn({name:'tabId'})
     tab: Tab;
 
     @ManyToOne(() => Permission, (permission) => permission.tabPermission)

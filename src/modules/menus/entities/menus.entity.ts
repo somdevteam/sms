@@ -27,7 +27,6 @@ export class Menus extends BaseEntity{
 
     @Column()
     ISACTIVE: string;
-    // Add other columns as needed
 
     @OneToMany(() => Tab, (tab) => tab.Menus)
     tabs: Tab[];
