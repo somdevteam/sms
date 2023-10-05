@@ -38,6 +38,7 @@ export class AuthController {
         firstName: user.username,
         lastName: user.username,
         role : 'Admin',
+        branchId: null,
         token: token.access_token
         }
         return new ApiBaseResponse("Login Successfully",HttpStatus.OK,users);

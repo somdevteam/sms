@@ -168,15 +168,16 @@ export class StudentService {
     }
 
 
-    async getStudentCountByBranchAndAcademic(branchId: number, academicId: number): Promise<number> {
+    async getStudentCountByBranchAndAcademic(branchId: number, academicId: number): Promise<any> {
         const queryBuilder = this.StudentRepository
           .createQueryBuilder('student')
-          .innerJoin('student.studentClass', 'studentclass')
-          .innerJoin('studentclass.classSection', 'ClassSection')
-          .innerJoin('ClassSection.branchAcademic', 'academicBranch')
+          .leftJoinAndSelect('student.studentClass', 'studentclass')
+          .leftJoinAndSelect('studentclass.classSection', 'ClassSection')
+          .leftJoinAndSelect('ClassSection.branchAcademic', 'academicBranch')
           .where('academicBranch.branchId = :branchId', { branchId })
           .andWhere('academicBranch.academicId = :academicId', { academicId });
+          
     
-        return queryBuilder.getCount();
+        return queryBuilder.getMany();
       }
 }

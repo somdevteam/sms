@@ -34,7 +34,7 @@ export class BranchService {
       return await this.findAllByBranchId(+branchId)
     }
     const constantData: any[] = [
-      { branchid: 0, branchname: 'All Branches' }
+      { branchId: 0, branchName: 'All Branches' }
     ];
     const branchData = await this.branchRepository.find();
     if (!branchData) {
@@ -66,6 +66,7 @@ export class BranchService {
       );
     }
 
+    try {
     let branch = new Branch();
     branch.branchName = payload.branchName;
     branch.branchLogo = payload.branchLogo;
@@ -73,8 +74,6 @@ export class BranchService {
     branch.isActive = payload.isactive;
     branch.branchLocation = payload.branchLocation;
     branch.dateCreated = new Date();
-
-    try {
       return await this.branchRepository.save(branch);
     } catch (error) {
       if (error) {

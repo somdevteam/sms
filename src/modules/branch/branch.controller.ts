@@ -24,8 +24,9 @@ export class BranchController {
 
     @UseGuards(JwtAuthGuard)
     @Post("/")
-    createUser(@Body() branchDTO: BranchDTO) {
-        return this.branchService.create(branchDTO);
+   async createBranch(@Body() branchDTO: BranchDTO) : Promise<ApiBaseResponse> {
+        await this.branchService.create(branchDTO);
+        return new ApiBaseResponse('branch saved',HttpStatus.OK,null);
     }
 
     @UseGuards(JwtAuthGuard)

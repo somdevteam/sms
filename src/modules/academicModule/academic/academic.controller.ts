@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpStatus } from '@nestjs/common';
 import { AcademicService } from './academic.service';
 import { CreateAcademicDto } from './dto/create-academic.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import {ApiTags} from "@nestjs/swagger";
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('academic')
 @ApiTags('Academic Apis')
@@ -11,8 +12,9 @@ export class AcademicController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createAcademicDto: CreateAcademicDto) {
-    return this.academicService.create(createAcademicDto);
+  async create(@Body() createAcademicDto: CreateAcademicDto): Promise<ApiBaseResponse> {
+    await this.academicService.create(createAcademicDto);
+    return new ApiBaseResponse('academic saved',HttpStatus.OK,null);
   }
 
   @UseGuards(JwtAuthGuard)
