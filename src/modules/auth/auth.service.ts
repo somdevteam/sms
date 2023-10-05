@@ -30,6 +30,10 @@ export class AuthService {
         }
         return user;
     }
+
+    async getSinleUserInfo(userId:number)  {
+        return await this.usersService.fetchSingleUsersFullData(userId);
+     }
     
 
     async getUserInfo(request: any, user: any): Promise<Loginhistories> {

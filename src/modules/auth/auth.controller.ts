@@ -25,9 +25,8 @@ export class AuthController {
             loginDto.password,
         );
 
-        if (!user){
-            return new ApiBaseResponse("User not found",HttpStatus.NOT_FOUND,null);
-        }
+        const userInfo = await this.authService.getSinleUserInfo(user.userId);
+
         var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
         const token = await this.authService.createToken(user, loginHistoryInfo.loginHistoryId);
         const users = {
@@ -38,7 +37,7 @@ export class AuthController {
         firstName: user.username,
         lastName: user.username,
         role : 'Admin',
-        branchId: null,
+        branch: userInfo.branchId,
         token: token.access_token
         }
         return new ApiBaseResponse("Login Successfully",HttpStatus.OK,users);

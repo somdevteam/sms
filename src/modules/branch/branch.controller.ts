@@ -16,9 +16,12 @@ export class BranchController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('/')
-    async getAllBranches(@Request() req) : Promise<ApiBaseResponse> {
-        const  branches = await this.branchService.getAllBranches(req.user.user);
+    @Get(':type?')
+    async getAllBranches(@Request() req,@Param('type') type?: string) : Promise<ApiBaseResponse> {
+
+        const isAll = !type ? false: true;
+        
+        const  branches = await this.branchService.getAllBranches(req.user.user,isAll);
         return new ApiBaseResponse('branches list',HttpStatus.OK,branches);
     }
 

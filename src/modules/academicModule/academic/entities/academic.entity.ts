@@ -19,6 +19,6 @@ export class AcademicEntity extends BaseEntity {
 
   @Column()
   datecreated: Date;
-  @Column({default: true})
+  @Column({default: false})
   isactive: boolean;
 }

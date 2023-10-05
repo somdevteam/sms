@@ -28,20 +28,25 @@ export class BranchService {
     return this.branchRepository.find({ where: { branchId: branchId } });
   }
 
-  async getAllBranches(currentuser:CurrentUser) {
+  async getAllBranches(currentuser:CurrentUser,isAll:boolean) {
     const branchId = currentuser.profile.branchId;
     if (branchId) {
       return await this.findAllByBranchId(+branchId)
     }
-    const constantData: any[] = [
-      { branchId: 0, branchName: 'All Branches' }
-    ];
+    
     const branchData = await this.branchRepository.find();
+    
     if (!branchData) {
       return branchData;
     }
+
+    const constantData: any[] = [
+      { branchId: 0, branchName: 'All Branches' }
+    ];
     const combinedData = constantData.concat(branchData);
-    return combinedData;
+
+
+    return isAll ? combinedData : branchData;
   }
 
   async getBranchByName(branchName: string): Promise<Branch> {
