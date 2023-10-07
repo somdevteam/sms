@@ -12,13 +12,13 @@ export class AcademicEntity extends BaseEntity {
   academicId: number;
 
   @Column()
-  academicName: string;
+  academicYear: string;
 
   @OneToMany(() => AcademicBranch, (academicBranch) => academicBranch.academic)
   academicBranches: AcademicBranch[];
 
   @Column()
-  datecreated: Date;
+  dateCreated: Date;
   @Column({default: false})
-  isactive: boolean;
+  isActive: boolean;
 }

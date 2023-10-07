@@ -16,16 +16,20 @@ export class AcademicService {
     private academicRepository: Repository<AcademicEntity>,
   ) {}
 
-  getById(id: number): Promise<AcademicEntity> {
-    return this.academicRepository.findOne({ where: { academicId: id } });
+ async getById(id: number): Promise<AcademicEntity> {
+    const academic = await this.academicRepository.findOne({ where: { academicId: id } });
+    if (!academic) {
+      throw new Error('Academic not found');
+    }
+    return academic;
   }
 
-  getByUsername(academicName: string): Promise<AcademicEntity> {
-    return this.academicRepository.findOne({ where: { academicName } });
+  getByUsername(academicYear: string): Promise<AcademicEntity> {
+    return this.academicRepository.findOne({ where: { academicYear } });
   }
 
   async create(payload: CreateAcademicDto) {
-    const academicname = await this.getByUsername(payload.academicname);
+    const academicname = await this.getByUsername(payload.academicYear);
     if (academicname) {
       throw new NotAcceptableException(
         'The academic name currently exists. Please choose another one.',
@@ -33,8 +37,8 @@ export class AcademicService {
     }
     
     let academic = new AcademicEntity();
-    academic.academicName = payload.academicname;
-    academic.datecreated = new Date();
+    academic.academicYear = payload.academicYear;
+    academic.dateCreated = new Date();
     
     try {
       const savedAcademic = await this.academicRepository.save(academic); 
@@ -58,8 +62,17 @@ export class AcademicService {
     return `This action returns a #${id} academic`;
   }
 
-  update(id: number, updateAcademicDto) {
-    return `This action updates a #${id} academic`;
+  async update(id: number, payload:CreateAcademicDto) : Promise<AcademicEntity> {
+    const academic = await this.getById(id);
+
+    if (!academic) {
+      throw new Error('Academic not found');
+    }
+
+    academic.academicYear = payload.academicYear;
+    academic.isActive = payload.isActive
+
+    return this.academicRepository.save(academic);
   }
 
   remove(id: number) {

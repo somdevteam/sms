@@ -19,8 +19,9 @@ export class AcademicController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.academicService.findAll();
+ async findAll(): Promise<ApiBaseResponse> {
+    const academic = await this.academicService.findAll();
+    return new ApiBaseResponse('academic lists',HttpStatus.OK,academic)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -31,8 +32,9 @@ export class AcademicController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAcademicDto) {
-    return this.academicService.update(+id, updateAcademicDto);
+  async update(@Param('id') id: string, @Body() payload:CreateAcademicDto): Promise<ApiBaseResponse> {
+    const academic = await this.academicService.update(+id, payload);
+    return new ApiBaseResponse('academic updated successfully',HttpStatus.OK,academic)
   }
 
   @UseGuards(JwtAuthGuard)

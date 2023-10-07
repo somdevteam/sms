@@ -21,7 +21,13 @@ export class BranchService {
   ) {}
 
  async getById(id: number): Promise<Branch> {
-    return await this.branchRepository.findOne({ where: { branchId: id } });
+    const branch = await this.branchRepository.findOne({ where: { branchId: id } });
+
+    if (!branch) {
+      throw new NotFoundException('branch not found');
+    }
+
+    return branch;
   }
 
   async findAllByBranchId(branchId: number): Promise<Branch[]> {
