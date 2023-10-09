@@ -5,8 +5,6 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { UserDto } from '../user/Dto/user.dto';
-import crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Branch } from './branch.entity';
 import { Repository } from 'typeorm';
@@ -135,4 +133,20 @@ export class BranchService {
     }
     return this.branchRepository.delete(id);
   }
+  async findBranchesWithCondition(academicId: number) {
+    const branches = await this.branchRepository
+      .createQueryBuilder('branch')
+      .leftJoin('branch.academicBranches', 'academicBranch', 'academicBranch.academicId = :academicId', { academicId })
+      .where('academicBranchId IS NULL')
+      .select([
+        'branch.branchId branchId',
+        'branch.branchName branchName',
+        'academicBranch.academicBranchId academicBranchId',
+      ])
+      .getRawMany();
+
+    return branches;
+  }
+
+
 }

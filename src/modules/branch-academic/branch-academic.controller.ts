@@ -1,15 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
 import { BranchAcademicService } from './branch-academic.service';
-import { UpdateBranchAcademicDto } from './dto/update-branch-academic.dto';
-import { BranchAcademicDto } from './dto/create-branch-academic.dto';
+import { AcademicBranchDto } from './dto/create-branch-academic.dto';
+import { AcademicBranch } from './entities/branch-academic.entity';
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('branch-academic')
 export class BranchAcademicController {
   constructor(private readonly branchAcademicService: BranchAcademicService) {}
 
   @Post()
-  create(@Body() createBranchAcademicDto: BranchAcademicDto) {
-    return this.branchAcademicService.create(createBranchAcademicDto);
+ async create(@Body() createBranchAcademicDto: AcademicBranchDto): Promise<ApiBaseResponse> {
+    const data = await this.branchAcademicService.createAcademicBranch(createBranchAcademicDto);
+    return new ApiBaseResponse('created successfully',HttpStatus.OK,data);
   }
 
   @Get()
@@ -22,8 +24,14 @@ export class BranchAcademicController {
     return this.branchAcademicService.findOne(+id);
   }
 
+  @Get('academic/:academicId')
+  async getBranchesWithAcademicByAcademicId(@Param('academicId') academicId: number): Promise<ApiBaseResponse> {
+    const branchAcademics = await this.branchAcademicService.findBranchesWithAcademicByAcademicId(academicId);
+    return new ApiBaseResponse('branches by academic',HttpStatus.OK,branchAcademics);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBranchAcademicDto: UpdateBranchAcademicDto) {
+  update(@Param('id') id: string, @Body() updateBranchAcademicDto: AcademicBranchDto) {
     return this.branchAcademicService.update(+id, updateBranchAcademicDto);
   }
 

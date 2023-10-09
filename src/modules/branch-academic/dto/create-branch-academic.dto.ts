@@ -1,13 +1,21 @@
 // src/branch/dto/branch-academic.dto.ts
 
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNumber, IsString } from 'class-validator';
 
-export class BranchAcademicDto {
-  @IsInt()
-  @IsNotEmpty()
-   branchId: number;
 
-  @IsInt()
-  @IsNotEmpty()
-   academicId: number;
+export class AcademicBranchDto {
+  @IsNumber()
+  academicId: number;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  branches: BranchDto[];
+}
+
+export class BranchDto {
+  @IsNumber()
+  branchId: number;
+
+  @IsString()
+  branchName: string;
 }

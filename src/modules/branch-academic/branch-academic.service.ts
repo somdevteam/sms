@@ -1,11 +1,10 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { UpdateBranchAcademicDto } from './dto/update-branch-academic.dto';
-import { BranchAcademicDto } from './dto/create-branch-academic.dto';
 import { AcademicBranch } from './entities/branch-academic.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AcademicService } from '../academicModule/academic/academic.service';
 import { BranchService } from '../branch/branch.service';
+import { AcademicBranchDto } from './dto/create-branch-academic.dto';
 
 @Injectable()
 export class BranchAcademicService {
@@ -43,43 +42,47 @@ export class BranchAcademicService {
     return branchAcademic;
   }
 
-  
-  
-  
- async create(payload: BranchAcademicDto) {
 
-    const branch = await this.branchService.getById(payload.branchId);
-    if (!branch) {
-     throw new NotFoundException(`branch with ID ${payload.branchId} not found`)
-    }
- 
-
+  async createAcademicBranch(payload: AcademicBranchDto): Promise<AcademicBranch[]> {
     const academic = await this.academicService.getById(payload.academicId);
-    if (!academic) {
-     throw new NotFoundException(`academic with ID ${payload.academicId} not found`)
-    }
 
     try {
-
-      const branchAcademic = new AcademicBranch();
-      branchAcademic.branch = branch;
-      branchAcademic.academic = academic;
   
-      return await this.branchAcademicRepository.save(branchAcademic);
-
-    }catch(error) {
-      if (error) {
-        throw new ConflictException(
-          'The provided branch name is already associated.' + error.messages,
-        );
+    const savedAcademicBranches = await Promise.all(
+      payload.branches.map(async (branchPayload) => {
+        const branch = await this.branchService.getById(branchPayload.branchId);
+  
+        const academicBranch = this.branchAcademicRepository.create({
+          branch,
+          academic,
+          isActive: true,
+        });
+  
+        return await this.branchAcademicRepository.save(academicBranch);
+      })
+    );
+  
+    return savedAcademicBranches;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; // Re-throw NotFoundException to be handled by NestJS
       }
       throw new InternalServerErrorException(
-        'An error occurred while creating the branch.',
+        'An error occurred while creating the academic branches.',
       );
     }
-    }
-  
+  }
 
+  async findBranchesWithAcademicByAcademicId(academicId: number): Promise<AcademicBranch[]> {
+    const queryBuilder = await this.branchAcademicRepository.createQueryBuilder('branchAcademic')
+      .innerJoinAndSelect('branchAcademic.branch', 'branch')
+      .innerJoinAndSelect('branchAcademic.academic', 'academic')
+      .where('branchAcademic.academicId = :academicId', { academicId })
+      .getMany();
+
+    return queryBuilder;
+  }
+  
   findAll() {
     return `This action returns all branchAcademic`;
   }
@@ -88,7 +91,7 @@ export class BranchAcademicService {
     return `This action returns a #${id} branchAcademic`;
   }
 
-  update(id: number, updateBranchAcademicDto: UpdateBranchAcademicDto) {
+  update(id: number, updateBranchAcademicDto: AcademicBranchDto) {
     return `This action updates a #${id} branchAcademic`;
   }
 
