@@ -22,8 +22,12 @@ export class ClassService {
     return this.classRepository.findOne({ where: {  classname: name } });
   }
 
-  getById(id: number): Promise<Class> {
-    return this.classRepository.findOne({where: {classid: id}})
+  async getById(id: number): Promise<Class> {
+    const clas =  await this.classRepository.findOne({where: {classid: id}})
+    if (!clas) {
+      throw new NotFoundException('class not found');
+    }
+    return clas;
 }
 
  async create(payload: CreateClassDto) {

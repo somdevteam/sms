@@ -18,25 +18,13 @@ export class LevelclassService {
     private readonly classService :ClassService,
   ) {}
 
-  getById(id: number): Promise<Levelclass> {
-    return this.levelclassRepository.findOne({ where: { levelclassid: id } });
-  }
   
   async create(payload: CreateLevelclassDto) {
    const branch = await this.branchService.getById(payload.branchid);
-   if (!branch) {
-    throw new NotFoundException(`branch with ID ${payload.branchid} not found`)
-   }
 
-   const level = await this.levelService.getById(payload.levelid);
-   if (!level) {
-    throw new NotFoundException(`level with ID ${payload.levelid} not found`)
-   }
+   const level = await this.levelService.findOne(payload.levelid);
 
    const clas = await this.classService.getById(payload.classid);
-   if (!clas) {
-    throw new NotFoundException(`class with ID ${payload.classid} not found`)
-   }
 
     let lvlclass = new Levelclass();
     lvlclass.branch = branch;
@@ -47,15 +35,19 @@ export class LevelclassService {
   }
 
   findAll() {
-    return `This action returns all levelclass`;
+    return this.levelclassRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} levelclass`;
+  async findOne(id: number): Promise<Levelclass> {
+    const levelClass = await this.levelclassRepository.findOne({ where: { levelclassid: id } });
+    if (!levelClass) {
+      throw new NotFoundException(`Level class with ${id} not found`)
+    }
+    return levelClass;
   }
 
  async update( payload: UpdateLevelclassDto) {
-    const foundclasslevel = await this.getById(payload.levelclassid);
+    const foundclasslevel = await this.findOne(payload.levelclassid);
     if (!foundclasslevel) {
       throw new NotFoundException(`level class with id ${payload.levelclassid} not found`);
     }
@@ -65,7 +57,7 @@ export class LevelclassService {
      throw new NotFoundException(`branch with ID ${payload.branchid} not found`)
     }
  
-    const level = await this.levelService.getById(payload.levelid);
+    const level = await this.levelService.findOne(payload.levelid);
     if (!level) {
      throw new NotFoundException(`level with ID ${payload.levelid} not found`)
     }
@@ -91,7 +83,7 @@ export class LevelclassService {
   }
 
  async remove(id: number) {
-    const foundclasslevel = await this.getById(id);
+    const foundclasslevel = await this.findOne(id);
     if (!foundclasslevel) {
       throw new NotFoundException(`level class with id ${id} not found`);
     }
