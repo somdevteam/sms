@@ -39,8 +39,7 @@ export class Permission extends BaseEntity {
   // @ManyToMany(() => Tab, (tab) => tab.permissions)
   // @JoinTable({name: 'tabpermissions', joinColumn: {name: 'PERMISSIONID'}, inverseJoinColumn: {name: 'TABID'}})
   // tabPermissions: Tab[];
-  @OneToMany(
-    () => RolePermissionsEntity,
+  @OneToMany( () => RolePermissionsEntity,
     (rolePermissions) => rolePermissions.role,
   )
   rolePermissions: RolePermissionsEntity;

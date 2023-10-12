@@ -16,7 +16,7 @@ export class RolesEntity {
     @Column({ default: 'Y', length: 1 })
     isActive: string;
 
-    @Column()
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdBy: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
