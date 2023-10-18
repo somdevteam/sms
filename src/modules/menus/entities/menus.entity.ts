@@ -3,7 +3,7 @@ import {Tab} from "../../tabs/entities/tabs.entity";
 
 
 @Entity()
-export class Menus extends BaseEntity{
+export class Menus extends BaseEntity {
     @PrimaryGeneratedColumn()
     MENUID: number;
 
@@ -27,6 +27,22 @@ export class Menus extends BaseEntity{
 
     @Column()
     ISACTIVE: string;
+    @Column()
+    path: string;
+    @Column()
+    title: string;
+    @Column()
+    iconType: string;
+    @Column()
+    icon: string;
+    @Column()
+    class: string;
+    @Column()
+    groupTitle: string;
+    @Column()
+    badge: string;
+    @Column()
+    badgeClass: string;
 
     @OneToMany(() => Tab, (tab) => tab.Menus)
     tabs: Tab[];

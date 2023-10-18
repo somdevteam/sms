@@ -42,6 +42,36 @@ export class MenusService {
             .innerJoinAndSelect('p.userPermissions', 'up')
             .innerJoinAndSelect('up.user', 'u')
             .select([
+                'menus.path',
+                'menus.title',
+                'menus.iconType',
+                'menus.class',
+                'menus.groupTitle',
+                'menus.badge',
+                'menus.badgeClass',
+                'T.path',
+                'T.title',
+                'T.iconType',
+                'T.class',
+                'T.groupTitle',
+                'T.badge',
+                'T.badgeClass',
+            ])
+            .where('u.userid = :userId', {userId: 1})
+        // .orWhere('menus.MenuId IN (SELECT DISTINCT m.Parentid FROM MENUS m, A a WHERE m.MenuId = a.Parentid AND a.MenuId != a.parentid AND m.ISACTIVE = :isActive)', { isActive: 1 });
+        return query.getMany(); // TODO: getting all menus should be based on permission
+    }
+
+    async getUserMenus3(userId: number): Promise<Menus[]> {
+        userId = 1;
+        const query = this.menusRepository.createQueryBuilder('menus')
+
+            .innerJoinAndSelect('menus.tabs', 'T')
+            .innerJoinAndSelect('T.tabPermission', 'TP')
+            .innerJoinAndSelect('TP.permission', 'p')
+            .innerJoinAndSelect('p.userPermissions', 'up')
+            .innerJoinAndSelect('up.user', 'u')
+            .select([
                 'menus.MENUID',
                 'menus.MENUNAME',
                 'menus.DESCRIPTION',
