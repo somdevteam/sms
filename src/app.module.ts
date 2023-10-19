@@ -18,6 +18,16 @@ import { SectionModule } from './modules/academicModule/section/section.module';
 import {StudentModule} from "./modules/studentModule/student/student.module";
 import {ResponsibleModule} from "./modules/studentModule/responsible/responsible.module";
 import {StudentclassModule} from "./modules/studentModule/studentclass/studentclass.module";
+import {MenusModule} from "./modules/menus/menus.module";
+import {TabsModule} from "./modules/tabs/tabs.module";
+import {PermissionsModule} from './modules/permissions/permissions.module';
+import {TabPermissions} from './modules/tabPermissions/entities/tabPermissions.entity';
+import {RolesModule} from './modules/roles/roles.module';
+import {UserTypesModule} from './modules/userTypes/userTypes.module';
+import {UserPermissions} from './modules/userpermissions/userpermissions.entity';
+import {UserTypePermissions} from './modules/usertypepermissions/usertypepermissions.entity';
+import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.module';
+import { UserRolesModule } from './modules/userroles/userroles.module';
 
 
 @Module({
@@ -41,7 +51,8 @@ import {StudentclassModule} from "./modules/studentModule/studentclass/studentcl
       inject: [ConfigService],
     }),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule],
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
+    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserPermissions,UserTypePermissions,TabPermissionsModule,UserRolesModule],
   controllers: [AppController],
   providers: [AppService],
 })
