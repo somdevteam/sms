@@ -64,8 +64,11 @@ export class MenusService {
 
         return query.map(menu => {
             if (menu.tabs) {
+                menu.tabs = menu.tabs.map(tab => {
+                    tab["submenu"] = []; // Add a newline character
+                    return tab;
+                });
               menu["submenu"] = menu.tabs;
-              menu["submenu"].path;
               delete menu.tabs;
             }
             return menu;
