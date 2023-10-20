@@ -32,8 +32,7 @@ export class MenusService {
         return query.getMany(); // TODO: getting all menus should be based on permission
     }
 
-    async getUserMenus(userId: number): Promise<Menus[]> {
-        userId = 1;
+    async getUserMenusById(userId: number): Promise<Menus[]> {
         const query = await this.menusRepository.createQueryBuilder('menus')
 
             .innerJoinAndSelect('menus.tabs', 'T')
@@ -45,6 +44,7 @@ export class MenusService {
                 'menus.path',
                 'menus.title',
                 'menus.iconType',
+                'menus.icon',
                 'menus.class',
                 'menus.groupTitle',
                 'menus.badge',
@@ -52,12 +52,13 @@ export class MenusService {
                 'T.path',
                 'T.title',
                 'T.iconType',
+                'T.icon',
                 'T.class',
                 'T.groupTitle',
                 'T.badge',
                 'T.badgeClass',
             ])
-            .where('u.userid = :userId', {userId: 1})
+            .where('u.userid = :userId', {userId: userId})
             .getMany()
         // .orWhere('menus.MenuId IN (SELECT DISTINCT m.Parentid FROM MENUS m, A a WHERE m.MenuId = a.Parentid AND a.MenuId != a.parentid AND m.ISACTIVE = :isActive)', { isActive: 1 });
         // return query.getMany(); // TODO: getting all menus should be based on permission
