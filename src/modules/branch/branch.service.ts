@@ -133,7 +133,7 @@ export class BranchService {
     }
     return this.branchRepository.delete(id);
   }
-  async findBranchesWithCondition(academicId: number) {
+  async findBranchesWithCondition(academicId: number): Promise<any> {
     const branches = await this.branchRepository
       .createQueryBuilder('branch')
       .leftJoin('branch.academicBranches', 'academicBranch', 'academicBranch.academicId = :academicId', { academicId })

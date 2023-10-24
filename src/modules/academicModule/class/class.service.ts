@@ -58,6 +58,15 @@ export class ClassService {
     return this.classRepository.find();
   }
 
+  async findClassesNotInLevelClassWithBranch(branchId: number): Promise<Class[]> {
+    return  await this.classRepository
+    .createQueryBuilder('class')
+    .leftJoin('class.levelclass', 'levelClass','levelClass.branchId = :branchId', { branchId })
+    .where('levelClass.classId IS NULL')
+    .getMany();
+
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} class`;
   }

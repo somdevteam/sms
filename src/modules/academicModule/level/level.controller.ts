@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpStatus } from '@nestjs/common';
 import { LevelService } from './level.service';
 import { CreateLevelDto } from './dto/create-level.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import {ApiTags} from "@nestjs/swagger";
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('level')
 @ApiTags('Level Apis')
@@ -17,8 +18,9 @@ export class LevelController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.levelService.findAll();
+  async findAll(): Promise<ApiBaseResponse> {
+    const levels = await this.levelService.findAll();
+    return new ApiBaseResponse('levels',HttpStatus.OK,levels);
   }
 
   @UseGuards(JwtAuthGuard)

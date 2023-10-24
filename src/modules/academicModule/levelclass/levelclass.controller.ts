@@ -3,6 +3,7 @@ import { LevelclassService } from './levelclass.service';
 import { CreateLevelclassDto } from './dto/create-levelclass.dto';
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
+import { LevelClassDto } from './dto/level-class.dto';
 
 @Controller('levelclass')
 @ApiTags('Level-ClassApis')
@@ -10,9 +11,10 @@ export class LevelclassController {
   constructor(private readonly levelclassService: LevelclassService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
-  create(@Body() createLevelclassDto: CreateLevelclassDto) {
-    return this.levelclassService.create(createLevelclassDto);
+  @Post('add')
+  async insertData(@Body() data: LevelClassDto) {
+    await this.levelclassService.createLevelClass(data);
+    return { message: 'Data inserted successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
