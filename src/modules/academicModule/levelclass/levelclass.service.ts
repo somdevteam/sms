@@ -1,5 +1,4 @@
 import {ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException} from '@nestjs/common';
-import {CreateLevelclassDto} from './dto/create-levelclass.dto';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Levelclass} from './entities/levelclass.entity';
 import {Repository} from 'typeorm';
@@ -8,6 +7,7 @@ import { BranchService } from 'src/modules/branch/branch.service';
 import { LevelService } from '../level/level.service';
 import { ClassService } from '../class/class.service';
 import { LevelClassDto } from './dto/level-class.dto';
+import { BranchLevel } from './dto/branch-class.dto';
 
 @Injectable()
 export class LevelclassService {
@@ -125,15 +125,14 @@ export class LevelclassService {
       
   }
 
-    async fetchClassesByBranchId(branchId: number) :Promise<any>{
-      const levelId = 1;
+    async fetchClassesByBranchId(payload: BranchLevel) :Promise<any>{
         return await this.levelclassRepository
             .createQueryBuilder('levelClass')
             .leftJoinAndSelect('levelClass.branch', 'branch')
             .leftJoinAndSelect('levelClass.class', 'class')
             .leftJoinAndSelect('levelClass.level', 'level')
-            .where('levelClass.branch = :branchId', {branchId})
-            .andWhere('level.levelid = :levelId', {levelId})
+            .where('levelClass.branch = :branchId', {branchId: payload.branchId})
+            .andWhere('level.levelid = :levelId', {levelId: payload.levelId})
             .andWhere('class.isactive = :isActive', {isActive:true})
             // .select([
             //     'class.classid',

@@ -1,9 +1,10 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, HttpStatus} from '@nestjs/common';
 import { LevelclassService } from './levelclass.service';
-import { CreateLevelclassDto } from './dto/create-levelclass.dto';
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
 import { LevelClassDto } from './dto/level-class.dto';
+import { BranchLevel } from './dto/branch-class.dto';
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('levelclass')
 @ApiTags('Level-ClassApis')
@@ -43,14 +44,16 @@ export class LevelclassController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.levelclassService.remove(+id);
+  async remove(@Param('id') id: number): Promise<ApiBaseResponse>  {
+    await this.levelclassService.remove(id);
+    return new ApiBaseResponse('deleted succesfuuly',HttpStatus.OK,null);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/class/:branchId')
- async findClassesByBranchId(@Param('branchId') branchId: number):Promise<any> {
-    return await this.levelclassService.fetchClassesByBranchId(branchId);
+  @Post('classByBranchAndLevel')
+ async findClassesByBranchIdAndLevel(@Body() payload: BranchLevel):Promise<ApiBaseResponse> {
+  const data = await this.levelclassService.fetchClassesByBranchId(payload);
+  return new ApiBaseResponse(null,HttpStatus.OK,data);
   }
   
 }
