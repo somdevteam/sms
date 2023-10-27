@@ -33,6 +33,7 @@ export class LevelService {
 
     let level = new Level();
     level.levelname = payload.levelname;
+    level.levelFee = payload.levelFee;
     level.datecreated = new Date();
     try {
       const savedClass = this.levelRepository.save(level);
@@ -64,6 +65,7 @@ export class LevelService {
 
     try {
       foundLevel.levelname = payload.levelname;
+      foundLevel.levelFee = payload.levelFee;
       return await this.levelRepository.update(foundLevel.levelid, foundLevel);
     } catch (error) {
       if (error) {
