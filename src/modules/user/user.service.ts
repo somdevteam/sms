@@ -89,6 +89,24 @@ export class UserService {
     return query.getRawMany();
   }
 
+ //  async fetchSingleUsersFullData(userId: number) {
+ //    return await this.userRepository
+ //     .createQueryBuilder('user')
+ //     .leftJoinAndSelect('user.profile', 'profile')
+ //     .where('user.userId = :userId', { userId })
+ //     .select([
+ //       'user.userId as userId',
+ //       'user.email as email',
+ //       'user.username as username',
+ //       'profile.firstName as firstName',
+ //       'profile.middleName as middleName',
+ //       'profile.lastName as lastName',
+ //       'profile.mobile as mobile',
+ //       'profile.branchId as branchId',
+ //       'profile.userProfileId as userProfileId',
+ //     ]).getRawOne();
+ // }
+
   async fetchUsersFullData(userId?: number) {
     const usersList = await this.userRepository
       .createQueryBuilder('user')

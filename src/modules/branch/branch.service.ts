@@ -5,8 +5,6 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { UserDto } from '../user/Dto/user.dto';
-import crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Branch } from './branch.entity';
 import { Repository } from 'typeorm';
@@ -21,34 +19,45 @@ export class BranchService {
   ) {}
 
  async getById(id: number): Promise<Branch> {
-    return await this.branchRepository.findOne({ where: { branchid: id } });
+    const branch = await this.branchRepository.findOne({ where: { branchId: id } });
+
+    if (!branch) {
+      throw new NotFoundException('branch not found');
+    }
+
+    return branch;
   }
 
   async findAllByBranchId(branchId: number): Promise<Branch[]> {
-    return this.branchRepository.find({ where: { branchid: branchId } });
+    return this.branchRepository.find({ where: { branchId: branchId } });
   }
 
-  async getAllBranches(currentuser:CurrentUser) {
+  async getAllBranches(currentuser:CurrentUser,isAll:boolean) {
     const branchId = currentuser.profile.branchId;
     if (branchId) {
       return await this.findAllByBranchId(+branchId)
     }
-    const constantData: any[] = [
-      { branchid: 0, branchname: 'All Branches' }
-    ];
+    
     const branchData = await this.branchRepository.find();
+    
     if (!branchData) {
       return branchData;
     }
+
+    const constantData: any[] = [
+      { branchId: 0, branchName: 'All Branches' }
+    ];
     const combinedData = constantData.concat(branchData);
-    return combinedData;
+
+
+    return isAll ? combinedData : branchData;
   }
 
   async getBranchByName(branchName: string): Promise<Branch> {
     try {
       return await this.branchRepository.findOne({
         where: {
-          branchname: branchName,
+          branchName: branchName,
         },
       });
     } catch (error) {
@@ -66,15 +75,14 @@ export class BranchService {
       );
     }
 
-    let branch = new Branch();
-    branch.branchname = payload.branchName;
-    branch.branchlogo = payload.branchLogo;
-    branch.coverlogo = payload.coverLogo;
-    branch.isactive = payload.isactive;
-    branch.branchlocation = payload.branchLocation;
-    branch.datecreated = new Date();
-
     try {
+    let branch = new Branch();
+    branch.branchName = payload.branchName;
+    branch.branchLogo = payload.branchLogo;
+    branch.coverLogo = payload.coverLogo;
+    branch.isActive = payload.isactive;
+    branch.branchLocation = payload.branchLocation;
+    branch.dateCreated = new Date();
       return await this.branchRepository.save(branch);
     } catch (error) {
       if (error) {
@@ -90,7 +98,7 @@ export class BranchService {
 
   async update(payload: UpdateBranchDTO): Promise<any> {
     const foundBranch = await this.branchRepository.findOneBy({
-      branchid: payload.branchId,
+      branchId: payload.branchId,
     });
 
     if (!foundBranch) {
@@ -98,13 +106,13 @@ export class BranchService {
     }
 
     try {
-      foundBranch.branchname = payload.branchName;
-      foundBranch.branchlocation = payload.branchLocation;
+      foundBranch.branchName = payload.branchName;
+      foundBranch.branchLocation = payload.branchLocation;
       // foundBranch.branchlogo = payload.branchLogo;
       // foundBranch.coverlogo = payload.coverLogo;
 
       return await this.branchRepository.update(
-        foundBranch.branchid,
+        foundBranch.branchId,
         foundBranch,
       );
     } catch (error) {
@@ -117,7 +125,7 @@ export class BranchService {
 
   async remove(id: number) {
     const foundBranch = await this.branchRepository.findOneBy({
-      branchid: id,
+      branchId: id,
     });
 
     if (!foundBranch) {
@@ -125,4 +133,20 @@ export class BranchService {
     }
     return this.branchRepository.delete(id);
   }
+  async findBranchesWithCondition(academicId: number): Promise<any> {
+    const branches = await this.branchRepository
+      .createQueryBuilder('branch')
+      .leftJoin('branch.academicBranches', 'academicBranch', 'academicBranch.academicId = :academicId', { academicId })
+      .where('academicBranchId IS NULL')
+      .select([
+        'branch.branchId branchId',
+        'branch.branchName branchName',
+        'academicBranch.academicBranchId academicBranchId',
+      ])
+      .getRawMany();
+
+    return branches;
+  }
+
+
 }

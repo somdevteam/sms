@@ -18,24 +18,22 @@ export class LevelService {
     private levelRepository: Repository<Level>,
   ) {}
 
-  getByLevelname(name: string): Promise<Level> {
-    return this.levelRepository.findOne({ where: { levelname: name } });
-  }
-
-  getById(id: number): Promise<Level> {
-    return this.levelRepository.findOne({ where: { levelid: id } });
-  }
-
- async create(payload: CreateLevelDto) {
-    let classname = await this.getByLevelname(payload.levelname);
-    if (classname) {
+  async getByLevelname(name: string) {
+    const className =  await this.levelRepository.findOne({ where: { levelname: name } });
+    if (className) {
       throw new NotAcceptableException(
         'The level name currently exists. Please choose another one.',
       );
     }
+  }
+
+ async create(payload: CreateLevelDto) {
+    await this.getByLevelname(payload.levelname);
+    
 
     let level = new Level();
     level.levelname = payload.levelname;
+    level.levelFee = payload.levelFee;
     level.datecreated = new Date();
     try {
       const savedClass = this.levelRepository.save(level);
@@ -51,22 +49,23 @@ export class LevelService {
   }
 
   findAll() {
-    return `This action returns all level`;
+    return this.levelRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} level`;
-  }
-
-  async update(payload: UpdateLevelDto) {
-    let foundLevel = await this.getById(payload.levelid);
-
+  async findOne(id: number): Promise<Level> {
+    const foundLevel = await this.levelRepository.findOne({ where: { levelid: id } });
     if (!foundLevel) {
       throw new NotFoundException('level not found');
     }
+    return foundLevel;
+  }
+
+  async update(payload: UpdateLevelDto) {
+    let foundLevel = await this.findOne(payload.levelid);
 
     try {
       foundLevel.levelname = payload.levelname;
+      foundLevel.levelFee = payload.levelFee;
       return await this.levelRepository.update(foundLevel.levelid, foundLevel);
     } catch (error) {
       if (error) {
@@ -79,11 +78,7 @@ export class LevelService {
   }
 
   async remove(id: number) {
-    let foundlevel = await this.getById(id);
-
-    if (!foundlevel) {
-      throw new NotFoundException('level not found');
-    }
+     await this.findOne(id);
     return await this.levelRepository.delete(id);
   }
 }

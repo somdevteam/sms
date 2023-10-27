@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 import {ApiProperty} from "@nestjs/swagger";
 
 export class CreateLevelDto {
@@ -9,4 +9,10 @@ export class CreateLevelDto {
     @IsNotEmpty()
     @IsString()
     levelname:string;
+    @ApiProperty({
+        required: true,
+    })
+    @IsNotEmpty()
+    @IsNumber()
+    levelFee:number;
 }

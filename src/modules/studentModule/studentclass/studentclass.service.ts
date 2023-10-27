@@ -115,12 +115,13 @@ export class StudentClassService {
     await this.classSectionService.getSectionIdByClassIdAndSectionId(
       payload.toClass,
       payload.toSection,
+      null
     );
 
   if (!existingClassSection) {
     const newClassSection = new ClassSection();
-    newClassSection.academic = existingAcademicYear;
-    newClassSection.branch = existingBranch;
+    // newClassSection.academic = existingAcademicYear;
+    // newClassSection.branch = existingBranch;
     newClassSection.class = existingClass;
     newClassSection.section = existingSection;
     newClassSection.dateCreated = new Date();

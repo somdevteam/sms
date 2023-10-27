@@ -8,6 +8,8 @@ export class Level extends BaseEntity {
     @Column()
     levelname: string;
     @Column()
+    levelFee: number;
+    @Column()
     datecreated: Date;
     @Column({default: true})
     isactive: boolean;

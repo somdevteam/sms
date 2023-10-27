@@ -41,6 +41,7 @@ export class CreateStudentDto {
     @IsNotEmpty()
     @IsNumber()
     sectionId: number;
+    branchId:number
 
 
 

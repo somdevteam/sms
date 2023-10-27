@@ -26,7 +26,7 @@ export class AuthController {
             loginDto.password,
         );
 
-        const userInfo = await this.authService.getSinleUserInfo(user.userId);
+        const userInfo = await this.authService.getSingleUserInfo(user.userId);
 
         var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
         const token = await this.authService.createToken(user, loginHistoryInfo.loginHistoryId);

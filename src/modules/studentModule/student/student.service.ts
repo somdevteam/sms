@@ -19,6 +19,7 @@ import {StudentClass} from "../studentclass/entities/studentclass.entity";
 import {StudentClassService} from "../studentclass/studentclass.service";
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
+import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
 
 @Injectable()
 export class StudentService {
@@ -29,19 +30,24 @@ export class StudentService {
         @InjectRepository(StudentClass) private studentClassRepository: Repository<StudentClass>,
         @Inject(forwardRef(() => StudentClassService))
         private readonly studentClassService: StudentClassService,
-        private readonly classSectionService: ClassSectionService
+        private readonly classSectionService: ClassSectionService,
+        private readonly academicBranchService: BranchAcademicService
+        
     ) {
     }
 
 
-    async create(payload: CreateStudentDto): Promise<Student | null> {
+    async create(payload: CreateStudentDto,currentUser:CurrentUser): Promise<Student | null> {
 
         try {
             let savedResponsible = null;
-           const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId);
-           if (!classSection) {
-            throw new NotFoundException('Class With this section not found');
-           }
+            const branchId = currentUser.profile.branchId ? currentUser.profile.branchId : payload.branchId
+            if (!branchId) {
+                throw new NotFoundException('branch id is required');
+            }
+            const academicBranch = await this.academicBranchService.findLatestActiveBranchAcademic(+branchId);
+           const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId,academicBranch.academicBranchId);
+           
             const responsible = await this.responsibleService.getByPhone(payload.resPhone);
             if (!responsible) {
                 const newResponsible = new Responsible();
@@ -160,4 +166,18 @@ export class StudentService {
 
      return result;
     }
+
+
+    async getStudentCountByBranchAndAcademic(branchId: number, academicId: number): Promise<any> {
+        const queryBuilder = this.StudentRepository
+          .createQueryBuilder('student')
+          .leftJoinAndSelect('student.studentClass', 'studentclass')
+          .leftJoinAndSelect('studentclass.classSection', 'ClassSection')
+          .leftJoinAndSelect('ClassSection.branchAcademic', 'academicBranch')
+          .where('academicBranch.branchId = :branchId', { branchId })
+          .andWhere('academicBranch.academicId = :academicId', { academicId });
+          
+    
+        return queryBuilder.getMany();
+      }
 }

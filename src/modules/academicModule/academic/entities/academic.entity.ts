@@ -1,18 +1,24 @@
 import { ClassSection } from "src/modules/academicModule/class-section/entities/class-section.entity";
+import { AcademicBranch } from "src/modules/branch-academic/entities/branch-academic.entity";
+import { Branch } from "src/modules/branch/branch.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
-@Entity('academic')
+
+
+
+@Entity('academics')
 export class AcademicEntity extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    academicid: number;
-    @Column()
-    academicname: string;
-    @Column()
-    datecreated: Date;
-    @Column({default: true})
-    isactive: boolean;
+  @PrimaryGeneratedColumn()
+  academicId: number;
 
-    @OneToMany(() => ClassSection, clsSec => clsSec.academic)
-    classSection: ClassSection
+  @Column()
+  academicYear: string;
 
+  @OneToMany(() => AcademicBranch, (academicBranch) => academicBranch.academic)
+  academicBranches: AcademicBranch[];
+
+  @Column()
+  dateCreated: Date;
+  @Column({default: false})
+  isActive: boolean;
 }

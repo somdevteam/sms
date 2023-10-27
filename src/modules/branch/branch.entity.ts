@@ -4,29 +4,30 @@ import { Level } from "../academicModule/level/entities/level.entity";
 import { Levelclass } from "src/modules/academicModule/levelclass/entities/levelclass.entity";
 import { ClassSubject } from "../academicModule/class-subject/entities/class-subject.entity";
 import { ClassSection } from "../academicModule/class-section/entities/class-section.entity";
+import { AcademicBranch } from "../branch-academic/entities/branch-academic.entity";
+@Entity()
+export class Branch  extends BaseEntity{
+  @PrimaryGeneratedColumn()
+  branchId: number;
 
-@Entity('branch')
-export class Branch extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    branchid: number;
-    @Column()
-    @Unique(['branchname'])
-    branchname: string;
-    @Column()
-    branchlocation: string;
-    @Column({nullable:true})
-    branchlogo: string;
-    @Column({nullable: true})
-    coverlogo: string;
-    @Column()
-    datecreated: Date;
-    @Column({default: true})
-    isactive: boolean;
-    @OneToMany(() => Levelclass, levelclass => levelclass.branch)
-    levelclass: Levelclass[]
-    @OneToMany(() => ClassSubject, clssub => clssub.branch)
-    classSubject: ClassSubject
-    @OneToMany(() => ClassSection, clsSec => clsSec.branch)
-    classSection: ClassSection
+  @Column()
+  @Unique(['branchname'])
+  branchName: string;
+  @Column()
+  branchLocation: string;
+  @Column({nullable:true})
+  branchLogo: string;
+  @Column({nullable: true})
+  coverLogo: string;
+  @Column()
+  dateCreated: Date;
+  @Column({default: true})
+  isActive: boolean;
+  @OneToMany(() => Levelclass, levelclass => levelclass.branch)
+  levelclass: Levelclass[]
+  @OneToMany(() => ClassSubject, clssub => clssub.branch)
+  classSubject: ClassSubject
 
+  @OneToMany(() => AcademicBranch, (academicBranch) => academicBranch.branch)
+  academicBranches: AcademicBranch[];
 }

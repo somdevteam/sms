@@ -19,6 +19,6 @@ export class Class extends BaseEntity {
     @OneToMany(() => ClassSubject, clsSub => clsSub.class)
     classSubject: ClassSubject
     @OneToMany(() => ClassSection, clsSec => clsSec.class)
-    classSection: ClassSection
+    classSection: ClassSection[]
 
 }

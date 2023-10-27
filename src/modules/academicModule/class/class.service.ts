@@ -22,8 +22,12 @@ export class ClassService {
     return this.classRepository.findOne({ where: {  classname: name } });
   }
 
-  getById(id: number): Promise<Class> {
-    return this.classRepository.findOne({where: {classid: id}})
+  async getById(id: number): Promise<Class> {
+    const clas =  await this.classRepository.findOne({where: {classid: id}})
+    if (!clas) {
+      throw new NotFoundException('class not found');
+    }
+    return clas;
 }
 
  async create(payload: CreateClassDto) {
@@ -52,6 +56,15 @@ export class ClassService {
 
   findAll() {
     return this.classRepository.find();
+  }
+
+  async findClassesNotInLevelClassWithBranch(branchId: number): Promise<Class[]> {
+    return  await this.classRepository
+    .createQueryBuilder('class')
+    .leftJoin('class.levelclass', 'levelClass','levelClass.branchId = :branchId', { branchId })
+    .where('levelClass.classId IS NULL')
+    .getMany();
+
   }
 
   findOne(id: number) {
@@ -91,5 +104,21 @@ export class ClassService {
       throw new NotFoundException('class not found');
     }
     return await this.classRepository.delete(id);
+  }
+
+  async getClassWithSections() {
+    const classes = await this.classRepository
+      .createQueryBuilder('class')
+      .leftJoinAndSelect('class.classSection', 'ClassSection')
+      .leftJoinAndSelect('ClassSection.section', 'Section')
+      .getMany();
+      return classes;
+      // const result = classes.map((clazz) => ({ 
+      //   classname: clazz.classname,
+      //   section: clazz.classSection.map((classSection) => ({
+      //     [`section`]: classSection.section.sectionname,
+      //   })),
+      // }));
+      // return result;
   }
 }

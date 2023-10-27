@@ -1,5 +1,4 @@
-import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from '@nestjs/common';
-import {CreateLevelclassDto} from './dto/create-levelclass.dto';
+import {ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Levelclass} from './entities/levelclass.entity';
 import {Repository} from 'typeorm';
@@ -7,6 +6,8 @@ import {UpdateLevelclassDto} from './dto/update-levelclass.dto';
 import { BranchService } from 'src/modules/branch/branch.service';
 import { LevelService } from '../level/level.service';
 import { ClassService } from '../class/class.service';
+import { LevelClassDto } from './dto/level-class.dto';
+import { BranchLevel } from './dto/branch-class.dto';
 
 @Injectable()
 export class LevelclassService {
@@ -18,44 +19,59 @@ export class LevelclassService {
     private readonly classService :ClassService,
   ) {}
 
-  getById(id: number): Promise<Levelclass> {
-    return this.levelclassRepository.findOne({ where: { levelclassid: id } });
-  }
-  
-  async create(payload: CreateLevelclassDto) {
-   const branch = await this.branchService.getById(payload.branchid);
-   if (!branch) {
-    throw new NotFoundException(`branch with ID ${payload.branchid} not found`)
-   }
+  async createLevelClass(payload: LevelClassDto) {
+    const { branchid, classid, levelid } = payload;
 
-   const level = await this.levelService.getById(payload.levelid);
-   if (!level) {
-    throw new NotFoundException(`level with ID ${payload.levelid} not found`)
-   }
+    const branch = await this.branchService.getById(branchid);
 
-   const clas = await this.classService.getById(payload.classid);
-   if (!clas) {
-    throw new NotFoundException(`class with ID ${payload.classid} not found`)
-   }
+   const level = await this.levelService.findOne(levelid);
 
-    let lvlclass = new Levelclass();
-    lvlclass.branch = branch;
-    lvlclass.level = level;
-    lvlclass.class = clas;
 
-    return await this.levelclassRepository.save(lvlclass);
+    const newLevelclasses = await Promise.all(classid.map(async (data)  => {
+      const clas = await  this.classService.getById(data.classid);
+
+      await this.isExistingLevelclass(1,1,4);
+
+      const levelclass = new Levelclass();
+      levelclass.branch = branch;
+      levelclass.class = clas;
+      levelclass.level = level;
+
+      return levelclass;
+    }));
+
+    await this.levelclassRepository.save(newLevelclasses);
   }
 
   findAll() {
-    return `This action returns all levelclass`;
+    return this.levelclassRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} levelclass`;
+  async findOne(id: number): Promise<Levelclass> {
+    const levelClass = await this.levelclassRepository.findOne({ where: { levelclassid: id } });
+    if (!levelClass) {
+      throw new NotFoundException(`Level class with ${id} not found`)
+    }
+    return levelClass;
+  }
+
+  async isExistingLevelclass(branchId:number,levelId:number,classId:number) {
+    const existingLevelclass = await this.levelclassRepository.findOne({
+      where: {
+        branch: { branchId },
+        class: { classid: classId }, // Assuming you check for the first class only
+        level: { levelid: levelId },
+      },
+    });
+
+    if (existingLevelclass) {
+      throw new NotAcceptableException('Levelclass already exists with the same branch, class, and level.')
+    }
+
   }
 
  async update( payload: UpdateLevelclassDto) {
-    const foundclasslevel = await this.getById(payload.levelclassid);
+    const foundclasslevel = await this.findOne(payload.levelclassid);
     if (!foundclasslevel) {
       throw new NotFoundException(`level class with id ${payload.levelclassid} not found`);
     }
@@ -65,7 +81,7 @@ export class LevelclassService {
      throw new NotFoundException(`branch with ID ${payload.branchid} not found`)
     }
  
-    const level = await this.levelService.getById(payload.levelid);
+    const level = await this.levelService.findOne(payload.levelid);
     if (!level) {
      throw new NotFoundException(`level with ID ${payload.levelid} not found`)
     }
@@ -91,7 +107,7 @@ export class LevelclassService {
   }
 
  async remove(id: number) {
-    const foundclasslevel = await this.getById(id);
+    const foundclasslevel = await this.findOne(id);
     if (!foundclasslevel) {
       throw new NotFoundException(`level class with id ${id} not found`);
     }
@@ -109,22 +125,21 @@ export class LevelclassService {
       
   }
 
-    async fetchClassesByBranchId(branchId: number) :Promise<any>{
-      const levelId = 1;
+    async fetchClassesByBranchId(payload: BranchLevel) :Promise<any>{
         return await this.levelclassRepository
             .createQueryBuilder('levelClass')
             .leftJoinAndSelect('levelClass.branch', 'branch')
             .leftJoinAndSelect('levelClass.class', 'class')
             .leftJoinAndSelect('levelClass.level', 'level')
-            .where('levelClass.branch = :branchId', {branchId})
-            .andWhere('level.levelid = :levelId', {levelId})
+            .where('levelClass.branch = :branchId', {branchId: payload.branchId})
+            .andWhere('level.levelid = :levelId', {levelId: payload.levelId})
             .andWhere('class.isactive = :isActive', {isActive:true})
-            .select([
-                'class.classid',
-                'class.classname',
-                'class.datecreated',
-                'class.isactive',
-            ])
-            .getRawMany();
+            // .select([
+            //     'class.classid',
+            //     'class.classname',
+            //     'class.datecreated',
+            //     'class.isactive',
+            // ])
+            .getMany();
     }
 }

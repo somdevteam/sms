@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class UpdateLevelDto {
     @IsNotEmpty()
@@ -6,4 +6,7 @@ export class UpdateLevelDto {
     @IsNotEmpty()
     @IsString()
     levelname:string;
+    @IsNotEmpty()
+    @IsNumber()
+    levelFee:number;
 }
