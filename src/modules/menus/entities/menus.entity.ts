@@ -7,25 +7,25 @@ export class Menus extends BaseEntity {
     @PrimaryGeneratedColumn()
     MENUID: number;
 
-    @Column()
+    @Column({ nullable: true})
     MENUNAME: string;
 
-    @Column()
+    @Column({ nullable: true})
     DESCRIPTION: string;
 
-    @Column()
+    @Column({ nullable: true})
     PARENTID: number;
 
-    @Column()
+    @Column({ nullable: true})
     ROUTE: string;
 
-    @Column()
+    @Column({ nullable: true})
     MENUORDER: number;
 
-    @Column()
+    @Column({ nullable: true})
     ROUTE2: string;
 
-    @Column()
+    @Column({ nullable: true})
     ISACTIVE: string;
     @Column()
     path: string;
@@ -33,15 +33,15 @@ export class Menus extends BaseEntity {
     title: string;
     @Column()
     iconType: string;
-    @Column()
+    @Column({ nullable: true})
     icon: string;
     @Column()
     class: string;
-    @Column()
+    @Column({ nullable: true})
     groupTitle: string;
-    @Column()
+    @Column({ nullable: true})
     badge: string;
-    @Column()
+    @Column({ nullable: true})
     badgeClass: string;
 
     @OneToMany(() => Tab, (tab) => tab.Menus)

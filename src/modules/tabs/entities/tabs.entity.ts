@@ -24,13 +24,13 @@ export class Tab extends BaseEntity {
     // @Column({ type: 'int' })
     // menuId: number;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ nullable: true, type: 'varchar', length: 255 })
     route: string;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ nullable: true, type: 'varchar', length: 255 })
     tabOrder: string;
 
-    @Column({ type: 'varchar', length: 1 })
+    @Column({ nullable: true, type: 'varchar', length: 1 })
     preload: string;
 
     @Column()
@@ -39,15 +39,15 @@ export class Tab extends BaseEntity {
     title: string;
     @Column()
     iconType: string;
-    @Column()
+    @Column({ nullable: true})
     icon: string;
-    @Column()
+    @Column({ nullable: true})
     class: string;
-    @Column()
+    @Column({ nullable: true})
     groupTitle: string;
-    @Column()
+    @Column({ nullable: true})
     badge: string;
-    @Column()
+    @Column({ nullable: true})
     badgeClass: string;
 
     @ManyToOne(() => Menus, (Menus) => Menus.tabs)
