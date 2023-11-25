@@ -27,7 +27,7 @@ export class Menus extends BaseEntity {
 
     @Column({ nullable: true})
     ISACTIVE: string;
-    @Column()
+    @Column({nullable:true})
     path: string;
     @Column()
     title: string;

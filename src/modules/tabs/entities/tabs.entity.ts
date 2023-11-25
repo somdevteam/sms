@@ -37,7 +37,7 @@ export class Tab extends BaseEntity {
     path: string;
     @Column()
     title: string;
-    @Column()
+    @Column({ nullable: true})
     iconType: string;
     @Column({ nullable: true})
     icon: string;
