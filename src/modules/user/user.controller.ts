@@ -55,4 +55,11 @@ export class UserController {
     getUser(@Request() req) {
         return "user " + JSON.stringify(req.user.user);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/userloginhistory/:userId')
+    async getUserLoginHistory(@Param('userId') userId): Promise<ApiBaseResponse> {
+        const userLoginHistoryInfo = await this.userService.getUserLoginHistory(userId);
+        return new ApiBaseResponse('success', 200, userLoginHistoryInfo);
+    }
 }

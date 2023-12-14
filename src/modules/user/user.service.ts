@@ -277,4 +277,9 @@ export class UserService {
       );
     }
   }
+
+  async getUserLoginHistory(userId) {
+    const userLoginHistories = await this.loginRepository.find({where: {userId}});
+    return userLoginHistories;
+  }
 }
