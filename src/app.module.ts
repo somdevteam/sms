@@ -6,7 +6,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from "./modules/auth/auth.module";
 import {BranchModule} from "./modules/branch/branch.module";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-import configuration from "./config/configuration";
+import configuration from "../config/configuration";
 import {ClassModule} from "./modules/academicModule/class/class.module";
 import {SubjectModule} from "./modules/academicModule/subject/subject.module";
 import {LevelModule} from "./modules/academicModule/level/level.module";
@@ -46,7 +46,7 @@ import { UserRolesModule } from './modules/userroles/userroles.module';
         database: configService.get<string>('database.name'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         logging: configService.get('database.logging'),
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),
