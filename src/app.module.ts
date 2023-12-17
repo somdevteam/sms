@@ -28,6 +28,7 @@ import {UserPermissions} from './modules/userpermissions/userpermissions.entity'
 import {UserTypePermissions} from './modules/usertypepermissions/usertypepermissions.entity';
 import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.module';
 import { UserRolesModule } from './modules/userroles/userroles.module';
+import {dataSourceOptions} from "../db/data-source";
 
 
 @Module({
@@ -36,20 +37,7 @@ import { UserRolesModule } from './modules/userroles/userroles.module';
       envFilePath: '.env',
       load: [configuration],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('database.host'),
-        username: configService.get('database.username'),
-        password: configService.get<string>('database.password'),
-        database: configService.get<string>('database.name'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        logging: configService.get('database.logging'),
-        synchronize: false,
-      }),
-      inject: [ConfigService],
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     UserModule, AuthModule, BranchModule,
   ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
     MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserPermissions,UserTypePermissions,TabPermissionsModule,UserRolesModule],

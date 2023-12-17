@@ -1,0 +1,121 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class NewMigrations1702805119565 implements MigrationInterface {
+    name = 'NewMigrations1702805119565'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TABLE \`user_profiles\` (\`userProfileId\` int NOT NULL AUTO_INCREMENT, \`firstName\` varchar(255) NOT NULL, \`lastName\` varchar(255) NOT NULL, \`middleName\` varchar(255) NOT NULL, \`mobile\` varchar(255) NOT NULL, \`branchId\` int NULL, \`datecreated\` datetime NOT NULL, \`dateModified\` datetime NOT NULL, \`userId\` int NULL, UNIQUE INDEX \`IDX_c34696c3d434c3bcaa023c7ce9\` (\`mobile\`), UNIQUE INDEX \`REL_8481388d6325e752cd4d7e26c6\` (\`userId\`), PRIMARY KEY (\`userProfileId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`roles\` (\`roleId\` int NOT NULL AUTO_INCREMENT, \`roleName\` varchar(100) NOT NULL, \`description\` varchar(500) NOT NULL, \`isActive\` varchar(1) NOT NULL DEFAULT 'Y', \`createdBy\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`dateCreated\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (\`roleId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`rolepermissions\` (\`rolePermissionId\` int NOT NULL AUTO_INCREMENT, \`roleId\` int NULL, \`permissionId\` int NULL, PRIMARY KEY (\`rolePermissionId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`usertypes\` (\`userTypeId\` int NOT NULL AUTO_INCREMENT, \`description\` varchar(500) NOT NULL, PRIMARY KEY (\`userTypeId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`usertypepermissions\` (\`usertypepermissionid\` int NOT NULL AUTO_INCREMENT, \`userTypeId\` int NULL, \`permissionId\` int NULL, PRIMARY KEY (\`usertypepermissionid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`menus\` (\`MENUID\` int NOT NULL AUTO_INCREMENT, \`MENUNAME\` varchar(255) NULL, \`DESCRIPTION\` varchar(255) NULL, \`PARENTID\` int NULL, \`ROUTE\` varchar(255) NULL, \`MENUORDER\` int NULL, \`ROUTE2\` varchar(255) NULL, \`ISACTIVE\` varchar(255) NULL, \`path\` varchar(255) NULL, \`title\` varchar(255) NOT NULL, \`iconType\` varchar(255) NOT NULL, \`icon\` varchar(255) NULL, \`class\` varchar(255) NOT NULL, \`groupTitle\` varchar(255) NULL, \`badge\` varchar(255) NULL, \`badgeClass\` varchar(255) NULL, PRIMARY KEY (\`MENUID\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`tab\` (\`tabId\` int NOT NULL AUTO_INCREMENT, \`tabName\` varchar(255) NOT NULL, \`description\` varchar(255) NOT NULL, \`route\` varchar(255) NULL, \`tabOrder\` varchar(255) NULL, \`preload\` varchar(1) NULL, \`path\` varchar(255) NOT NULL, \`title\` varchar(255) NOT NULL, \`iconType\` varchar(255) NULL, \`icon\` varchar(255) NULL, \`class\` varchar(255) NULL, \`groupTitle\` varchar(255) NULL, \`badge\` varchar(255) NULL, \`badgeClass\` varchar(255) NULL, \`menuId\` int NULL, PRIMARY KEY (\`tabId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`tabpermissions\` (\`tabpermissionid\` int NOT NULL AUTO_INCREMENT, \`tabId\` int NULL, \`permissionId\` int NULL, PRIMARY KEY (\`tabpermissionid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`permissions\` (\`PERMISSIONID\` int NOT NULL AUTO_INCREMENT, \`PERMISSION\` varchar(150) NOT NULL, \`DESCRIPTION\` varchar(200) NOT NULL, \`CREATEDBY\` int NULL, \`DATECREATED\` datetime(6) NULL DEFAULT CURRENT_TIMESTAMP(6), \`ISACTIVE\` varchar(255) NOT NULL, PRIMARY KEY (\`PERMISSIONID\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`userpermissions\` (\`userpermissionid\` int NOT NULL AUTO_INCREMENT, \`userid\` int NULL, \`permissionId\` int NULL, PRIMARY KEY (\`userpermissionid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`user\` (\`userId\` int NOT NULL AUTO_INCREMENT, \`email\` varchar(255) NOT NULL, \`username\` varchar(255) NOT NULL, \`password\` varchar(255) NOT NULL, \`isActive\` tinyint NOT NULL DEFAULT 1, \`datecreated\` datetime NOT NULL, \`dateModified\` datetime NOT NULL, UNIQUE INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` (\`email\`), UNIQUE INDEX \`IDX_78a916df40e02a9deb1c4b75ed\` (\`username\`), PRIMARY KEY (\`userId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`login_history\` (\`loginHistoryId\` int NOT NULL AUTO_INCREMENT, \`userId\` int NULL, \`ip\` varchar(255) NOT NULL, \`browser\` varchar(255) NOT NULL, \`loginDate\` datetime NOT NULL, \`logoutDate\` datetime NULL, PRIMARY KEY (\`loginHistoryId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`academic\` (\`academicid\` int NOT NULL AUTO_INCREMENT, \`academicname\` varchar(255) NOT NULL, \`datecreated\` datetime NOT NULL, \`isactive\` tinyint NOT NULL DEFAULT 1, PRIMARY KEY (\`academicid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`section\` (\`sectionid\` int NOT NULL AUTO_INCREMENT, \`sectionname\` varchar(255) NOT NULL, \`datecreated\` datetime NOT NULL, \`isactive\` tinyint NOT NULL DEFAULT 1, UNIQUE INDEX \`IDX_ac208e4ea26e47e43852cf78aa\` (\`sectionname\`), PRIMARY KEY (\`sectionid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`responsible\` (\`responsibleid\` int NOT NULL AUTO_INCREMENT, \`responsiblename\` varchar(255) NOT NULL, \`phone\` varchar(255) NOT NULL, PRIMARY KEY (\`responsibleid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`student\` (\`studentid\` int NOT NULL AUTO_INCREMENT, \`firstname\` varchar(255) NOT NULL, \`middlename\` varchar(255) NOT NULL, \`lastname\` varchar(255) NOT NULL, \`Sex\` varchar(255) NOT NULL, \`dob\` datetime NOT NULL, \`bob\` varchar(255) NOT NULL, \`responsibleid\` int NULL, PRIMARY KEY (\`studentid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`student_class\` (\`studentClassId\` int NOT NULL AUTO_INCREMENT, \`dateCreated\` datetime NOT NULL, \`classsectionid\` int NULL, \`studentid\` int NULL, PRIMARY KEY (\`studentClassId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`class_section\` (\`classSectionId\` int NOT NULL AUTO_INCREMENT, \`dateCreated\` datetime NOT NULL, \`branchid\` int NULL, \`classid\` int NULL, \`sectionid\` int NULL, \`academicid\` int NULL, PRIMARY KEY (\`classSectionId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`subject\` (\`subjectid\` int NOT NULL AUTO_INCREMENT, \`subjectname\` varchar(255) NOT NULL, \`datecreated\` datetime NOT NULL, \`isactive\` tinyint NOT NULL DEFAULT 1, UNIQUE INDEX \`IDX_a122f2153b3412576fbff48049\` (\`subjectname\`), PRIMARY KEY (\`subjectid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`class_subject\` (\`classSubjectId\` int NOT NULL AUTO_INCREMENT, \`branchid\` int NULL, \`classid\` int NULL, \`subjectid\` int NULL, PRIMARY KEY (\`classSubjectId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`class\` (\`classid\` int NOT NULL AUTO_INCREMENT, \`classname\` varchar(255) NOT NULL, \`datecreated\` datetime NOT NULL, \`isactive\` tinyint NOT NULL DEFAULT 1, PRIMARY KEY (\`classid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`level\` (\`levelid\` int NOT NULL AUTO_INCREMENT, \`levelname\` varchar(255) NOT NULL, \`datecreated\` datetime NOT NULL, \`isactive\` tinyint NOT NULL DEFAULT 1, PRIMARY KEY (\`levelid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`levelclass\` (\`levelclassid\` int NOT NULL AUTO_INCREMENT, \`branchid\` int NULL, \`levelid\` int NULL, \`classid\` int NULL, PRIMARY KEY (\`levelclassid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`branch\` (\`branchid\` int NOT NULL AUTO_INCREMENT, \`branchname\` varchar(255) NOT NULL, \`branchlocation\` varchar(255) NOT NULL, \`branchlogo\` varchar(255) NULL, \`coverlogo\` varchar(255) NULL, \`datecreated\` datetime NOT NULL, \`isactive\` tinyint NOT NULL DEFAULT 1, \`coverlogo2\` varchar(255) NULL, UNIQUE INDEX \`IDX_bbd5234ec3388fc7e34a5a1da5\` (\`branchname\`), PRIMARY KEY (\`branchid\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`userroles\` (\`userRoleId\` int NOT NULL AUTO_INCREMENT, \`userId\` int NULL, \`roleId\` int NULL, PRIMARY KEY (\`userRoleId\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`ALTER TABLE \`user_profiles\` ADD CONSTRAINT \`FK_8481388d6325e752cd4d7e26c6d\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`userId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`rolepermissions\` ADD CONSTRAINT \`FK_720e7912c4ff5734339c91be2d1\` FOREIGN KEY (\`roleId\`) REFERENCES \`roles\`(\`roleId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`rolepermissions\` ADD CONSTRAINT \`FK_18be7dd9302eec9e86aec7b0af3\` FOREIGN KEY (\`permissionId\`) REFERENCES \`permissions\`(\`PERMISSIONID\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`usertypepermissions\` ADD CONSTRAINT \`FK_539b60f8999a35922b207eee8f6\` FOREIGN KEY (\`userTypeId\`) REFERENCES \`usertypes\`(\`userTypeId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`usertypepermissions\` ADD CONSTRAINT \`FK_d8e567d04f235e0ffbe6d029253\` FOREIGN KEY (\`permissionId\`) REFERENCES \`permissions\`(\`PERMISSIONID\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`tab\` ADD CONSTRAINT \`FK_45e02016c409a3102e4779629d3\` FOREIGN KEY (\`menuId\`) REFERENCES \`menus\`(\`MENUID\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`tabpermissions\` ADD CONSTRAINT \`FK_65fd4f8340d8c801d4fb6a23dc5\` FOREIGN KEY (\`tabId\`) REFERENCES \`tab\`(\`tabId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`tabpermissions\` ADD CONSTRAINT \`FK_fb3a2442eaa8ae7133fd69988bf\` FOREIGN KEY (\`permissionId\`) REFERENCES \`permissions\`(\`PERMISSIONID\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`userpermissions\` ADD CONSTRAINT \`FK_b87d0c9a2d40ff0719b7a6fb4af\` FOREIGN KEY (\`userid\`) REFERENCES \`user\`(\`userId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`userpermissions\` ADD CONSTRAINT \`FK_e2b2977db7e2d27bae83d883d75\` FOREIGN KEY (\`permissionId\`) REFERENCES \`permissions\`(\`PERMISSIONID\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`login_history\` ADD CONSTRAINT \`FK_911ecf99e0f1a95668fea7cd6d8\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`userId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`student\` ADD CONSTRAINT \`FK_8cd2e79418be87058125f7c6327\` FOREIGN KEY (\`responsibleid\`) REFERENCES \`responsible\`(\`responsibleid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`student_class\` ADD CONSTRAINT \`FK_b9dff1cb1572dc502a7409847f5\` FOREIGN KEY (\`classsectionid\`) REFERENCES \`class_section\`(\`classSectionId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`student_class\` ADD CONSTRAINT \`FK_5846e24e11ef7d6436e4e52fa3a\` FOREIGN KEY (\`studentid\`) REFERENCES \`student\`(\`studentid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_section\` ADD CONSTRAINT \`FK_971cf5f5b96a1a664072e84060f\` FOREIGN KEY (\`branchid\`) REFERENCES \`branch\`(\`branchid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_section\` ADD CONSTRAINT \`FK_e2752b6eba6d50606c60b40b9eb\` FOREIGN KEY (\`classid\`) REFERENCES \`class\`(\`classid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_section\` ADD CONSTRAINT \`FK_6dfb9d23eaba89d31365599ca9b\` FOREIGN KEY (\`sectionid\`) REFERENCES \`section\`(\`sectionid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_section\` ADD CONSTRAINT \`FK_1a99c6a516b89c2a5bc8a0c6558\` FOREIGN KEY (\`academicid\`) REFERENCES \`academic\`(\`academicid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_subject\` ADD CONSTRAINT \`FK_8b3a0f45666fda4134083af5c85\` FOREIGN KEY (\`branchid\`) REFERENCES \`branch\`(\`branchid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_subject\` ADD CONSTRAINT \`FK_51baf0607feffffcda014f591c6\` FOREIGN KEY (\`classid\`) REFERENCES \`class\`(\`classid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`class_subject\` ADD CONSTRAINT \`FK_37932cacafc5b806b690e32692c\` FOREIGN KEY (\`subjectid\`) REFERENCES \`subject\`(\`subjectid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`levelclass\` ADD CONSTRAINT \`FK_79ea1c8a2382ed17f538c304860\` FOREIGN KEY (\`branchid\`) REFERENCES \`branch\`(\`branchid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`levelclass\` ADD CONSTRAINT \`FK_91f5aa80395047a12d171eaeaa2\` FOREIGN KEY (\`levelid\`) REFERENCES \`level\`(\`levelid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`levelclass\` ADD CONSTRAINT \`FK_6c8d2305e8f6f0d2c0ab9c9fb67\` FOREIGN KEY (\`classid\`) REFERENCES \`class\`(\`classid\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`userroles\` ADD CONSTRAINT \`FK_93ff56f9d18997faacbeea72539\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`userId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`userroles\` ADD CONSTRAINT \`FK_149176f0dd68297c0066248ff98\` FOREIGN KEY (\`roleId\`) REFERENCES \`roles\`(\`roleId\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE \`userroles\` DROP FOREIGN KEY \`FK_149176f0dd68297c0066248ff98\``);
+        await queryRunner.query(`ALTER TABLE \`userroles\` DROP FOREIGN KEY \`FK_93ff56f9d18997faacbeea72539\``);
+        await queryRunner.query(`ALTER TABLE \`levelclass\` DROP FOREIGN KEY \`FK_6c8d2305e8f6f0d2c0ab9c9fb67\``);
+        await queryRunner.query(`ALTER TABLE \`levelclass\` DROP FOREIGN KEY \`FK_91f5aa80395047a12d171eaeaa2\``);
+        await queryRunner.query(`ALTER TABLE \`levelclass\` DROP FOREIGN KEY \`FK_79ea1c8a2382ed17f538c304860\``);
+        await queryRunner.query(`ALTER TABLE \`class_subject\` DROP FOREIGN KEY \`FK_37932cacafc5b806b690e32692c\``);
+        await queryRunner.query(`ALTER TABLE \`class_subject\` DROP FOREIGN KEY \`FK_51baf0607feffffcda014f591c6\``);
+        await queryRunner.query(`ALTER TABLE \`class_subject\` DROP FOREIGN KEY \`FK_8b3a0f45666fda4134083af5c85\``);
+        await queryRunner.query(`ALTER TABLE \`class_section\` DROP FOREIGN KEY \`FK_1a99c6a516b89c2a5bc8a0c6558\``);
+        await queryRunner.query(`ALTER TABLE \`class_section\` DROP FOREIGN KEY \`FK_6dfb9d23eaba89d31365599ca9b\``);
+        await queryRunner.query(`ALTER TABLE \`class_section\` DROP FOREIGN KEY \`FK_e2752b6eba6d50606c60b40b9eb\``);
+        await queryRunner.query(`ALTER TABLE \`class_section\` DROP FOREIGN KEY \`FK_971cf5f5b96a1a664072e84060f\``);
+        await queryRunner.query(`ALTER TABLE \`student_class\` DROP FOREIGN KEY \`FK_5846e24e11ef7d6436e4e52fa3a\``);
+        await queryRunner.query(`ALTER TABLE \`student_class\` DROP FOREIGN KEY \`FK_b9dff1cb1572dc502a7409847f5\``);
+        await queryRunner.query(`ALTER TABLE \`student\` DROP FOREIGN KEY \`FK_8cd2e79418be87058125f7c6327\``);
+        await queryRunner.query(`ALTER TABLE \`login_history\` DROP FOREIGN KEY \`FK_911ecf99e0f1a95668fea7cd6d8\``);
+        await queryRunner.query(`ALTER TABLE \`userpermissions\` DROP FOREIGN KEY \`FK_e2b2977db7e2d27bae83d883d75\``);
+        await queryRunner.query(`ALTER TABLE \`userpermissions\` DROP FOREIGN KEY \`FK_b87d0c9a2d40ff0719b7a6fb4af\``);
+        await queryRunner.query(`ALTER TABLE \`tabpermissions\` DROP FOREIGN KEY \`FK_fb3a2442eaa8ae7133fd69988bf\``);
+        await queryRunner.query(`ALTER TABLE \`tabpermissions\` DROP FOREIGN KEY \`FK_65fd4f8340d8c801d4fb6a23dc5\``);
+        await queryRunner.query(`ALTER TABLE \`tab\` DROP FOREIGN KEY \`FK_45e02016c409a3102e4779629d3\``);
+        await queryRunner.query(`ALTER TABLE \`usertypepermissions\` DROP FOREIGN KEY \`FK_d8e567d04f235e0ffbe6d029253\``);
+        await queryRunner.query(`ALTER TABLE \`usertypepermissions\` DROP FOREIGN KEY \`FK_539b60f8999a35922b207eee8f6\``);
+        await queryRunner.query(`ALTER TABLE \`rolepermissions\` DROP FOREIGN KEY \`FK_18be7dd9302eec9e86aec7b0af3\``);
+        await queryRunner.query(`ALTER TABLE \`rolepermissions\` DROP FOREIGN KEY \`FK_720e7912c4ff5734339c91be2d1\``);
+        await queryRunner.query(`ALTER TABLE \`user_profiles\` DROP FOREIGN KEY \`FK_8481388d6325e752cd4d7e26c6d\``);
+        await queryRunner.query(`DROP TABLE \`userroles\``);
+        await queryRunner.query(`DROP INDEX \`IDX_bbd5234ec3388fc7e34a5a1da5\` ON \`branch\``);
+        await queryRunner.query(`DROP TABLE \`branch\``);
+        await queryRunner.query(`DROP TABLE \`levelclass\``);
+        await queryRunner.query(`DROP TABLE \`level\``);
+        await queryRunner.query(`DROP TABLE \`class\``);
+        await queryRunner.query(`DROP TABLE \`class_subject\``);
+        await queryRunner.query(`DROP INDEX \`IDX_a122f2153b3412576fbff48049\` ON \`subject\``);
+        await queryRunner.query(`DROP TABLE \`subject\``);
+        await queryRunner.query(`DROP TABLE \`class_section\``);
+        await queryRunner.query(`DROP TABLE \`student_class\``);
+        await queryRunner.query(`DROP TABLE \`student\``);
+        await queryRunner.query(`DROP TABLE \`responsible\``);
+        await queryRunner.query(`DROP INDEX \`IDX_ac208e4ea26e47e43852cf78aa\` ON \`section\``);
+        await queryRunner.query(`DROP TABLE \`section\``);
+        await queryRunner.query(`DROP TABLE \`academic\``);
+        await queryRunner.query(`DROP TABLE \`login_history\``);
+        await queryRunner.query(`DROP INDEX \`IDX_78a916df40e02a9deb1c4b75ed\` ON \`user\``);
+        await queryRunner.query(`DROP INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` ON \`user\``);
+        await queryRunner.query(`DROP TABLE \`user\``);
+        await queryRunner.query(`DROP TABLE \`userpermissions\``);
+        await queryRunner.query(`DROP TABLE \`permissions\``);
+        await queryRunner.query(`DROP TABLE \`tabpermissions\``);
+        await queryRunner.query(`DROP TABLE \`tab\``);
+        await queryRunner.query(`DROP TABLE \`menus\``);
+        await queryRunner.query(`DROP TABLE \`usertypepermissions\``);
+        await queryRunner.query(`DROP TABLE \`usertypes\``);
+        await queryRunner.query(`DROP TABLE \`rolepermissions\``);
+        await queryRunner.query(`DROP TABLE \`roles\``);
+        await queryRunner.query(`DROP INDEX \`REL_8481388d6325e752cd4d7e26c6\` ON \`user_profiles\``);
+        await queryRunner.query(`DROP INDEX \`IDX_c34696c3d434c3bcaa023c7ce9\` ON \`user_profiles\``);
+        await queryRunner.query(`DROP TABLE \`user_profiles\``);
+    }
+
+}
