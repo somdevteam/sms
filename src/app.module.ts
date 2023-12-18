@@ -28,6 +28,7 @@ import {UserPermissions} from './modules/userpermissions/userpermissions.entity'
 import {UserTypePermissions} from './modules/usertypepermissions/usertypepermissions.entity';
 import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.module';
 import { UserRolesModule } from './modules/userroles/userroles.module';
+import {RolePermissionsModule} from "./modules/rolePermissions/rolePermissions.module";
 
 
 @Module({
@@ -52,7 +53,7 @@ import { UserRolesModule } from './modules/userroles/userroles.module';
     }),
     UserModule, AuthModule, BranchModule,
   ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
-    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserPermissions,UserTypePermissions,TabPermissionsModule,UserRolesModule],
+    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserPermissions,UserTypePermissions,TabPermissionsModule,UserRolesModule, RolePermissionsModule],
   controllers: [AppController],
   providers: [AppService],
 })

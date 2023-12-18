@@ -20,8 +20,16 @@ export class RolePermissionsService {
         return await this.rolePermissionsRepository.find();
     }
 
-    async findRolePermissionById(rolePermissionId: number): Promise<RolePermissionsEntity | undefined> {
-        return await this.rolePermissionsRepository.findOne({where:{rolePermissionId}});
+    async findRolePermissionById(roleId: number): Promise<{ roleId: number, permissionId: number, permission: string }[]> {
+        const results = await this.rolePermissionsRepository
+            .createQueryBuilder('rp')
+            .leftJoin('rp.role', 'role')
+            .leftJoin('rp.permission', 'permission')
+            .select(['rp.roleId', 'rp.permissionId', 'permission.permission'])
+            .where('role.roleId = :roleId', { roleId })
+            .getRawMany();
+
+        return results;
     }
 
     async updateRolePermission(
@@ -29,7 +37,7 @@ export class RolePermissionsService {
       rolePermissionData: Partial<RolePermissionsEntity>,
     ): Promise<RolePermissionsEntity | undefined> {
         await this.rolePermissionsRepository.update(rolePermissionId, rolePermissionData);
-        return this.findRolePermissionById(rolePermissionId);
+        return null;
     }
 
     async deleteRolePermission(rolePermissionId: number): Promise<void> {

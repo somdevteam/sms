@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import {RolePermissionsEntity} from "./entities/rolePermissions.entity";
 import {RolePermissionsService} from "./rolePermissions.service";
+import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 
 
 @Controller('rolePermissions')
@@ -17,9 +18,10 @@ export class RolePermissionsController {
     return this.rolePermissionsService.findAllRolePermissions();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') rolePermissionId: number): Promise<RolePermissionsEntity | undefined> {
-    return this.rolePermissionsService.findRolePermissionById(rolePermissionId);
+  @Get('/:id')
+  async findOne(@Param('id') roleId: number): Promise<ApiBaseResponse> {
+    const rolerPermissions = await this.rolePermissionsService.findRolePermissionById(roleId);
+    return new ApiBaseResponse('success', 200, rolerPermissions);
   }
 
   @Put(':id')
