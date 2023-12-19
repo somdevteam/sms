@@ -24,12 +24,10 @@ import {PermissionsModule} from './modules/permissions/permissions.module';
 import {TabPermissions} from './modules/tabPermissions/entities/tabPermissions.entity';
 import {RolesModule} from './modules/roles/roles.module';
 import {UserTypesModule} from './modules/userTypes/userTypes.module';
-import {UserPermissions} from './modules/userpermissions/userpermissions.entity';
 import {UserTypePermissions} from './modules/usertypepermissions/usertypepermissions.entity';
 import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.module';
 import { UserRolesModule } from './modules/userroles/userroles.module';
 import {dataSourceOptions} from "../db/data-source";
-import {UserpermissionsModule} from "./modules/userpermissions/userpermissions.module";
 
 
 @Module({
@@ -41,7 +39,7 @@ import {UserpermissionsModule} from "./modules/userpermissions/userpermissions.m
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule, AuthModule, BranchModule,
   ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
-    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,,UserTypePermissions,TabPermissionsModule,UserRolesModule,UserpermissionsModule],
+    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserTypePermissions,TabPermissionsModule,UserRolesModule],
   controllers: [AppController],
   providers: [AppService],
 })
