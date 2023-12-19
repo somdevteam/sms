@@ -25,7 +25,7 @@ export class RolePermissionsService {
             .createQueryBuilder('rp')
             .leftJoin('rp.role', 'role')
             .leftJoin('rp.permission', 'permission')
-            .select(['rp.roleId', 'rp.permissionId', 'permission.permission'])
+            .select(['rp.roleId', 'rp.permissionId', 'permission.permission as permissionName'])
             .where('role.roleId = :roleId', { roleId })
             .getRawMany();
 

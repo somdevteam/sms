@@ -13,4 +13,6 @@ export class PermissionsService {
     async findAll(): Promise<Permission[]> {
         return this.permissionsRepository.find();
     }
+
+
 }

@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import {UserTypesEntity} from "../userTypes/entities/userTypes.entity";
 import {Permission} from "../permissions/entities/permissions.entity";
 import {UserEntity} from "../user/user.entity";
 

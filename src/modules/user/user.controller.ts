@@ -6,6 +6,9 @@ import {ApiTags} from "@nestjs/swagger";
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 import { UserFilterDto } from './Dto/search-user.dto';
 import { ResetPasswordDto } from './Dto/reset-password.dto';
+import {UserPermissionsGuard} from "../../common/guards/userPermission.guards";
+import {RequirePermissions} from "../../common/decorators/requirePermissions.decorator";
+import {UserPermissions} from "../../common/enum/sms.enum";
 
 @Controller('user')
 @ApiTags('User Apis')
@@ -13,7 +16,8 @@ export class UserController {
     constructor(private userService: UserService) {
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard,UserPermissionsGuard)
+    @RequirePermissions(UserPermissions.VIEW_USER)
     @Get('/')
     async getAllUsers(@Request() req) :Promise<ApiBaseResponse>{
         const users = await this.userService.getAllUser(req.user.user);
@@ -60,6 +64,13 @@ export class UserController {
     @Get('/userloginhistory/:userId')
     async getUserLoginHistory(@Param('userId') userId): Promise<ApiBaseResponse> {
         const userLoginHistoryInfo = await this.userService.getUserLoginHistory(userId);
+        return new ApiBaseResponse('success', 200, userLoginHistoryInfo);
+    }
+
+   // @UseGuards(JwtAuthGuard)
+    @Get('fetch/:userId')
+    async fetchData(@Param('userId') userId): Promise<ApiBaseResponse> {
+        const userLoginHistoryInfo = await this.userService.fetchSpecificUserData(userId,106);
         return new ApiBaseResponse('success', 200, userLoginHistoryInfo);
     }
 }

@@ -1,6 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
 import {ClassSection} from "../../academicModule/class-section/entities/class-section.entity";
 import {RolePermissionsEntity} from "../../rolePermissions/entities/rolePermissions.entity";
+import {UserRolesEntity} from "../../userroles/entities/userroles.entity";
 
 @Entity('roles')
 export class RolesEntity {
@@ -23,4 +24,7 @@ export class RolesEntity {
     dateCreated: Date;
     @OneToMany(() => RolePermissionsEntity, rolePermissions => rolePermissions.role)
     rolePermissions: RolePermissionsEntity
+
+    @OneToMany(() => UserRolesEntity, (userRoles) => userRoles.role)
+    userRoles: UserRolesEntity;
 }

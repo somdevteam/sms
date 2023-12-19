@@ -112,6 +112,8 @@ export class UserService {
      return await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
+         .leftJoinAndSelect('user.userRoles','userRoles')
+         .leftJoinAndSelect('userRoles.role','role')
       .where('user.userId = :userId', { userId })
       .select([
         'user.userId as userId',
@@ -123,6 +125,8 @@ export class UserService {
         'profile.mobile as mobile',
         'profile.branchId as branchId',
         'profile.userProfileId as userProfileId',
+        'userRoles.roleId as roleId',
+        'role.roleName as roleName'
       ]).getRawOne();
   }
 
@@ -130,7 +134,10 @@ export class UserService {
     return await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
+        .leftJoinAndSelect('user.userRoles','userRoles')
+        .leftJoinAndSelect('userRoles.role','role')
       .leftJoinAndSelect('user.loginHistory', 'loginHistory')
+
       .where(
         'user.userId = :userId and loginHistory.loginHistoryId = :loginHistoryId',
         { userId, loginHistoryId },
@@ -147,6 +154,8 @@ export class UserService {
         'loginHistory.loginHistoryId',
         'loginHistory.userId',
         'loginHistory.loginDate',
+        'userRoles.roleId as roleId',
+        'role.roleName as roleName'
       ])
       .getOne();
   }

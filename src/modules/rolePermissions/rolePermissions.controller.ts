@@ -20,6 +20,7 @@ export class RolePermissionsController {
 
   @Get('/:id')
   async findOne(@Param('id') roleId: number): Promise<ApiBaseResponse> {
+    console.log(roleId);
     const rolerPermissions = await this.rolePermissionsService.findRolePermissionById(roleId);
     return new ApiBaseResponse('success', 200, rolerPermissions);
   }

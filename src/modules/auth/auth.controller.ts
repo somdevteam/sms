@@ -1,9 +1,17 @@
-import {Body, Controller, Get, NotFoundException, Post, UseGuards, Request, Req, HttpStatus} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    NotFoundException,
+    Post,
+    UseGuards,
+    Request,
+    Req,
+    HttpStatus,
+    Param
+} from '@nestjs/common';
 import {LoginDto} from "./Dto/login.dto";
-import {AuthGuard} from "@nestjs/passport";
-import {LocalAuthGuard} from "./local-auth.guard";
 import {AuthService} from "./auth.service";
-import {JwtAuthGuard} from "./jwt-auth.guard";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
 
@@ -27,6 +35,7 @@ export class AuthController {
         );
 
         const userInfo = await this.authService.getSinleUserInfo(user.userId);
+        console.log(userInfo);
 
         var loginHistoryInfo = await this.authService.getUserInfo(req, user); // TODO
         const token = await this.authService.createToken(user, loginHistoryInfo.loginHistoryId);
@@ -37,12 +46,18 @@ export class AuthController {
         password :user.password,
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
-        role : 'Admin',
+        role : userInfo.roleName,
         branch: userInfo.branchId,
         token: token.access_token
         }
         return new ApiBaseResponse("Login Successfully",HttpStatus.OK,users);
     }
 
+    @Get('/:id')
+    async findOne(@Param('id') roleId: number): Promise<ApiBaseResponse> {
+        console.log(roleId);
+        const userInfo = await this.authService.getSinleUserInfo(roleId);
+        return new ApiBaseResponse('success', 200, userInfo);
+    }
 
 }
