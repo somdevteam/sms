@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import {ApiBaseResponse} from "../../common/dto/apiresponses.dto";
+import {UserPermissions} from "../userpermissions/userpermissions.entity";
 
 @Controller('permissions')
 export class PermissionsController {
@@ -11,4 +12,5 @@ export class PermissionsController {
        const allPermissions = await this.permissionsService.findAll();
         return new ApiBaseResponse ('success', 200,allPermissions)
     }
+
 }
