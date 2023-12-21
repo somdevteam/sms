@@ -21,12 +21,15 @@ export class UserPermissionsGuard implements CanActivate {
         const {
             user: { roleId },
         } = context.switchToHttp().getRequest();
-        const response = await this.rolePermissionsService.findRolePermissionById(roleId);
-        console.log(response);
-        // const permissions = (await response.data?.permissions).map((p) => p.name);
+        const response = await this.rolePermissionsService.findRolePermissionById(1);
+        const permissions = response.map(item => item["permissionName"]);
+
+        console.log(permissions);
+        // const permissions = (response?.map((p) => p.permissionName));
+       //  console.log(permissions);
         //
-        // return requiredPermissions.some((permission) =>
-        //     permissions.includes(permission),
-        // );
+        return requiredPermissions.some((permission) =>
+            permissions.includes(permission),
+        );
     }
 }

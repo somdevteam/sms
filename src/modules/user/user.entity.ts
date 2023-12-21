@@ -42,7 +42,7 @@ export class UserEntity extends BaseEntity {
     @OneToMany(() => UserPermissions, userPermission => userPermission.user)
     userPermissions: UserPermissions
 
-    @OneToMany(() => UserRolesEntity, (userRoles) => userRoles.user)
+    @OneToOne(() => UserRolesEntity, (userRoles) => userRoles.user)
     userRoles: UserRolesEntity;
 
 }

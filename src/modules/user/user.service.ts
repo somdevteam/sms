@@ -131,34 +131,85 @@ export class UserService {
   }
 
   async fetchSpecificUserData(userId: number, loginHistoryId: number) {
-    return await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.profile', 'profile')
-        .leftJoinAndSelect('user.userRoles','userRoles')
-        .leftJoinAndSelect('userRoles.role','role')
-      .leftJoinAndSelect('user.loginHistory', 'loginHistory')
+    const result =await this.userRepository
+        .createQueryBuilder('u')
+        .leftJoinAndSelect('u.profile', 'up')
+        .leftJoinAndSelect('u.userRoles', 'ur')
+        .leftJoinAndSelect('ur.role', 'r')
+        .leftJoinAndSelect('u.loginHistory', 'lh')
+        .where('u.userId = :userId and lh.loginHistoryId = :loginHistoryId', { userId, loginHistoryId })
+        .select([
+          'u.userId',
+          'u.email',
+          'u.username',
+          'up.firstName',
+          'up.middleName',
+          'up.mobile',
+          'up.branchId',
+          'up.userProfileId',
+          'lh.loginHistoryId',
+          'lh.userId',
+          'lh.loginDate',
+          'r.roleId as roleId',
+          'r.roleName as roleName'
+        ])
+        .getOne();
 
-      .where(
-        'user.userId = :userId and loginHistory.loginHistoryId = :loginHistoryId',
-        { userId, loginHistoryId },
-      )
-      .select([
-        'user.userId',
-        'user.email',
-        'user.username',
-        'profile.firstName',
-        'profile.middleName',
-        'profile.mobile',
-        'profile.branchId',
-        'profile.userProfileId',
-        'loginHistory.loginHistoryId',
-        'loginHistory.userId',
-        'loginHistory.loginDate',
-        'userRoles.roleId as roleId',
-        'role.roleName as roleName'
-      ])
-      .getOne();
+    console.log(result);
+    return result;
   }
+
+  // async fetchSpecificUserData(userId: number, loginHistoryId: number) {
+  //   const query =  this.userRepository
+  //       .createQueryBuilder('user')
+  //       .leftJoinAndSelect('user.userRoles', 'userRoles')
+  //       .where('user.userId = :userId', { userId })
+  //       .select([
+  //         'user.userId',
+  //         'user.email',
+  //         'user.username',
+  //         'userRoles.roleId',
+  //
+  //       ])
+  //
+  //
+  //   const [sql, parameters] = query.getQueryAndParameters();
+  //   console.log('SQL Query:', sql);
+  //   console.log('Parameters:', parameters);
+  //   return await query.getOne();
+  // }
+
+
+
+  // async fetchSpecificUserData(userId: number, loginHistoryId: number) {
+  //   return await this.userRepository
+  //     .createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.profile', 'profile')
+  //       .leftJoinAndSelect('user.userRoles','userRoles')
+  //       .leftJoinAndSelect('userRoles.role','role')
+  //     .leftJoinAndSelect('user.loginHistory', 'loginHistory')
+  //
+  //     .where(
+  //       'user.userId = :userId and loginHistory.loginHistoryId = :loginHistoryId',
+  //       { userId, loginHistoryId },
+  //     )
+  //     .select([
+  //       'user.userId',
+  //       'user.email',
+  //       'user.username',
+  //       'profile.firstName',
+  //       'profile.middleName',
+  //       'profile.mobile',
+  //       'profile.branchId',
+  //       'profile.userProfileId',
+  //       'loginHistory.loginHistoryId',
+  //       'loginHistory.userId',
+  //       'loginHistory.loginDate',
+  //       'role.roleId as roleId',
+  //       'role.roleName as roleName'
+  //     ])
+  //     .getOne();
+  // }
 
   async create(payload: UserDto) {
     const username = await this.getByUsername(payload.username);

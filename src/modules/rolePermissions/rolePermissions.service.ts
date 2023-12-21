@@ -20,7 +20,7 @@ export class RolePermissionsService {
         return await this.rolePermissionsRepository.find();
     }
 
-    async findRolePermissionById(roleId: number): Promise<{ roleId: number, permissionId: number, permission: string }[]> {
+    async findRolePermissionById(roleId: number): Promise<RolePermissionsEntity[]> {
         const results = await this.rolePermissionsRepository
             .createQueryBuilder('rp')
             .leftJoin('rp.role', 'role')
@@ -31,7 +31,6 @@ export class RolePermissionsService {
 
         return results;
     }
-
     async updateRolePermission(
       rolePermissionId: number,
       rolePermissionData: Partial<RolePermissionsEntity>,

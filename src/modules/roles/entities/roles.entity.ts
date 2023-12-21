@@ -26,5 +26,5 @@ export class RolesEntity {
     rolePermissions: RolePermissionsEntity
 
     @OneToMany(() => UserRolesEntity, (userRoles) => userRoles.role)
-    userRoles: UserRolesEntity;
+    userRoles: UserRolesEntity[];
 }
