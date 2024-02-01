@@ -16,12 +16,14 @@ export class UserPermissionsGuard implements CanActivate {
         if (!requiredPermissions) {
             return true;
         }
-       const user  = context.switchToHttp().getRequest();
+       //const user  = context.switchToHttp().getRequest();
 
         const {
-            user: { roleId },
+            user: { user },
         } = context.switchToHttp().getRequest();
-        const response = await this.rolePermissionsService.findRolePermissionById(1);
+
+        const roleId = user.roleId;
+        const response = await this.rolePermissionsService.findRolePermissionById(roleId);
         const permissions = response.map(item => item["permissionName"]);
 
         console.log(permissions);

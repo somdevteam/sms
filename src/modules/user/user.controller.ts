@@ -70,7 +70,7 @@ export class UserController {
    // @UseGuards(JwtAuthGuard)
     @Get('fetch/:userId')
     async fetchData(@Param('userId') userId): Promise<ApiBaseResponse> {
-        const userLoginHistoryInfo = await this.userService.fetchSpecificUserData(userId,106);
+        const userLoginHistoryInfo = await this.userService.fetchSpecificUserData(userId,101);
         return new ApiBaseResponse('success', 200, userLoginHistoryInfo);
     }
 }
