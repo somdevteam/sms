@@ -13,8 +13,8 @@ export class MenusController {
     //     return new ApiBaseResponse('success', 200, menus);
     // }
 
-    @Get(':userId')
-    async getUserMenus(@Param('userId') userId: number): Promise<ApiBaseResponse> {
+    @Get(':roleId')
+    async getUserMenus(@Param('roleId') userId: number): Promise<ApiBaseResponse> {
         console.log("userid"+userId);
         const menus = await this.menusService.getUserMenusById(userId);
         return new ApiBaseResponse('success', 200, menus);
