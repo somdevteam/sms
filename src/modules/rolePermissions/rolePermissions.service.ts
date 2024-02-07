@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
 import {RolePermissionsEntity} from "./entities/rolePermissions.entity";
 
 
@@ -21,15 +21,13 @@ export class RolePermissionsService {
     }
 
     async findRolePermissionById(roleId: number): Promise<RolePermissionsEntity[]> {
-        const results = await this.rolePermissionsRepository
+        return await this.rolePermissionsRepository
             .createQueryBuilder('rp')
             .leftJoin('rp.role', 'role')
             .leftJoin('rp.permission', 'permission')
             .select(['rp.roleId', 'rp.permissionId', 'permission.permission as permissionName'])
-            .where('role.roleId = :roleId', { roleId })
+            .where('role.roleId = :roleId', {roleId})
             .getRawMany();
-
-        return results;
     }
     async updateRolePermission(
       rolePermissionId: number,

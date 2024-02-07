@@ -7,9 +7,10 @@ import {LocalStrategy} from "./local.strategy";
 import {JwtModule} from "@nestjs/jwt";
 import {JwtStrategy} from "./jwt.strategy";
 import {ConfigModule, ConfigService} from "@nestjs/config";
+import {RolePermissionsModule} from "../rolePermissions/rolePermissions.module";
 
 @Module({
-  imports:[UserModule,
+  imports:[UserModule, RolePermissionsModule,
     PassportModule.register({ defaultStrategy: 'local' }),
       JwtModule.registerAsync({
         imports: [ConfigModule],
