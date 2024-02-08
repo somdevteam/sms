@@ -6,7 +6,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from "./modules/auth/auth.module";
 import {BranchModule} from "./modules/branch/branch.module";
 import {ConfigModule, ConfigService} from "@nestjs/config";
-import configuration from "./config/configuration";
+import configuration from "../config/configuration";
 import {ClassModule} from "./modules/academicModule/class/class.module";
 import {SubjectModule} from "./modules/academicModule/subject/subject.module";
 import {LevelModule} from "./modules/academicModule/level/level.module";
@@ -18,7 +18,17 @@ import { SectionModule } from './modules/academicModule/section/section.module';
 import {StudentModule} from "./modules/studentModule/student/student.module";
 import {ResponsibleModule} from "./modules/studentModule/responsible/responsible.module";
 import {StudentclassModule} from "./modules/studentModule/studentclass/studentclass.module";
-import { BranchAcademicModule } from './modules/branch-academic/branch-academic.module';
+import {MenusModule} from "./modules/menus/menus.module";
+import {TabsModule} from "./modules/tabs/tabs.module";
+import {PermissionsModule} from './modules/permissions/permissions.module';
+import {TabPermissions} from './modules/tabPermissions/entities/tabPermissions.entity';
+import {RolesModule} from './modules/roles/roles.module';
+import {UserTypesModule} from './modules/userTypes/userTypes.module';
+import {UserTypePermissions} from './modules/usertypepermissions/usertypepermissions.entity';
+import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.module';
+import { UserRolesModule } from './modules/userroles/userroles.module';
+import {dataSourceOptions} from "../db/data-source";
+import {RolePermissionsModule} from "./modules/rolePermissions/rolePermissions.module";
 
 
 @Module({
@@ -27,26 +37,10 @@ import { BranchAcademicModule } from './modules/branch-academic/branch-academic.
       envFilePath: '.env',
       load: [configuration],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('database.host'),
-        username: configService.get('database.username'),
-        password: configService.get<string>('database.password'),
-        database: configService.get<string>('database.name'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        logging: configService.get('database.logging'),
-        synchronize: true,
-      }),
-      inject: [ConfigService],
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     UserModule, AuthModule, BranchModule,
-  ClassModule, SubjectModule, LevelModule, 
-  LevelclassModule, AcademicModule, ClassSubjectModule,
-  SectionModule,ClassSectionModule,StudentModule,
-  ResponsibleModule, StudentclassModule,BranchAcademicModule
-],
+  ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
+    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserTypePermissions,TabPermissionsModule,UserRolesModule,RolePermissionsModule],
   controllers: [AppController],
   providers: [AppService],
 })

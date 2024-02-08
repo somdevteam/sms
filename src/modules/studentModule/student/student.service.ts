@@ -41,7 +41,7 @@ export class StudentService {
 
         try {
             let savedResponsible = null;
-            const branchId = currentUser.profile.branchId ? currentUser.profile.branchId : payload.branchId
+            const branchId =  payload.branchId
             if (!branchId) {
                 throw new NotFoundException('branch id is required');
             }

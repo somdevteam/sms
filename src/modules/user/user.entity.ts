@@ -1,7 +1,20 @@
-import {BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique} from "typeorm";
+import {
+    BaseEntity,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    Unique
+} from "typeorm";
 import {isEmail, IsNotEmpty} from "class-validator";
 import {UserProfile} from "./userprofile.entity";
 import {Loginhistories} from "../auth/loginhistories.entity";
+import {UserTypePermissions} from "../usertypepermissions/usertypepermissions.entity";
+import {UserPermissions} from "../userpermissions/userpermissions.entity";
+import {UserRolesEntity} from "../userroles/entities/userroles.entity";
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -26,5 +39,10 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => Loginhistories, loginHistory => loginHistory.user)
     loginHistory:Loginhistories[];
+    @OneToMany(() => UserPermissions, userPermission => userPermission.user)
+    userPermissions: UserPermissions
+
+    @OneToOne(() => UserRolesEntity, (userRoles) => userRoles.user)
+    userRoles: UserRolesEntity;
 
 }
