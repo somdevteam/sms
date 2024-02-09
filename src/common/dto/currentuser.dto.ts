@@ -1,26 +1,16 @@
 ;
 
 export class CurrentUser {
-    username: string;
-  
-    userId: string;
-
-    email:string;
-    profile: Profile;
-    loginHistory: LoginHistory[]
-  }
-
-   class Profile {
-    userProfileId: string;
-    firstName: string;
-    middleName: string;
-    mobile: string;
-    branchId: string;
-}
-
- class LoginHistory {
-  loginHistoryId: string;
+  userId: number;
+  email: string;
+  username: string;
   firstName: string;
-  userId: string;
+  lastName: string;
+  mobile: string;
+  branchId: number | null;
+  userProfileId: number;
+  loginHistoryId: number;
   loginDate: Date;
+  roleId: number;
+  roleName: string;
 }

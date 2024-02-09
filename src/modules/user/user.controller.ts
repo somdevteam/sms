@@ -28,6 +28,8 @@ export class UserController {
 
     //@UseGuards(JwtAuthGuard)
     @Post("/")
+    @UseGuards(JwtAuthGuard,UserPermissionsGuard)
+    @RequirePermissions(UserPermissions.CREATE_USER)
     async createUser(@Body() userDto: UserDto): Promise<ApiBaseResponse> {
         const users = await this.userService.create(userDto);
         return new ApiBaseResponse('user created successfully',HttpStatus.OK,null)

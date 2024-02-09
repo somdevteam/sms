@@ -75,11 +75,11 @@ export class StudentClassService {
       );
     }
 
-    if (currentUser.profile.branchId == null && payload.branchId == null) {
+    if (currentUser.branchId == null && payload.branchId == null) {
       throw new NotFoundException('branch is required');
     }
 
-    const branchId = payload.branchId != null ? payload.branchId : currentUser.profile.branchId;
+    const branchId = payload.branchId != null ? payload.branchId : currentUser.branchId;
 
     const existingBranch = await this.branchService.getById(+branchId);
     if (!existingBranch) {

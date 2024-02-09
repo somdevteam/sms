@@ -141,10 +141,10 @@ export class StudentService {
 
     async getStudentsByClassIdAndSectionId(payload:StudentsByClassSectionDto,currentUser:CurrentUser):Promise<Student[]>{
         
-        if (payload.branchId == null && currentUser.profile.branchId == null) {
+        if (payload.branchId == null && currentUser.branchId == null) {
             throw new NotFoundException('branchId is required');
         }
-        const branchId = payload.branchId ? payload.branchId : currentUser.profile.branchId;
+        const branchId = payload.branchId ? payload.branchId : currentUser.branchId;
 
      const result = (await this.StudentRepository.createQueryBuilder('student')
          .leftJoinAndSelect('student.studentClass', 'studentclass')

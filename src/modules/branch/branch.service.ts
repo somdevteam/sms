@@ -33,7 +33,7 @@ export class BranchService {
   }
 
   async getAllBranches(currentuser:CurrentUser,isAll:boolean) {
-    const branchId = currentuser.profile.branchId;
+    const branchId = currentuser.branchId;
     if (branchId) {
       return await this.findAllByBranchId(+branchId)
     }
