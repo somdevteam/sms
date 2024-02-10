@@ -15,6 +15,7 @@ import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { Loginhistories } from '../auth/loginhistories.entity';
 import { UserFilterDto } from './Dto/search-user.dto';
 import { ResetPasswordDto } from './Dto/reset-password.dto';
+import { UserRolesService } from '../userroles/userroles.service';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,7 @@ export class UserService {
     private userProfileRepository: Repository<UserProfile>,
     @InjectRepository(Loginhistories)
     private loginRepository: Repository<Loginhistories>,
+    private readonly userRoleService: UserRolesService,
   ) {}
 
   private readonly users: any[] = [];
@@ -255,6 +257,8 @@ export class UserService {
       userProfile.dateModified = currentDate;
 
       await this.userProfileRepository.save(userProfile);
+
+      await this.userRoleService.createUserRole(payload.roleId,savedUser.userId)
 
       return savedUser;
     } catch (error) {

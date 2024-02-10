@@ -9,7 +9,7 @@ export class UserRolesEntity {
 
     @OneToOne(() => UserEntity, (user) => user.userRoles)
     @JoinColumn({name:'userId'})
-    user: UserEntity[];
+    user: UserEntity;
 
     @ManyToOne(() => RolesEntity, (roles) => roles.userRoles)
     @JoinColumn({name:'roleId'})
