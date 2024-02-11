@@ -1,9 +1,11 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
@@ -26,6 +28,7 @@ export class UserService {
     private userProfileRepository: Repository<UserProfile>,
     @InjectRepository(Loginhistories)
     private loginRepository: Repository<Loginhistories>,
+    @Inject(forwardRef(() => UserRolesService))
     private readonly userRoleService: UserRolesService,
   ) {}
 

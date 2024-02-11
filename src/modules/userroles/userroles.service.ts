@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {FindManyOptions, Repository} from 'typeorm';
 import { UserRolesEntity } from './entities/userroles.entity';
@@ -11,6 +11,7 @@ export class UserRolesService {
       @InjectRepository(UserRolesEntity)
       private readonly userRolesRepository: Repository<UserRolesEntity>,
       private readonly roleService: RolesService,
+      @Inject(forwardRef(() => UserService))
       private readonly userService: UserService,
     ) {}
 

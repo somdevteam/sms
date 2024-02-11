@@ -2,7 +2,7 @@ import {DataSource, DataSourceOptions} from "typeorm";
 
 export const dataSourceOptions : DataSourceOptions ={
     type: 'mysql',
-    host: 'localhost',
+    host: '127.0.0.1',
     username: 'root',
     password: 'mypassword',
     database: 'sms',
