@@ -31,6 +31,9 @@ export class UserRolesService {
         return await this.userRolesRepository.save(userRole);
       }
 
+      async update(id: number, payload: any): Promise<any> {
+      }
+
     // async findUserRolesByUserId(user: number): Promise<UserRolesEntity[]> {
     //     return await this.userRolesRepository.find( {where: {user:user}});
     // }

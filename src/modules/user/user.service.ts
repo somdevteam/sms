@@ -72,6 +72,7 @@ export class UserService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.userRoles','userRoles')
       .where('user.isActive = :isActive', { isActive: data.isActive })
       .select([
         'user.userId as userId',
@@ -81,6 +82,7 @@ export class UserService {
         'profile.middleName as middleName',
         'profile.lastName as lastName',
         'profile.mobile as mobile',
+        'userRoles.role as roleId',
         'profile.branchId as branchId',
         'profile.userProfileId as userProfileId',
       ]);
