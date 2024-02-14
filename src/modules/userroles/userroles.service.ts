@@ -31,7 +31,14 @@ export class UserRolesService {
         return await this.userRolesRepository.save(userRole);
       }
 
-      async update(id: number, payload: any): Promise<any> {
+      async update(userId: number, roleId: any): Promise<any> {
+        const existingUser = await this.userRolesRepository.findOneBy({
+             user: {userId: userId}
+          });
+        existingUser.role = roleId;
+
+        const updatedRole = await this.userRolesRepository.update(existingUser.userRoleId,existingUser);
+        return updatedRole;
       }
 
     // async findUserRolesByUserId(user: number): Promise<UserRolesEntity[]> {

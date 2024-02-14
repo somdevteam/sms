@@ -303,10 +303,12 @@ export class UserService {
       foundUser.userId,
       foundUser,
     );
-    const updateUserProfile = await this.userProfileRepository.update(
+     await this.userProfileRepository.update(
       { user: { userId: foundUser.userId } },
       existingUserProfile,
     );
+
+    await this.userRoleService.update(foundUser.userId,payload.roleId)
     return updatedUser;
   }
 
