@@ -24,10 +24,15 @@ export class LevelclassController {
     return this.levelclassService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/lvl/:id')
   findLevelByclass(@Param('id') id: string) {
-    return this.levelclassService.getLevelClassesWithLevel(+id);
+    return this.levelclassService.getLevelClassesWithLevel1(+id);
+  }
+
+  @Get('/levelbybranch/:id')
+  findLevelByBranch(@Param('id') id: string) {
+    return this.levelclassService.getLevelsByBranch(+id);
   }
 
   @UseGuards(JwtAuthGuard)

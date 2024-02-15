@@ -125,6 +125,32 @@ export class LevelclassService {
       
   }
 
+  async getLevelsByBranch(branchId: number): Promise<any>{
+    return await this.levelclassRepository
+    .createQueryBuilder('lc')
+    .innerJoin('lc.level', 'l')
+    .innerJoin('lc.class', 'c')
+    .innerJoin('lc.branch', 'b')
+    .select([
+      'l.levelid as levelId', 
+      'l.levelname as levelName',
+    ]) 
+    .where('b.branchId = :branchId', { branchId })
+    .getRawMany();
+  }
+  
+
+  async getLevelClassesWithLevel1(levelId: number) {
+    return await this.levelclassRepository
+      .createQueryBuilder('lc')
+      .innerJoin('lc.level', 'l')
+      .innerJoinAndSelect('lc.class', 'c')
+      .innerJoin('lc.branch', 'b')
+      .where('l.levelid = :levelId', { levelId })
+      .getMany();
+  }
+  
+
     async fetchClassesByBranchId(payload: BranchLevel) :Promise<any>{
         return await this.levelclassRepository
             .createQueryBuilder('levelClass')
