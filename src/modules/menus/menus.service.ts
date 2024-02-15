@@ -31,7 +31,7 @@ export class MenusService {
     //     // .orWhere('menus.MenuId IN (SELECT DISTINCT m.Parentid FROM MENUS m, A a WHERE m.MenuId = a.Parentid AND a.MenuId != a.parentid AND m.ISACTIVE = :isActive)', { isActive: 1 });
     //     return query.getMany(); // TODO: getting all menus should be based on permission
     // }
-    async getUserMenusById(userId: number): Promise<Menus[]> {
+    async getUserMenusById(roleId: number): Promise<Menus[]> {
         const query = await this.menusRepository.createQueryBuilder('menus')
 
             .innerJoinAndSelect('menus.tabs', 'T')
@@ -57,7 +57,7 @@ export class MenusService {
                 'T.badge',
                 'T.badgeClass',
             ])
-            .where('role.roleId = :userId', {userId: userId})
+            .where('role.roleId = :roleId', {roleId: roleId})
             .getMany()
         // .orWhere('menus.MenuId IN (SELECT DISTINCT m.Parentid FROM MENUS m, A a WHERE m.MenuId = a.Parentid AND a.MenuId != a.parentid AND m.ISACTIVE = :isActive)', { isActive: 1 });
         // return query.getMany(); // TODO: getting all menus should be based on permission

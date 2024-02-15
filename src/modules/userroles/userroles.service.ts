@@ -48,7 +48,7 @@ export class UserRolesService {
         const options: FindManyOptions<UserRolesEntity> = {
             where: { user: user } as any,
         };
-        return await this.userRolesRepository.find(options);
+      return await this.userRolesRepository.find(options);
     }
 
 }
