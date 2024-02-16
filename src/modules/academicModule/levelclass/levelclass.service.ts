@@ -132,10 +132,26 @@ export class LevelclassService {
     .innerJoin('lc.class', 'c')
     .innerJoin('lc.branch', 'b')
     .select([
-      'l.levelid as levelId', 
+      'DISTINCT l.levelid as levelId', 
       'l.levelname as levelName',
     ]) 
     .where('b.branchId = :branchId', { branchId })
+    .getRawMany();
+  }
+
+  async getClassesByBranchAndLevel(payload: BranchLevel): Promise<any>{
+    return await this.levelclassRepository
+    .createQueryBuilder('lc')
+    .innerJoin('lc.level', 'l')
+    .innerJoinAndSelect('lc.class', 'c')
+    .innerJoin('lc.branch', 'b')
+    .select([
+      'c.classid as classId',
+      'c.classname as className',
+      'c.datecreated as dateCreated',
+      'c.isactive as isActive'
+    ])
+    .where('b.branchId = :branchId and l.levelid = :levelId', { branchId: payload.branchId,levelId:payload.levelId })
     .getRawMany();
   }
   

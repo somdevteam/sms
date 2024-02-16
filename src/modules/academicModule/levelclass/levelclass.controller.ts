@@ -31,8 +31,15 @@ export class LevelclassController {
   }
 
   @Get('/levelbybranch/:id')
-  findLevelByBranch(@Param('id') id: string) {
-    return this.levelclassService.getLevelsByBranch(+id);
+  async findLevelByBranch(@Param('id') id: string) : Promise<ApiBaseResponse> {
+    const levels = await this.levelclassService.getLevelsByBranch(+id);
+    return new ApiBaseResponse(null,HttpStatus.OK,levels)
+  }
+
+  @Post('/classbybranchandlevel')
+  async findClassByBranchAndLevel(@Body() payload:BranchLevel) : Promise<ApiBaseResponse> {
+    const levels = await this.levelclassService.getClassesByBranchAndLevel(payload);
+    return new ApiBaseResponse(null,HttpStatus.OK,levels)
   }
 
   @UseGuards(JwtAuthGuard)
