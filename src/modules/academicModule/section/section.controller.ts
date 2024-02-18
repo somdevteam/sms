@@ -1,8 +1,9 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpStatus} from '@nestjs/common';
 import { SectionService } from './section.service';
 import { CreateSectionDto } from './dto/create-section.dto';
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('section')
 @ApiTags('Section-Apis')
@@ -17,8 +18,9 @@ export class SectionController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
-  findAll() {
-    return this.sectionService.findAll();
+  async findAll(): Promise<ApiBaseResponse> {
+    const sections = await this.sectionService.findAll();
+    return new ApiBaseResponse(null,HttpStatus.OK,sections)
   }
 
   @UseGuards(JwtAuthGuard)
