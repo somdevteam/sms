@@ -145,25 +145,26 @@ export class StudentService {
             throw new NotFoundException('branchId is required');
         }
         const branchId = payload.branchId ? payload.branchId : currentUser.branchId;
-
-     const result = (await this.StudentRepository.createQueryBuilder('student')
-         .leftJoinAndSelect('student.studentClass', 'studentclass')
-         .leftJoinAndSelect('studentclass.classSection', 'classSection')
-         .leftJoinAndSelect('classSection.class', 'class')
-         .leftJoinAndSelect('classSection.academic', 'academic')
-         .leftJoinAndSelect('classSection.branch', 'branch')
-         .where('classSection.classId =:classId and classSection.sectionId=:sectionId', {classId :payload.classId,sectionId: payload.sectionId})
-         .andWhere('academic.academicid =:academicId and branch.branchid =:branchId', {academicId: payload.academicId,branchId})
-         .select([
-                 'student.studentid as studentid',
-                 'student.firstname as firstname',
-                 'student.middlename as lastname',
-                 'student.responsibleid as responsibleid',
-                 'student.bob as pob',
-                 'academic.academicname as academicname'
-             ]
-         ).getRawMany())
-
+        payload.sectionId =1;
+        payload.academicId = 1;
+        const result = (await this.StudentRepository.createQueryBuilder('s')
+            .leftJoinAndSelect('s.studentClass', 'sc')
+            .leftJoinAndSelect('sc.classSection', 'cs')
+            .leftJoinAndSelect('cs.class', 'c')
+            .leftJoinAndSelect('cs.branchAcademic', 'ba')
+            .leftJoinAndSelect('ba.branch', 'b')
+            .leftJoinAndSelect('ba.academic','a')
+            .where('c.classId =:classId', {classId :payload.classId})
+            .andWhere('b.branchid =:branchId', {branchId})
+            .select([
+                    's.studentid as studentid',
+                    's.firstname as firstname',
+                    's.middlename as lastname',
+                    's.responsibleid as responsibleid',
+                    's.bob as pob',
+                    'a.academicYear as academicYear',
+                ]
+            ).getRawMany())
      return result;
     }
 
