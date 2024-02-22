@@ -47,22 +47,27 @@ export class StudentService {
             }
             const academicBranch = await this.academicBranchService.findLatestActiveBranchAcademic(+branchId);
            const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId,academicBranch.academicBranchId);
-           
-            const responsible = await this.responsibleService.getByPhone(payload.resPhone);
+           const studentInfo = await this.findByRollNumber(payload.rollNumber);
+           if (studentInfo) {
+            throw new InternalServerErrorException("Student with this roll number already exists ");
+            }
+            const responsible = await this.responsibleService.getByPhone(payload.responsiblePhone);
+
             if (!responsible) {
                 const newResponsible = new Responsible();
-                newResponsible.responsiblename = payload.responsiblename;
-                newResponsible.phone = payload.resPhone;
+                newResponsible.responsiblename = payload.responsibleName;
+                newResponsible.phone = payload.responsiblePhone;
                 savedResponsible = await this.responsibleRepository.save(newResponsible);
             }
 
             let student = new Student();
-            student.firstname = payload.firstname;
-            student.middlename = payload.middlename;
-            student.lastname = payload.lastname;
-            student.Sex = payload.sex;
-            student.dob = new Date();
-            student.bob = payload.bob;
+            student.firstname = payload.firstName;
+            student.rollNumber = payload.rollNumber;
+            student.middlename = payload.middleName;
+            student.lastname = payload.lastName;
+            student.Sex = payload.gender;
+            student.dob = payload.dateOfBirth;
+            student.bob = payload.pob;
             student.responsible = responsible ? responsible : savedResponsible;
             const savedStudent = await this.StudentRepository.save(student);
 
@@ -95,6 +100,10 @@ export class StudentService {
         return this.StudentRepository.findOne({where: {studentid: id}})
     }
 
+    async findByRollNumber(rollNumber: number): Promise<Student> {
+        return this.StudentRepository.findOne({where: {rollNumber: rollNumber}})
+    }
+
     async update(id: number, payload: UpdateStudentDto) {
         let studentToUpdate = await this.StudentRepository.findOne({
             where: {studentid: id,}
@@ -108,12 +117,12 @@ export class StudentService {
             throw new NotFoundException("The responsible you selected does not exist")
         }
         try {
-            studentToUpdate.firstname = payload.firstname;
-            studentToUpdate.middlename = payload.middlename;
-            studentToUpdate.lastname = payload.lastname;
-            studentToUpdate.Sex = payload.sex;
-            studentToUpdate.dob = new Date();
-            studentToUpdate.bob = payload.bob;
+            studentToUpdate.firstname = payload.firstName;
+            studentToUpdate.middlename = payload.middleName;
+            studentToUpdate.lastname = payload.lastName;
+            // studentToUpdate.Sex = payload.sex;
+            // studentToUpdate.dob = new Date();
+            studentToUpdate.bob = payload.pob;
             // studentToUpdate.responsible = responsible;
 
             await this.StudentRepository.update(studentToUpdate.studentid, studentToUpdate);
@@ -148,21 +157,29 @@ export class StudentService {
         payload.sectionId =1;
         payload.academicId = 1;
         const result = (await this.StudentRepository.createQueryBuilder('s')
+        
             .leftJoinAndSelect('s.studentClass', 'sc')
             .leftJoinAndSelect('sc.classSection', 'cs')
             .leftJoinAndSelect('cs.class', 'c')
             .leftJoinAndSelect('cs.branchAcademic', 'ba')
             .leftJoinAndSelect('ba.branch', 'b')
             .leftJoinAndSelect('ba.academic','a')
+            .leftJoinAndSelect('s.responsible', 'rp')
             .where('c.classId =:classId', {classId :payload.classId})
             .andWhere('b.branchid =:branchId', {branchId})
             .select([
                     's.studentid as studentid',
-                    's.firstname as firstname',
-                    's.middlename as lastname',
+                    's.firstname as firstName',
+                    's.middlename as middleName',
+                    's.lastname as lastName',
                     's.responsibleid as responsibleid',
                     's.bob as pob',
                     'a.academicYear as academicYear',
+                    's.rollnumber as rollNumber',
+                    'rp.responsiblename as responsibleName',
+                    'rp.phone as responsiblePhone',
+                    'b.branchId as branchId',
+                    'cs.sectionid as sectionId'
                 ]
             ).getRawMany())
      return result;

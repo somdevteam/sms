@@ -10,22 +10,22 @@ export class UpdateStudentDto {
     })
     @IsNotEmpty()
     @IsString()
-    firstname:string;
+    firstName:string;
 
 
     @IsNotEmpty()
     @IsString()
-    middlename:string;
+    middleName:string;
 
     @IsNotEmpty()
     @IsString()
-    lastname:string;
-    @IsString()
-    sex:string;
+    lastName:string;
+    // @IsString()
+    // sex:string;
 
     @IsNotEmpty()
     @IsString()
-    bob:string;
+    pob:string;
 
     @IsNotEmpty()
     @IsNumber()

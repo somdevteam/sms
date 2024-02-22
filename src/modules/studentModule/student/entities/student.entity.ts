@@ -9,6 +9,8 @@ export class Student extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     studentid: number;
+    @Column({unique: true})
+    rollNumber: number
     @Column()
     firstname: string;
     @Column()
