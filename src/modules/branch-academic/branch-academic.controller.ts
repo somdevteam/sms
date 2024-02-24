@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
 import { BranchAcademicService } from './branch-academic.service';
 import { AcademicBranchDto } from './dto/create-branch-academic.dto';
-import { AcademicBranch } from './entities/branch-academic.entity';
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('branch-academic')
@@ -26,7 +25,7 @@ export class BranchAcademicController {
 
   @Get('academic/:academicId')
   async getBranchesWithAcademicByAcademicId(@Param('academicId') academicId: number): Promise<ApiBaseResponse> {
-    const branchAcademics = await this.branchAcademicService.findBranchesWithAcademicByAcademicId(academicId);
+    const branchAcademics = await this.branchAcademicService.findBranchesByAcademicId(academicId);
     return new ApiBaseResponse('branches by academic',HttpStatus.OK,branchAcademics);
   }
 
@@ -38,5 +37,12 @@ export class BranchAcademicController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.branchAcademicService.remove(+id);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get('academicsByBranch/:branchId')
+  async findAcademicsByBranch(@Param('branchId') branchId: number): Promise<ApiBaseResponse> {
+    const resp =  await this.branchAcademicService.findAcademicByBranch(branchId)
+    return new ApiBaseResponse(null,200,resp);
   }
 }

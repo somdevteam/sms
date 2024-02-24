@@ -159,46 +159,6 @@ export class ClassSectionService {
     return classSection;
   }
 
-  // async getAcademicByClassAndSectionId(classId:number,sectionId:number):Promise<any>{
-  //   return await this.classSectionRepository.createQueryBuilder('classSection')
-  //       .leftJoinAndSelect('academic','academy')
-  //       .where('classSection.classid=:classId',{classId})
-  //       .andWhere('classSection.sectionid=:sectionId',{sectionId})
-  //       .select([
-  //           'academy.academicid',
-  //           'academy.academicname',
-  //           'academy.datecreated'
-  //       ])
-  //       .getMany()
-  //
-  // }
-  // async getAcademicByClassAndSectionId(classId: number, sectionId: number): Promise<any> {
-  //     return await this.classSectionRepository.createQueryBuilder('classSection')
-  //         .leftJoinAndSelect('classSection.academic', 'academic')
-  //         .where('classSection.classid = :classId', { classId: classId })
-  //         .andWhere('classSection.sectionid = :sectionId', { sectionId: sectionId })
-  //         .select([
-  //             'academicid',
-  //             'academicname',
-  //             'datecreated'
-  //         ])
-  //         .getRawMany();
-  // }
 
-  async getAcademicByClassAndSectionId(
-    classId: number,
-    sectionId: number,
-  ): Promise<any[]> {
-    return await this.classSectionRepository
-      .createQueryBuilder('classSection')
-      .leftJoinAndSelect('classSection.academic', 'academic')
-      .where('classSection.classid = :classId', { classId: classId })
-      .andWhere('classSection.sectionid = :sectionId', { sectionId: sectionId })
-      .select([
-        'academic.academicid as academicid',
-        'academic.academicname as academicname',
-        'academic.datecreated as academicdate',
-      ])
-      .getMany();
-  }
+
 }

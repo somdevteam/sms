@@ -73,7 +73,7 @@ export class BranchAcademicService {
     }
   }
 
-  async findBranchesWithAcademicByAcademicId(academicId: number): Promise<AcademicBranch[]> {
+  async findBranchesByAcademicId(academicId: number): Promise<AcademicBranch[]> {
     const queryBuilder = await this.branchAcademicRepository.createQueryBuilder('branchAcademic')
       .innerJoinAndSelect('branchAcademic.branch', 'branch')
       .innerJoinAndSelect('branchAcademic.academic', 'academic')
@@ -82,6 +82,17 @@ export class BranchAcademicService {
 
     return queryBuilder;
   }
+
+  async findAcademicByBranch(branchId: number): Promise<any> {
+    const result =  await this.branchAcademicRepository.find({
+       where: {branch: {branchId}, isActive: true},
+       relations: ['academic','branch'],
+     })
+
+     // Filter out any objects where isActive is not true
+    // const filteredResult = result.filter(item => item.isActive === true);
+    return result;
+   }
   
   findAll() {
     return `This action returns all branchAcademic`;

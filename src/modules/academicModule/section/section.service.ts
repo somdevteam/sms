@@ -80,4 +80,12 @@ export class SectionService {
     }
     return await this.sectionRepository.delete(id);
   }
+
+
+  async findSections() {
+    return await this.sectionRepository.createQueryBuilder('s')
+    .leftJoinAndSelect('s.classSection','sc')
+    .select(['s.sectionid','s.sectionname'])
+    .getRawMany()
+  }
 }

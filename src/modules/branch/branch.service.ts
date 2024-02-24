@@ -148,5 +148,34 @@ export class BranchService {
     return branches;
   }
 
+  async activeAndDeactivateBranch(branchId: number): Promise<any> {
+    try {
+      
+      const activeBranch = await this.branchRepository.findOneBy({ isActive: true });
+      const foundBranch = await this.branchRepository.findOneBy({ branchId });
+
+      if (!foundBranch) {
+          throw new NotFoundException('Branch not found');
+      }
+
+      if (activeBranch) {
+          activeBranch.isActive = false;
+          await this.branchRepository.update(activeBranch.branchId, activeBranch);
+      }
+
+      foundBranch.isActive = !foundBranch.isActive;
+      await this.branchRepository.update(foundBranch.branchId, foundBranch);
+
+      return foundBranch;
+
+    } catch (error) {
+      if (error) {
+        throw new NotAcceptableException(error);
+      }
+      throw new InternalServerErrorException('An error occurred',error.message);
+    }
+
+  }
+
 
 }

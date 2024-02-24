@@ -40,4 +40,10 @@ export class SectionController {
   remove(@Param('id') id: string) {
     return this.sectionService.remove(+id);
   }
+
+  @Get('/allsections')
+  async findAllsection(): Promise<ApiBaseResponse> {
+    const sections = await this.sectionService.findSections();
+    return new ApiBaseResponse(null,HttpStatus.OK,sections)
+  }
 }
