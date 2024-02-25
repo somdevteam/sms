@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { AcademicBranch } from './entities/branch-academic.entity';
 import { Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -85,7 +85,7 @@ export class BranchAcademicService {
 
   async findAcademicByBranch(branchId: number): Promise<any> {
     const result =  await this.branchAcademicRepository.find({
-       where: {branch: {branchId}, isActive: true},
+       where: {branch: {branchId}},
        relations: ['academic','branch'],
      })
 
@@ -93,6 +93,43 @@ export class BranchAcademicService {
     // const filteredResult = result.filter(item => item.isActive === true);
     return result;
    }
+
+   async activeAndDeactivateBranchAcademic(payload: any): Promise<any> {
+    try {
+      
+      const activeBranchAcademic = await this.branchAcademicRepository.findOneBy({
+         academic: {academicId: payload.academicId},
+         branch: {branchId: payload.branchId},
+         isActive: true 
+        });
+
+      const foundBranchAcademicBranch = await this.branchAcademicRepository.findOneBy({ 
+        academic: {academicId: payload.academicId},
+        branch: {branchId: payload.branchId}
+       });
+
+      if (!foundBranchAcademicBranch) {
+          throw new NotFoundException('Branch Academic not found');
+      }
+
+      if (activeBranchAcademic) {
+        activeBranchAcademic.isActive = false;
+          await this.branchAcademicRepository.update(activeBranchAcademic.academicBranchId, activeBranchAcademic);
+      }
+
+      foundBranchAcademicBranch.isActive = !foundBranchAcademicBranch.isActive;
+      await this.branchAcademicRepository.update(foundBranchAcademicBranch.academicBranchId, foundBranchAcademicBranch);
+
+      return foundBranchAcademicBranch;
+
+    } catch (error) {
+      if (error) {
+        throw new NotAcceptableException(error);
+      }
+      throw new InternalServerErrorException('An error occurred',error.message);
+    }
+
+  }
   
   findAll() {
     return `This action returns all branchAcademic`;

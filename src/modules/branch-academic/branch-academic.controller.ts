@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseGuards } from '@nestjs/common';
 import { BranchAcademicService } from './branch-academic.service';
 import { AcademicBranchDto } from './dto/create-branch-academic.dto';
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('branch-academic')
 export class BranchAcademicController {
@@ -44,5 +45,12 @@ export class BranchAcademicController {
   async findAcademicsByBranch(@Param('branchId') branchId: number): Promise<ApiBaseResponse> {
     const resp =  await this.branchAcademicService.findAcademicByBranch(branchId)
     return new ApiBaseResponse(null,200,resp);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Post('activate')
+  async activeAndDeactivateBranchAcademic(@Body() payload: any): Promise<ApiBaseResponse> {
+    const resp =  await this.branchAcademicService.activeAndDeactivateBranchAcademic(payload)
+    return new ApiBaseResponse('successfully activated',200,resp);
   }
 }

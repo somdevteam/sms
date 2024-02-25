@@ -82,10 +82,15 @@ export class SectionService {
   }
 
 
-  async findSections() {
-    return await this.sectionRepository.createQueryBuilder('s')
-    .leftJoinAndSelect('s.classSection','sc')
-    .select(['s.sectionid','s.sectionname'])
-    .getRawMany()
+  async findSections(payload: any) {
+    return await this.sectionRepository
+  .createQueryBuilder('sec')
+  .leftJoinAndSelect('sec.classSection', 'cs','cs.classId = :classId', {classId: payload.classId})
+  .leftJoin('cs.branchAcademic','academic')
+  .leftJoin('cs.branchAcademic','branch')
+  .getMany();
+
   }
+
+  
 }

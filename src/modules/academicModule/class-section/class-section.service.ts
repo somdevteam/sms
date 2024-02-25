@@ -159,6 +159,20 @@ export class ClassSectionService {
     return classSection;
   }
 
+  async findSectionByAny(payload: any) {
+    // return await this.classSectionRepository.find({
+    //   relations: ['section','class']
+    // })
+    return await this.classSectionRepository.createQueryBuilder('cs')
+    .leftJoinAndSelect('cs.section', 's')
+    .leftJoinAndSelect('cs.class','c','c.classId = :classId', {classId: payload.classId})
+    .leftJoin('cs.branchAcademic','ba')
+    .leftJoin('ba.academic','a','a.academicId = :academicId', {academicId: payload.academicId})
+    .leftJoin('ba.branch','b','b.branchId = :branchId', {branchId: payload.branchId})
+    .where('c.classId is null')
+    .getMany();
+  }
+
 
 
 }

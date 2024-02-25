@@ -41,4 +41,9 @@ export class ClassSectionController {
   remove(@Param('id') id: string) {
     return this.classSectionService.remove(+id);
   }
+
+  @Get('sectionBy')
+  async findSectionByAny() {
+    return await this.classSectionService.findSectionByAny('');
+  }
 }
