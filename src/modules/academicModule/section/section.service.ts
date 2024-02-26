@@ -82,14 +82,35 @@ export class SectionService {
   }
 
 
-  async findSections(payload: any) {
+  async findSections1(payload: any) {
     return await this.sectionRepository
   .createQueryBuilder('sec')
   .leftJoinAndSelect('sec.classSection', 'cs','cs.classId = :classId', {classId: payload.classId})
-  .leftJoin('cs.branchAcademic','academic')
-  .leftJoin('cs.branchAcademic','branch')
+  .leftJoin('cs.branchAcademic','ba','ba.academic')
   .getMany();
 
+  }
+
+  async findSections(payload: any): Promise<any[]> {
+    const sections = await this.sectionRepository.find({
+      relations: ['classSection'],
+      where: {
+        classSection: {
+          class : {classid : payload.classId},
+          branchAcademic: {
+            academic: {academicId : payload.academicId},
+            branch: {branchId : payload.branchId},
+          },
+        }
+      }
+    })
+
+    const existingSectionNumbers = sections.map(section => section.sectionid);
+    const allSections = await this.sectionRepository.find();
+
+    // Find missing sections
+    const missingSections = allSections.filter(section => !existingSectionNumbers.includes(section.sectionid));
+    return missingSections;
   }
 
   
