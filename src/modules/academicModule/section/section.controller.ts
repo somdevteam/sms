@@ -41,9 +41,9 @@ export class SectionController {
     return this.sectionService.remove(+id);
   }
 
-  @Post('/allsections')
-  async findAllsection(@Body() payload: any): Promise<ApiBaseResponse> {
-    const sections = await this.sectionService.findSections(payload);
+  @Post('/sectionsByFilter')
+  async findSectionByFilter(@Body() payload: any): Promise<ApiBaseResponse> {
+    const sections = await this.sectionService.findSectionByFilter(payload);
     return new ApiBaseResponse(null,HttpStatus.OK,sections)
   }
 }

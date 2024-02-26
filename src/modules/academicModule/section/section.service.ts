@@ -91,14 +91,13 @@ export class SectionService {
 
   }
 
-  async findSections(payload: any): Promise<any[]> {
+  async findSectionByFilter(payload: any): Promise<any[]> {
     const sections = await this.sectionRepository.find({
       relations: ['classSection'],
       where: {
         classSection: {
           class : {classid : payload.classId},
           branchAcademic: {
-            academic: {academicId : payload.academicId},
             branch: {branchId : payload.branchId},
           },
         }

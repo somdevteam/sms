@@ -140,19 +140,23 @@ export class LevelclassService {
   }
 
   async getClassesByBranchAndLevel(payload: BranchLevel): Promise<any>{
-    return await this.levelclassRepository
-    .createQueryBuilder('lc')
-    .innerJoin('lc.level', 'l')
-    .innerJoinAndSelect('lc.class', 'c')
-    .innerJoin('lc.branch', 'b')
-    .select([
-      'c.classid as classId',
-      'c.classname as className',
-      'c.datecreated as dateCreated',
-      'c.isactive as isActive'
-    ])
-    .where('b.branchId = :branchId and l.levelid = :levelId', { branchId: payload.branchId,levelId:payload.levelId })
-    .getRawMany();
+    return await this.levelclassRepository.find({
+      relations: ['level','class','branch'],
+      where: {branch: {branchId: payload.branchId},level: {levelid: payload.levelId}}
+    })
+    // return await this.levelclassRepository
+    // .createQueryBuilder('lc')
+    // .innerJoin('lc.level', 'l')
+    // .innerJoinAndSelect('lc.class', 'c')
+    // .innerJoin('lc.branch', 'b')
+    // .select([
+    //   'c.classid as classId',
+    //   'c.classname as className',
+    //   'c.datecreated as dateCreated',
+    //   'c.isactive as isActive'
+    // ])
+    // .where('b.branchId = :branchId and l.levelid = :levelId', { branchId: payload.branchId,levelId:payload.levelId })
+    // .getRawMany();
   }
   
 
@@ -165,23 +169,4 @@ export class LevelclassService {
       .where('l.levelid = :levelId', { levelId })
       .getMany();
   }
-  
-
-    async fetchClassesByBranchId(payload: BranchLevel) :Promise<any>{
-        return await this.levelclassRepository
-            .createQueryBuilder('levelClass')
-            .leftJoinAndSelect('levelClass.branch', 'branch')
-            .leftJoinAndSelect('levelClass.class', 'class')
-            .leftJoinAndSelect('levelClass.level', 'level')
-            .where('levelClass.branch = :branchId', {branchId: payload.branchId})
-            .andWhere('level.levelid = :levelId', {levelId: payload.levelId})
-            .andWhere('class.isactive = :isActive', {isActive:true})
-            // .select([
-            //     'class.classid',
-            //     'class.classname',
-            //     'class.datecreated',
-            //     'class.isactive',
-            // ])
-            .getMany();
-    }
 }
