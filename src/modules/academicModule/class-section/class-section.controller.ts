@@ -5,6 +5,7 @@ import { SectionByClassDto } from './dto/SectionByClas.dto';
 import { UpdateClassSectionDto } from './dto/update-class-section.dto';
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('class-section')
 @ApiTags('class Section Apis')
@@ -41,4 +42,13 @@ export class ClassSectionController {
   remove(@Param('id') id: string) {
     return this.classSectionService.remove(+id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('assingSectionsToClass')
+  async assingSectionsToClass(@Body() createClassSectionDto: SectionByClassDto) : Promise<ApiBaseResponse> {
+
+    const resp = await this.classSectionService.assignSectionToClass(createClassSectionDto);
+    return new ApiBaseResponse('added successfully',200, resp);
+  }
+
 }

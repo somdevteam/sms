@@ -114,10 +114,10 @@ export class ClassSectionService {
   }
 
   async fetchSectionByClassId(payload: SectionByClassDto): Promise<any> {
-    const classId = payload.classid;
-    const branchId = payload.branchid;
-    const academicId = payload.academicid;
-    const data = await this.classSectionRepository
+    const classId = payload.classId;
+    const branchId = payload.branchId;
+    const academicId = payload.academicId;
+    const data = this.classSectionRepository
       .createQueryBuilder('classSection')
       .leftJoinAndSelect('classSection.branch', 'branch')
       .leftJoinAndSelect('classSection.class', 'class')
@@ -157,5 +157,22 @@ export class ClassSectionService {
       throw new NotFoundException('Class With this section not found');
     }
     return classSection;
+  }
+
+  async assignSectionToClass(payload:SectionByClassDto) {
+    const { branchId, classId,sections } = payload;
+
+    const academicBranch = await this.branchAcademicService.findLatestActiveBranchAcademic(branchId)
+    const newClassSections = await Promise.all(sections.map(async (data)  => {
+      const sectionClass = this.classSectionRepository.create({
+        class: {classid: classId},
+        section: {sectionid: data.sectionid},
+        branchAcademic: academicBranch,
+        dateCreated: new Date()
+      })
+      return sectionClass;
+    }));
+
+    return await this.classSectionRepository.save(newClassSections);
   }
 }
