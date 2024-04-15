@@ -7,19 +7,36 @@ import {
   Param,
   Patch,
   Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-import { UserService } from '../user/user.service';
+  Request, Res, UploadedFile,
+  UseGuards, UseInterceptors
+} from "@nestjs/common";
+
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UserDto } from '../user/Dto/user.dto';
-import { UserEntity } from '../user/user.entity';
 import { BranchService } from './branch.service';
 import { BranchDTO } from './dto/branch.dto';
 import { UpdateBranchDTO } from './dto/update-branch.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import path = require('path');
+import { join } from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { Observable, of } from "rxjs";
+import { UserEntity } from "../user/user.entity";
+import { UserService } from "../user/user.service";
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/profileimages',
+    filename: (req, file, cb) => {
+      const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+      const extension: string = path.parse(file.originalname).ext;
 
+       cb(null, `${filename}${extension}`)
+    }
+  })
+
+}
 @Controller('branch')
 @ApiTags('Branch Apis')
 export class BranchController {
@@ -69,4 +86,25 @@ export class BranchController {
     );
     return new ApiBaseResponse('branches', HttpStatus.OK, branhes);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', storage))
+    uploadFile(@UploadedFile() file, @Request() req): ApiBaseResponse {
+    let branchId = req.user.user.branchId;
+    let  branchDto = new UpdateBranchDTO();
+    branchDto.branchId = branchId ? branchId: 1;
+    branchDto.branchLogo = file.filename;
+    let users = this.branchService.update(branchDto);
+    console.log(file);
+    return file.filename;
+    return new ApiBaseResponse('Success',200,file.filename)
+
+ }
+  @Get('branchlogo/:imagename')
+  findProfileImage(@Param('imagename') imagename, @Res() res): Observable<Object> {
+    return of(res.sendFile(join(process.cwd(), 'uploads/profileimages/' + imagename)));
+  }
+
+
 }

@@ -108,7 +108,7 @@ export class BranchService {
     try {
       foundBranch.branchName = payload.branchName;
       foundBranch.branchLocation = payload.branchLocation;
-      // foundBranch.branchlogo = payload.branchLogo;
+      foundBranch.branchLogo = payload.branchLogo;
       // foundBranch.coverlogo = payload.coverLogo;
 
       return await this.branchRepository.update(

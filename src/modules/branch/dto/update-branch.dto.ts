@@ -22,4 +22,5 @@ export class UpdateBranchDTO {
     datecreated: Date;
 
     isactive: boolean;
+
 }
