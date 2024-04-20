@@ -15,6 +15,8 @@ import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { Loginhistories } from '../auth/loginhistories.entity';
 import { UserFilterDto } from './Dto/search-user.dto';
 import { ResetPasswordDto } from './Dto/reset-password.dto';
+import { Branch } from "../branch/branch.entity";
+import { BranchService } from "../branch/branch.service";
 
 @Injectable()
 export class UserService {
@@ -25,6 +27,7 @@ export class UserService {
     private userProfileRepository: Repository<UserProfile>,
     @InjectRepository(Loginhistories)
     private loginRepository: Repository<Loginhistories>,
+    private branchService: BranchService,
   ) {}
 
   private readonly users: any[] = [];
@@ -125,13 +128,13 @@ export class UserService {
     if (userId) usersList.where('user.userId = :userId', { userId });
     return usersList.getRawMany();
   }
-
   async fetchSingleUsersFullData(userId: number) {
-     return await this.userRepository
+    return await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
-         .leftJoinAndSelect('user.userRoles','userRoles')
-         .leftJoinAndSelect('userRoles.role','role')
+      .leftJoinAndSelect('profile.branch', 'branch')
+      .leftJoinAndSelect('user.userRoles', 'userRoles')
+      .leftJoinAndSelect('userRoles.role', 'role')
       .where('user.userId = :userId', { userId })
       .select([
         'user.userId as userId',
@@ -144,9 +147,33 @@ export class UserService {
         'profile.branchId as branchId',
         'profile.userProfileId as userProfileId',
         'userRoles.roleId as roleId',
-        'role.roleName as roleName'
+        'role.roleName as roleName',
+        'branch.branchLogo as branchLogo' // Include the branchLogo column
       ]).getRawOne();
   }
+
+
+  // async fetchSingleUsersFullData(userId: number) {
+  //    return await this.userRepository
+  //     .createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.profile', 'profile')
+  //        .leftJoinAndSelect('user.userRoles','userRoles')
+  //        .leftJoinAndSelect('userRoles.role','role')
+  //     .where('user.userId = :userId', { userId })
+  //     .select([
+  //       'user.userId as userId',
+  //       'user.email as email',
+  //       'user.username as username',
+  //       'profile.firstName as firstName',
+  //       'profile.middleName as middleName',
+  //       'profile.lastName as lastName',
+  //       'profile.mobile as mobile',
+  //       'profile.branchId as branchId',
+  //       'profile.userProfileId as userProfileId',
+  //       'userRoles.roleId as roleId',
+  //       'role.roleName as roleName'
+  //     ]).getRawOne();
+  // }
     async fetchSpecificUserData(userId: number, loginHistoryId: number) {
         const result = await this.userRepository
             .createQueryBuilder('u')
@@ -230,6 +257,7 @@ export class UserService {
         'The provided Email  is already associated with an account.',
       );
     }
+    //const isBranchExists = this.branchServi
 
     const user = new UserEntity();
     user.isActive = payload.isActive;
@@ -243,12 +271,21 @@ export class UserService {
     try {
       const savedUser = await this.userRepository.save(user); // Step 1: Save UserEntity
 
+
+      const branch = await this.branchService.getById(payload.branchId);
+       if (!branch){
+         throw new ConflictException(
+           'The branch is not found',
+         );
+       }
+
+
       const userProfile = new UserProfile();
       userProfile.firstName = payload.firstName;
       userProfile.lastName = payload.lastName;
       userProfile.middleName = payload.middleName;
       userProfile.mobile = payload.mobile;
-      userProfile.branchId = payload.branchId > 0 ? payload.branchId : null;
+      userProfile.branch =  branch ? branch : null;
       userProfile.user = savedUser; // Step 2: Associate UserProfile with UserEntity
 
       userProfile.datecreated = currentDate;
@@ -287,7 +324,7 @@ export class UserService {
     existingUserProfile.middleName = payload.middleName;
     existingUserProfile.lastName = payload.lastName;
     existingUserProfile.mobile = payload.mobile;
-    existingUserProfile.branchId = payload.branchId;
+    //existingUserProfile.branchId = payload.branchId;
     existingUserProfile.dateModified = currentDate;
 
     const updatedUser = await this.userRepository.update(

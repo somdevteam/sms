@@ -20,8 +20,8 @@ export class UserProfile {
     @Unique(['mobile'])
     mobile: string;
 
-    @Column({nullable:true})
-    branchId: number;
+    // @Column({nullable:true})
+    // branchId: number;
 
     @OneToOne(() => UserEntity, user => user.profile)
     @JoinColumn({name: 'userId'}) // Specify the foreign key column
@@ -31,6 +31,10 @@ export class UserProfile {
     datecreated: Date;
     @Column()
     dateModified: Date;
+
+    @ManyToOne(() => Branch, branch => branch.userProfile)
+    @JoinColumn({name: 'branchId'}) // Specify the foreign key column
+    branch : Branch;
 
     // Other columns and methods can be added here
 }

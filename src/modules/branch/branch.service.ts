@@ -29,7 +29,7 @@ export class BranchService {
   }
 
   async findAllByBranchId(branchId: number): Promise<Branch[]> {
-    return this.branchRepository.find({ where: { branchId: branchId } });
+    return await this.branchRepository.find({ where: { branchId: branchId } });
   }
 
   async getAllBranches(currentuser:CurrentUser,isAll:boolean) {

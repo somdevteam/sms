@@ -55,6 +55,7 @@ export class AuthController {
             role: userInfo.roleName,
             roleId: userInfo.roleId,
             branch: userInfo.branchId,
+            branchLogo: userInfo.branchLogo,
             token: token.access_token,
             permissions: permissions
         }
