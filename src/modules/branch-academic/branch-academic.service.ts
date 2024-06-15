@@ -27,7 +27,7 @@ export class BranchAcademicService {
     return academicBranch;
   }
 
-  async findLatestActiveBranchAcademic(branchId: number): Promise<AcademicBranch> {
+  async findActiveBranchAcademic(branchId: number): Promise<AcademicBranch> {
     const branchAcademic = await  this.branchAcademicRepository.findOne({
       where: {
         branch :  { branchId ,isActive: true},

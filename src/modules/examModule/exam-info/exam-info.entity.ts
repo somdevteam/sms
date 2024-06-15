@@ -16,6 +16,9 @@ export class ExamsInfo {
     @JoinColumn({ name: 'academicBranch' })
     academicBranch: AcademicBranch;
 
+    @Column({ type: 'text' })
+    description: string;
+
     @Column()
     startDate: Date;
 

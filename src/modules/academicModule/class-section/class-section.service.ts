@@ -19,7 +19,7 @@ export class ClassSectionService {
     private readonly classService: ClassService,
     private readonly sectionService: SectionService,
     private readonly branchAcademicService: BranchAcademicService,
-  ) {}
+  ) { }
 
   getById(id: number): Promise<ClassSection> {
     return this.classSectionRepository.findOne({
@@ -159,14 +159,14 @@ export class ClassSectionService {
     return classSection;
   }
 
-  async assignSectionToClass(payload:SectionByClassDto) {
-    const { branchId, classId,sections } = payload;
+  async assignSectionToClass(payload: SectionByClassDto) {
+    const { branchId, classId, sections } = payload;
 
-    const academicBranch = await this.branchAcademicService.findLatestActiveBranchAcademic(branchId)
-    const newClassSections = await Promise.all(sections.map(async (data)  => {
+    const academicBranch = await this.branchAcademicService.findActiveBranchAcademic(branchId)
+    const newClassSections = await Promise.all(sections.map(async (data) => {
       const sectionClass = this.classSectionRepository.create({
-        class: {classid: classId},
-        section: {sectionid: data.sectionid},
+        class: { classid: classId },
+        section: { sectionid: data.sectionid },
         branchAcademic: academicBranch,
         dateCreated: new Date()
       })

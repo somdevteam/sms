@@ -1,6 +1,11 @@
+import { Type } from "class-transformer";
 import { IsDateString, IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateExamInfoDto {
+
+    @IsNotEmpty()
+    @Type(() => Number)
+    branchId: number;
 
     @IsNotEmpty()
     @IsNumber()
@@ -13,4 +18,7 @@ export class CreateExamInfoDto {
     @IsNotEmpty()
     @IsDateString()
     endDate: Date;
+
+    @IsNotEmpty()
+    description: string;
 }

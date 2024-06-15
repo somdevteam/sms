@@ -2,10 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ExamsService } from './exams.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('exams')
 export class ExamsController {
-  constructor(private readonly examsService: ExamsService) {}
+  constructor(private readonly examsService: ExamsService) { }
 
   @Post()
   create(@Body() createExamDto: CreateExamDto) {
@@ -13,8 +14,9 @@ export class ExamsController {
   }
 
   @Get()
-  findAll() {
-    return this.examsService.findAll();
+  async findAll(): Promise<any> {
+    const exams = await this.examsService.findAll();
+    return new ApiBaseResponse('', 200, exams)
   }
 
   @Get(':id')

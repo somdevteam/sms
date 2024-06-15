@@ -23,7 +23,9 @@ export class ExamsService {
   }
 
   findAll() {
-    return `This action returns all exams`;
+    return this.examRepository.find({
+      where: { isActive: true }
+    });
   }
 
   findOne(id: number) {
