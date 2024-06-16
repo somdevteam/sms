@@ -5,18 +5,18 @@ import {
     NotAcceptableException,
     NotFoundException
 } from '@nestjs/common';
-import {CreateStudentDto} from './dto/create-student.dto';
-import {UpdateStudentDto} from './dto/update-student.dto';
-import {InjectRepository} from "@nestjs/typeorm";
-import {Student} from "./entities/student.entity";
-import {Repository} from "typeorm";
-import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
+import { CreateStudentDto } from './dto/create-student.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Student } from "./entities/student.entity";
+import { Repository } from "typeorm";
+import { ApiBaseResponse } from "../../../common/dto/apiresponses.dto";
 
-import {ClassSectionService} from "../../academicModule/class-section/class-section.service";
-import {Responsible} from "../responsible/entities/responsible.entity";
-import {ResponsibleService} from "../responsible/responsible.service";
-import {StudentClass} from "../studentclass/entities/studentclass.entity";
-import {StudentClassService} from "../studentclass/studentclass.service";
+import { ClassSectionService } from "../../academicModule/class-section/class-section.service";
+import { Responsible } from "../responsible/entities/responsible.entity";
+import { ResponsibleService } from "../responsible/responsible.service";
+import { StudentClass } from "../studentclass/entities/studentclass.entity";
+import { StudentClassService } from "../studentclass/studentclass.service";
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
@@ -32,19 +32,20 @@ export class StudentService {
         private readonly studentClassService: StudentClassService,
         private readonly classSectionService: ClassSectionService,
         private readonly academicBranchService: BranchAcademicService
-        
+
     ) {
     }
 
 
-    async create(payload: CreateStudentDto,currentUser:CurrentUser): Promise<Student | null> {
+    async create(payload: CreateStudentDto, currentUser: CurrentUser): Promise<Student | null> {
 
         try {
             let savedResponsible = null;
-            const branchId =  payload.branchId
+            const branchId = payload.branchId
             if (!branchId) {
                 throw new NotFoundException('branch id is required');
             }
+<<<<<<< HEAD
             const academicBranch = await this.academicBranchService.findLatestActiveBranchAcademic(+branchId);
            const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId,academicBranch.academicBranchId);
            const studentInfo = await this.findByRollNumber(payload.rollNumber);
@@ -53,6 +54,12 @@ export class StudentService {
             }
             const responsible = await this.responsibleService.getByPhone(payload.responsiblePhone);
 
+=======
+            const academicBranch = await this.academicBranchService.findActiveBranchAcademic(+branchId);
+            const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(payload.classId, payload.sectionId, academicBranch.academicBranchId);
+
+            const responsible = await this.responsibleService.getByPhone(payload.resPhone);
+>>>>>>> master
             if (!responsible) {
                 const newResponsible = new Responsible();
                 newResponsible.responsiblename = payload.responsibleName;
@@ -77,14 +84,14 @@ export class StudentService {
 
             const studentClass = new StudentClass();
             studentClass.student = savedStudent;
-            studentClass.classSection =classSection;
+            studentClass.classSection = classSection;
             studentClass.dateCreated = new Date();
             const savedStudentClass = await this.studentClassRepository.save(studentClass);
             return savedStudent;
         } catch (error) {
             if (error) {
                 throw new ConflictException(error.message);
-                
+
             }
             throw new InternalServerErrorException(
                 "An error occurred while creating student");
@@ -97,7 +104,7 @@ export class StudentService {
     }
 
     findOne(id: number): Promise<Student> {
-        return this.StudentRepository.findOne({where: {studentid: id}})
+        return this.StudentRepository.findOne({ where: { studentid: id } })
     }
 
     async findByRollNumber(rollNumber: number): Promise<Student> {
@@ -106,7 +113,7 @@ export class StudentService {
 
     async update(id: number, payload: UpdateStudentDto) {
         let studentToUpdate = await this.StudentRepository.findOne({
-            where: {studentid: id,}
+            where: { studentid: id, }
         });
 
         if (!studentToUpdate) {
@@ -140,20 +147,21 @@ export class StudentService {
     }
 
     async remove(id: number) {
-        let studentToRemove = await this.StudentRepository.findOne({where: {studentid: id}});
+        let studentToRemove = await this.StudentRepository.findOne({ where: { studentid: id } });
         if (!studentToRemove) {
-            throw  new NotFoundException(new ApiBaseResponse('Responsible not found', 6006, null))
+            throw new NotFoundException(new ApiBaseResponse('Responsible not found', 6006, null))
         }
         await this.StudentRepository.delete(id);
         return `Deleted success`;
     }
 
-    async getStudentsByClassIdAndSectionId(payload:StudentsByClassSectionDto,currentUser:CurrentUser):Promise<Student[]>{
-        
+    async getStudentsByClassIdAndSectionId(payload: StudentsByClassSectionDto, currentUser: CurrentUser): Promise<Student[]> {
+
         if (payload.branchId == null && currentUser.branchId == null) {
             throw new NotFoundException('branchId is required');
         }
         const branchId = payload.branchId ? payload.branchId : currentUser.branchId;
+<<<<<<< HEAD
         payload.sectionId =1;
         payload.academicId = 1;
         const result = (await this.StudentRepository.createQueryBuilder('s')
@@ -183,19 +191,41 @@ export class StudentService {
                 ]
             ).getRawMany())
      return result;
+=======
+
+        const result = (await this.StudentRepository.createQueryBuilder('student')
+            .leftJoinAndSelect('student.studentClass', 'studentclass')
+            .leftJoinAndSelect('studentclass.classSection', 'classSection')
+            .leftJoinAndSelect('classSection.class', 'class')
+            .leftJoinAndSelect('classSection.academic', 'academic')
+            .leftJoinAndSelect('classSection.branch', 'branch')
+            .where('classSection.classId =:classId and classSection.sectionId=:sectionId', { classId: payload.classId, sectionId: payload.sectionId })
+            .andWhere('academic.academicid =:academicId and branch.branchid =:branchId', { academicId: payload.academicId, branchId })
+            .select([
+                'student.studentid as studentid',
+                'student.firstname as firstname',
+                'student.middlename as lastname',
+                'student.responsibleid as responsibleid',
+                'student.bob as pob',
+                'academic.academicname as academicname'
+            ]
+            ).getRawMany())
+
+        return result;
+>>>>>>> master
     }
 
 
     async getStudentCountByBranchAndAcademic(branchId: number, academicId: number): Promise<any> {
         const queryBuilder = this.StudentRepository
-          .createQueryBuilder('student')
-          .leftJoinAndSelect('student.studentClass', 'studentclass')
-          .leftJoinAndSelect('studentclass.classSection', 'ClassSection')
-          .leftJoinAndSelect('ClassSection.branchAcademic', 'academicBranch')
-          .where('academicBranch.branchId = :branchId', { branchId })
-          .andWhere('academicBranch.academicId = :academicId', { academicId });
-          
-    
+            .createQueryBuilder('student')
+            .leftJoinAndSelect('student.studentClass', 'studentclass')
+            .leftJoinAndSelect('studentclass.classSection', 'ClassSection')
+            .leftJoinAndSelect('ClassSection.branchAcademic', 'academicBranch')
+            .where('academicBranch.branchId = :branchId', { branchId })
+            .andWhere('academicBranch.academicId = :academicId', { academicId });
+
+
         return queryBuilder.getMany();
-      }
+    }
 }

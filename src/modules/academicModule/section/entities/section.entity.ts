@@ -14,5 +14,5 @@ export class Section extends BaseEntity {
     isactive: boolean;
 
     @OneToMany(() => ClassSection, clsSec => clsSec.section)
-    classSection: ClassSection[]
+    classSection: ClassSection
 }

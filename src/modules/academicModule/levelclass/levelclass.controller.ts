@@ -60,12 +60,5 @@ export class LevelclassController {
     await this.levelclassService.remove(id);
     return new ApiBaseResponse('deleted succesfuuly',HttpStatus.OK,null);
   }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('classByBranchAndLevel')
- async findClassesByBranchIdAndLevel(@Body() payload: BranchLevel):Promise<ApiBaseResponse> {
-  const data = await this.levelclassService.fetchClassesByBranchId(payload);
-  return new ApiBaseResponse(null,HttpStatus.OK,data);
-  }
   
 }

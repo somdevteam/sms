@@ -19,7 +19,7 @@ export class ClassSectionService {
     private readonly classService: ClassService,
     private readonly sectionService: SectionService,
     private readonly branchAcademicService: BranchAcademicService,
-  ) {}
+  ) { }
 
   getById(id: number): Promise<ClassSection> {
     return this.classSectionRepository.findOne({
@@ -114,10 +114,10 @@ export class ClassSectionService {
   }
 
   async fetchSectionByClassId(payload: SectionByClassDto): Promise<any> {
-    const classId = payload.classid;
-    const branchId = payload.branchid;
-    const academicId = payload.academicid;
-    const data = await this.classSectionRepository
+    const classId = payload.classId;
+    const branchId = payload.branchId;
+    const academicId = payload.academicId;
+    const data = this.classSectionRepository
       .createQueryBuilder('classSection')
       .leftJoinAndSelect('classSection.branch', 'branch')
       .leftJoinAndSelect('classSection.class', 'class')
@@ -159,46 +159,20 @@ export class ClassSectionService {
     return classSection;
   }
 
-  // async getAcademicByClassAndSectionId(classId:number,sectionId:number):Promise<any>{
-  //   return await this.classSectionRepository.createQueryBuilder('classSection')
-  //       .leftJoinAndSelect('academic','academy')
-  //       .where('classSection.classid=:classId',{classId})
-  //       .andWhere('classSection.sectionid=:sectionId',{sectionId})
-  //       .select([
-  //           'academy.academicid',
-  //           'academy.academicname',
-  //           'academy.datecreated'
-  //       ])
-  //       .getMany()
-  //
-  // }
-  // async getAcademicByClassAndSectionId(classId: number, sectionId: number): Promise<any> {
-  //     return await this.classSectionRepository.createQueryBuilder('classSection')
-  //         .leftJoinAndSelect('classSection.academic', 'academic')
-  //         .where('classSection.classid = :classId', { classId: classId })
-  //         .andWhere('classSection.sectionid = :sectionId', { sectionId: sectionId })
-  //         .select([
-  //             'academicid',
-  //             'academicname',
-  //             'datecreated'
-  //         ])
-  //         .getRawMany();
-  // }
+  async assignSectionToClass(payload: SectionByClassDto) {
+    const { branchId, classId, sections } = payload;
 
-  async getAcademicByClassAndSectionId(
-    classId: number,
-    sectionId: number,
-  ): Promise<any[]> {
-    return await this.classSectionRepository
-      .createQueryBuilder('classSection')
-      .leftJoinAndSelect('classSection.academic', 'academic')
-      .where('classSection.classid = :classId', { classId: classId })
-      .andWhere('classSection.sectionid = :sectionId', { sectionId: sectionId })
-      .select([
-        'academic.academicid as academicid',
-        'academic.academicname as academicname',
-        'academic.datecreated as academicdate',
-      ])
-      .getMany();
+    const academicBranch = await this.branchAcademicService.findActiveBranchAcademic(branchId)
+    const newClassSections = await Promise.all(sections.map(async (data) => {
+      const sectionClass = this.classSectionRepository.create({
+        class: { classid: classId },
+        section: { sectionid: data.sectionid },
+        branchAcademic: academicBranch,
+        dateCreated: new Date()
+      })
+      return sectionClass;
+    }));
+
+    return await this.classSectionRepository.save(newClassSections);
   }
 }

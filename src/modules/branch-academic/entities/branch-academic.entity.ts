@@ -2,6 +2,7 @@
 import { AcademicEntity } from 'src/modules/academicModule/academic/entities/academic.entity';
 import { ClassSection } from 'src/modules/academicModule/class-section/entities/class-section.entity';
 import { Branch } from 'src/modules/branch/branch.entity';
+import { ExamsInfo } from 'src/modules/examModule/exam-info/exam-info.entity';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Column } from 'typeorm';
 
 
@@ -19,9 +20,12 @@ export class AcademicBranch {
   branch: Branch;
 
   @OneToMany(() => ClassSection, (classSection) => classSection.branchAcademic)
-  classSections: ClassSection; // Define the reverse relationship
+  classSections: ClassSection;
 
-  @Column({default: true})
-  isActive:boolean
+  @OneToMany(() => ExamsInfo, (exam) => exam.academicBranch)
+  examInfo: ExamsInfo[];
+
+  @Column({ default: true })
+  isActive: boolean
 }
 

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { AcademicBranch } from './entities/branch-academic.entity';
 import { Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,10 +27,11 @@ export class BranchAcademicService {
     return academicBranch;
   }
 
-  async findLatestActiveBranchAcademic(branchId: number): Promise<AcademicBranch> {
+  async findActiveBranchAcademic(branchId: number): Promise<AcademicBranch> {
     const branchAcademic = await  this.branchAcademicRepository.findOne({
       where: {
-        branch :  { branchId },
+        branch :  { branchId ,isActive: true},
+        academic: {isActive: true},
         isActive: true,
       }, relations: ['academic', 'branch'], 
     });
@@ -73,7 +74,7 @@ export class BranchAcademicService {
     }
   }
 
-  async findBranchesWithAcademicByAcademicId(academicId: number): Promise<AcademicBranch[]> {
+  async findBranchesByAcademicId(academicId: number): Promise<AcademicBranch[]> {
     const queryBuilder = await this.branchAcademicRepository.createQueryBuilder('branchAcademic')
       .innerJoinAndSelect('branchAcademic.branch', 'branch')
       .innerJoinAndSelect('branchAcademic.academic', 'academic')
@@ -81,6 +82,54 @@ export class BranchAcademicService {
       .getMany();
 
     return queryBuilder;
+  }
+
+  async findAcademicByBranch(branchId: number): Promise<any> {
+    const result =  await this.branchAcademicRepository.find({
+       where: {branch: {branchId}},
+       relations: ['academic','branch'],
+     })
+
+     // Filter out any objects where isActive is not true
+    // const filteredResult = result.filter(item => item.isActive === true);
+    return result;
+   }
+
+   async activeAndDeactivateBranchAcademic(payload: any): Promise<any> {
+    try {
+      
+      const activeBranchAcademic = await this.branchAcademicRepository.findOneBy({
+         academic: {academicId: payload.academicId},
+         branch: {branchId: payload.branchId},
+         isActive: true 
+        });
+
+      const foundBranchAcademicBranch = await this.branchAcademicRepository.findOneBy({ 
+        academic: {academicId: payload.academicId},
+        branch: {branchId: payload.branchId}
+       });
+
+      if (!foundBranchAcademicBranch) {
+          throw new NotFoundException('Branch Academic not found');
+      }
+
+      if (activeBranchAcademic) {
+        activeBranchAcademic.isActive = false;
+          await this.branchAcademicRepository.update(activeBranchAcademic.academicBranchId, activeBranchAcademic);
+      }
+
+      foundBranchAcademicBranch.isActive = !foundBranchAcademicBranch.isActive;
+      await this.branchAcademicRepository.update(foundBranchAcademicBranch.academicBranchId, foundBranchAcademicBranch);
+
+      return foundBranchAcademicBranch;
+
+    } catch (error) {
+      if (error) {
+        throw new NotAcceptableException(error);
+      }
+      throw new InternalServerErrorException('An error occurred',error.message);
+    }
+
   }
   
   findAll() {
