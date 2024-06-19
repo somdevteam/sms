@@ -98,11 +98,13 @@ export class SectionService {
         classSection: {
           class : {classid : payload.classId},
           branchAcademic: {
-            branch: {branchId : payload.branchId},
+            branch: {branchId : payload.branchId,isActive: true},
           },
         }
       }
     })
+
+    if (!payload.isMissing) return sections;
 
     const existingSectionNumbers = sections.map(section => section.sectionid);
     const allSections = await this.sectionRepository.find();

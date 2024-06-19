@@ -1,9 +1,8 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, HttpStatus} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, HttpStatus, Query, ParseIntPipe} from '@nestjs/common';
 import { LevelclassService } from './levelclass.service';
 import {ApiTags} from "@nestjs/swagger";
 import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
 import { LevelClassDto } from './dto/level-class.dto';
-import { BranchLevel } from './dto/branch-class.dto';
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('levelclass')
@@ -30,15 +29,10 @@ export class LevelclassController {
     return this.levelclassService.getLevelClassesWithLevel1(+id);
   }
 
-  @Get('/levelbybranch/:id')
-  async findLevelByBranch(@Param('id') id: string) : Promise<ApiBaseResponse> {
-    const levels = await this.levelclassService.getLevelsByBranch(+id);
-    return new ApiBaseResponse(null,HttpStatus.OK,levels)
-  }
 
   @Post('/classbybranchandlevel')
-  async findClassByBranchAndLevel(@Body() payload:BranchLevel) : Promise<ApiBaseResponse> {
-    const levels = await this.levelclassService.getClassesByBranchAndLevel(payload);
+  async findClassByBranchAndLevel(@Query('branchId', new ParseIntPipe()) branchId: number,) : Promise<ApiBaseResponse> {
+    const levels = await this.levelclassService.getClassesByBranchAndLevel(branchId);
     return new ApiBaseResponse(null,HttpStatus.OK,levels)
   }
 

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
 import { ExamsInfo } from '../exam-info/exam-info.entity';
 
 @Entity()
@@ -15,6 +15,6 @@ export class Exam {
     @Column({ default: true })
     isActive: boolean;
 
-    @OneToMany(() => ExamsInfo, examsInfo => examsInfo.exam)
+    @OneToOne(() => ExamsInfo, examsInfo => examsInfo.exam)
     examsInfo: ExamsInfo[];
 }

@@ -1,5 +1,5 @@
 // exams-info.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { Exam } from '../exams/exam.entity';
 import { AcademicBranch } from 'src/modules/branch-academic/entities/branch-academic.entity';
 
@@ -8,7 +8,7 @@ export class ExamsInfo {
     @PrimaryGeneratedColumn()
     examInfoId: number;
 
-    @ManyToOne(() => Exam, exam => exam.examsInfo)
+    @OneToOne(() => Exam, exam => exam.examsInfo)
     @JoinColumn({ name: 'examId' })
     exam: Exam;
 

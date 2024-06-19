@@ -19,9 +19,8 @@ export class StudentController {
 
   @UseGuards(JwtAuthGuard)
   @Post('getStudentByClassAndSection')
-  async findStudentByClassAndSection(@Request() req,@Body() createStudentDto:StudentsByClassSectionDto) {
-    const data =  await this.studentService.getStudentsByClassIdAndSectionId(createStudentDto,req.user.user);
-    console.log(data);
+  async findStudentByClassAndSection(@Body() createStudentDto:StudentsByClassSectionDto) {
+    const data =  await this.studentService.getStudentsByClassIdAndSectionId(createStudentDto);
     return data;
   }
 
