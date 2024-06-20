@@ -30,7 +30,7 @@ export class UserService {
     private loginRepository: Repository<Loginhistories>,
     @Inject(forwardRef(() => UserRolesService))
     private readonly userRoleService: UserRolesService,
-  ) {}
+  ) { }
 
   private readonly users: any[] = [];
 
@@ -56,15 +56,15 @@ export class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-  async resetPassword(id:number,payload: ResetPasswordDto): Promise<any> {
+  async resetPassword(id: number, payload: ResetPasswordDto): Promise<any> {
     const foundedUser = await this.getById(id);
-    if(!foundedUser) {
+    if (!foundedUser) {
       throw new NotFoundException('this user not exists');
     }
 
     foundedUser.password = crypto.createHmac('sha256', payload.password).digest('hex');
 
-   return await this.userRepository.update(foundedUser.userId,foundedUser);
+    return await this.userRepository.update(foundedUser.userId, foundedUser);
 
   }
 
@@ -72,7 +72,7 @@ export class UserService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
-      .leftJoinAndSelect('user.userRoles','userRoles')
+      .leftJoinAndSelect('user.userRoles', 'userRoles')
       .where('user.isActive = :isActive', { isActive: data.isActive })
       .select([
         'user.userId as userId',
@@ -96,23 +96,23 @@ export class UserService {
     return query.getRawMany();
   }
 
- //  async fetchSingleUsersFullData(userId: number) {
- //    return await this.userRepository
- //     .createQueryBuilder('user')
- //     .leftJoinAndSelect('user.profile', 'profile')
- //     .where('user.userId = :userId', { userId })
- //     .select([
- //       'user.userId as userId',
- //       'user.email as email',
- //       'user.username as username',
- //       'profile.firstName as firstName',
- //       'profile.middleName as middleName',
- //       'profile.lastName as lastName',
- //       'profile.mobile as mobile',
- //       'profile.branchId as branchId',
- //       'profile.userProfileId as userProfileId',
- //     ]).getRawOne();
- // }
+  //  async fetchSingleUsersFullData(userId: number) {
+  //    return await this.userRepository
+  //     .createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.profile', 'profile')
+  //     .where('user.userId = :userId', { userId })
+  //     .select([
+  //       'user.userId as userId',
+  //       'user.email as email',
+  //       'user.username as username',
+  //       'profile.firstName as firstName',
+  //       'profile.middleName as middleName',
+  //       'profile.lastName as lastName',
+  //       'profile.mobile as mobile',
+  //       'profile.branchId as branchId',
+  //       'profile.userProfileId as userProfileId',
+  //     ]).getRawOne();
+  // }
 
   async fetchUsersFullData(userId?: number) {
     const usersList = await this.userRepository
@@ -134,11 +134,11 @@ export class UserService {
   }
 
   async fetchSingleUsersFullData(userId: number) {
-     return await this.userRepository
+    return await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
-         .leftJoinAndSelect('user.userRoles','userRoles')
-         .leftJoinAndSelect('userRoles.role','role')
+      .leftJoinAndSelect('user.userRoles', 'userRoles')
+      .leftJoinAndSelect('userRoles.role', 'role')
       .where('user.userId = :userId', { userId })
       .select([
         'user.userId as userId',
@@ -154,36 +154,36 @@ export class UserService {
         'role.roleName as roleName'
       ]).getRawOne();
   }
-    async fetchSpecificUserData(userId: number, loginHistoryId: number) {
-        const result = await this.userRepository
-            .createQueryBuilder('u')
-            .select([
-                'u.userId as userId',
-                'u.email as email',
-                'u.username as userName',
-                'up.firstName as firstName',
-                'up.middleName as lastName',
-                'up.mobile as mobile',
-                'up.branchId as branchId',
-                'up.userProfileId as userProfileId',
-                'lh.loginHistoryId as loginHistoryId',
-                'lh.loginDate as loginDate',
-                'r.roleId as roleId',
-                'r.roleName as roleName',
-            ])
-            .leftJoin('u.profile', 'up')
-            .leftJoin('u.userRoles', 'ur')
-            .leftJoin('ur.role', 'r')
-            .leftJoin('u.loginHistory', 'lh')
-            .where('u.userId = :userId and lh.loginHistoryId = :loginHistoryId', { userId, loginHistoryId })
-            .getRawOne();
+  async fetchSpecificUserData(userId: number, loginHistoryId: number) {
+    const result = await this.userRepository
+      .createQueryBuilder('u')
+      .select([
+        'u.userId as userId',
+        'u.email as email',
+        'u.username as userName',
+        'up.firstName as firstName',
+        'up.middleName as lastName',
+        'up.mobile as mobile',
+        'up.branchId as branchId',
+        'up.userProfileId as userProfileId',
+        'lh.loginHistoryId as loginHistoryId',
+        'lh.loginDate as loginDate',
+        'r.roleId as roleId',
+        'r.roleName as roleName',
+      ])
+      .leftJoin('u.profile', 'up')
+      .leftJoin('u.userRoles', 'ur')
+      .leftJoin('ur.role', 'r')
+      .leftJoin('u.loginHistory', 'lh')
+      .where('u.userId = :userId and lh.loginHistoryId = :loginHistoryId', { userId, loginHistoryId })
+      .getRawOne();
 
-        console.log(result);
-        return result;
-    }
+    console.log(result);
+    return result;
+  }
 
-    async fetchSpecificUserData1(userId: number, loginHistoryId: number) {
-        const result = await this.userRepository.query(`
+  async fetchSpecificUserData1(userId: number, loginHistoryId: number) {
+    const result = await this.userRepository.query(`
         SELECT
             u.userId,
             u.email,
@@ -213,9 +213,9 @@ export class UserService {
             u.userId = ? AND lh.loginHistoryId = ?
     `, [userId, loginHistoryId]);
 
-        console.log(result[0]); // Assuming the result is an array of rows
-        return result[0]; // Assuming you want to return the first row
-    }
+    console.log(result[0]); // Assuming the result is an array of rows
+    return result[0]; // Assuming you want to return the first row
+  }
 
 
   async create(payload: UserDto) {
@@ -263,7 +263,7 @@ export class UserService {
 
       await this.userProfileRepository.save(userProfile);
 
-      await this.userRoleService.createUserRole(payload.roleId,savedUser.userId)
+      await this.userRoleService.createUserRole(payload.roleId, savedUser.userId)
 
       return savedUser;
     } catch (error) {
@@ -303,12 +303,12 @@ export class UserService {
       foundUser.userId,
       foundUser,
     );
-     await this.userProfileRepository.update(
+    await this.userProfileRepository.update(
       { user: { userId: foundUser.userId } },
       existingUserProfile,
     );
 
-    await this.userRoleService.update(foundUser.userId,payload.roleId)
+    await this.userRoleService.update(foundUser.userId, payload.roleId)
     return updatedUser;
   }
 
@@ -350,7 +350,7 @@ export class UserService {
   }
 
   async getUserLoginHistory(userId) {
-    const userLoginHistories = await this.loginRepository.find({where: {userId}});
+    const userLoginHistories = await this.loginRepository.find({ where: { userId } });
     return userLoginHistories;
   }
 }

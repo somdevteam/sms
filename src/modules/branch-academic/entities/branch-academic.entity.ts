@@ -2,7 +2,7 @@
 import { AcademicEntity } from 'src/modules/academicModule/academic/entities/academic.entity';
 import { ClassSection } from 'src/modules/academicModule/class-section/entities/class-section.entity';
 import { Branch } from 'src/modules/branch/branch.entity';
-import { ExamsInfo } from 'src/modules/examModule/exam-info/exam-info.entity';
+import { ExamsInfo } from 'src/modules/examModule/exams/exam-info.entity';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Column } from 'typeorm';
 
 

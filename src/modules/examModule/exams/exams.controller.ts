@@ -16,7 +16,7 @@ export class ExamsController {
   @Get('/findexamsbybranch')
   async findExamsByBranch(@Query('branchId', new ParseIntPipe()) branchId: number): Promise<any> {
     const exams = await this.examsService.findExamsByBranch(branchId);
-    return new ApiBaseResponse(null,200,exams);
+    return new ApiBaseResponse(null, 200, exams);
   }
 
   @Get()
@@ -25,18 +25,15 @@ export class ExamsController {
     return new ApiBaseResponse('', 200, exams)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.examsService.findOne(+id);
+  @Post('/addexaminfo')
+  async createExamInfo(@Body() payload: any): Promise<any> {
+    await this.examsService.createExamInfo(payload);
+    return new ApiBaseResponse('exam updated', 200, null);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExamDto: UpdateExamDto) {
-    return this.examsService.update(+id, updateExamDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.examsService.remove(+id);
+  @Patch('updatexaminfo/:id')
+  async updateExamInfo(@Param('id') id: string, @Body() payload: any): Promise<any> {
+    await this.examsService.updateExamInfo(+id, payload);
+    return new ApiBaseResponse('exam updated', 200, null);
   }
 }
