@@ -5,7 +5,7 @@ import { ExamsInfo } from "../../exams/exam-info.entity";
 @Entity()
 export class ClassExam {
   @PrimaryGeneratedColumn()
-  classexam: number;
+  class_exam_id: number;
 
   @ManyToOne(() => Class, classEntity => classEntity.classExams)
   @JoinColumn({ name: 'classid' })

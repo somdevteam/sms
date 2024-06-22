@@ -5,7 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./modules/auth/auth.module";
 import { BranchModule } from "./modules/branch/branch.module";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import configuration from "../config/configuration";
 import { ClassModule } from "./modules/academicModule/class/class.module";
 import { SubjectModule } from "./modules/academicModule/subject/subject.module";
@@ -39,6 +39,7 @@ import { ClassExamModule } from './modules/examModule/class-exam/class-exam.modu
       envFilePath: '.env',
       load: [configuration],
     }),
+    
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule, AuthModule, BranchModule,
     ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule, SectionModule, ClassSectionModule, StudentModule, ResponsibleModule, StudentclassModule,
