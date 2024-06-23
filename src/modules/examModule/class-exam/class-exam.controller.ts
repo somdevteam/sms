@@ -2,14 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ClassExamService } from './class-exam.service';
 import { CreateClassExamDto } from './dto/create-class-exam.dto';
 import { UpdateClassExamDto } from './dto/update-class-exam.dto';
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('class-exam')
 export class ClassExamController {
-  constructor(private readonly classExamService: ClassExamService) {}
+  constructor(private readonly classExamService: ClassExamService) { }
 
   @Post()
-  create(@Body() createClassExamDto: CreateClassExamDto) {
-    return this.classExamService.create(createClassExamDto);
+  async create(@Body() payload: CreateClassExamDto): Promise<ApiBaseResponse> {
+    await this.classExamService.create(payload);
+    return new ApiBaseResponse('created successfully', 200, null);
   }
 
   @Get()
