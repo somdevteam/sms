@@ -29,6 +29,7 @@ import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.mo
 import { UserRolesModule } from './modules/userroles/userroles.module';
 import {dataSourceOptions} from "../db/data-source";
 import {RolePermissionsModule} from "./modules/rolePermissions/rolePermissions.module";
+import { PaymentsModule } from "./modules/payments/payments.module";
 
 
 @Module({
@@ -40,7 +41,7 @@ import {RolePermissionsModule} from "./modules/rolePermissions/rolePermissions.m
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule, AuthModule, BranchModule,
   ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, ClassSubjectModule,SectionModule,ClassSectionModule,StudentModule,ResponsibleModule, StudentclassModule,
-    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserTypePermissions,TabPermissionsModule,UserRolesModule,RolePermissionsModule],
+    MenusModule, TabsModule,PermissionsModule, TabPermissions, RolesModule, UserTypesModule,UserTypePermissions,TabPermissionsModule,UserRolesModule,RolePermissionsModule,PaymentsModule],
   controllers: [AppController],
   providers: [AppService],
 })
