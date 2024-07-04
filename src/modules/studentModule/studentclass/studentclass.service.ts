@@ -47,7 +47,7 @@ export class StudentClassService {
   }
 
   async findOne(studentClassId: number): Promise<StudentClass> {
-    return await this.studentClassRepository.findOne(null);
+    return await this.studentClassRepository.findOne( {where: {studentClassId:studentClassId}});
   }
 
   async update(

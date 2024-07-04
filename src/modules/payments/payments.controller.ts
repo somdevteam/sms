@@ -2,14 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { ApiBaseResponse } from "../../common/dto/apiresponses.dto";
 
-@Controller('payments')
+@Controller('payment')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  @Post('add')
+  async create(@Body() createPaymentDto: CreatePaymentDto):Promise<ApiBaseResponse> {
+    await this.paymentsService.create(createPaymentDto);
+    return new ApiBaseResponse('Payment created successfully',200,null);
   }
 
   @Get()

@@ -26,9 +26,8 @@ export class Payment {
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
-  @ManyToOne(() => Months)
-  @JoinColumn({ name: 'monthid' })
-  monthid: Months;
+
+  monthName: string;
 
   @CreateDateColumn()
   datecreated: Date;
