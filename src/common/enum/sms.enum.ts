@@ -3,6 +3,14 @@ export enum UserPermissions {
     VIEW_PERMISSION = 'viewPermission',
     CREATE_USER = 'createUser',
     VIEW_USER = 'viewUsers',
+    VIEW_FEES = 'userCanViewFees',
+    ADD_FEES ='userCanAddFees',
+}
+
+export enum FeesPermissions {
+    VIEW_USER = 'viewUsers',
+    VIEW_FEES = 'userCanViewFees',
+    ADD_FEES ='userCanAddFees',
 }
 export enum Months {
     'jan' = 1,
