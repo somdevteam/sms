@@ -63,4 +63,11 @@ export class UserDto {
         required: true,
     })
     branchId: number;
+
+    @ApiProperty({
+        required: true,
+    })
+
+    @IsNotEmpty()
+    roleId: number;
 }

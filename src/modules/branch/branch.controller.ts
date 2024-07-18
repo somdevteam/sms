@@ -69,4 +69,12 @@ export class BranchController {
     );
     return new ApiBaseResponse('branches', HttpStatus.OK, branhes);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('activate/:branchId')
+  async activeAndDeactivateBranch(@Param('branchId') branchId: number): Promise<ApiBaseResponse> {
+    const resp =  await this.branchService.activeAndDeactivateBranch(branchId)
+    return new ApiBaseResponse('successfully activated',200,resp);
+  }
+  
 }

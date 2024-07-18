@@ -6,7 +6,7 @@ import { ApiBaseResponse } from '../../common/dto/apiresponses.dto';
 export class RolesController {
   constructor(private readonly roleService: RolesService) {}
 
-  @Get()
+  @Get(':/')
   async findAll(): Promise<ApiBaseResponse> {
     const roles = await this.roleService.findAllRoles();
     return new ApiBaseResponse('success', 200, roles);

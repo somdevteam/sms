@@ -5,7 +5,7 @@ export const dataSourceOptions : DataSourceOptions ={
     host: 'localhost',
     username: 'root',
     password: 'pASSWORD',
-    database: 'sms2',
+    database: 'smsupd',
     synchronize:true,
     //entities: [],
     //entities: ['dist/src/**/*.entity{.ts,.js}'],

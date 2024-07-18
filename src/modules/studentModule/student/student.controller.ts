@@ -4,6 +4,7 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
 
 @Controller('student')
 export class StudentController {
@@ -11,14 +12,15 @@ export class StudentController {
 
   @UseGuards(JwtAuthGuard)
   @Post('add')
-  create(@Body() createStudentDto:CreateStudentDto,@Request() req) {
-     return this.studentService.create(createStudentDto,req.user.user);
+  async create(@Body() createStudentDto:CreateStudentDto,@Request() req) {
+     let studentData = await this.studentService.create(createStudentDto,req.user.user);
+     return new ApiBaseResponse('successfully saved', 200, studentData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('getStudentByClassAndSection')
-  findStudentByClassAndSection(@Request() req,@Body() createStudentDto:StudentsByClassSectionDto) {
-    const data = this.studentService.getStudentsByClassIdAndSectionId(createStudentDto,req.user.user);
+  async findStudentByClassAndSection(@Request() req,@Body() createStudentDto:StudentsByClassSectionDto) {
+    const data =  await this.studentService.getStudentsByClassIdAndSectionId(createStudentDto,req.user.user);
     console.log(data);
     return data;
   }
@@ -35,9 +37,10 @@ export class StudentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('update/:id')
-  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
-    return this.studentService.update(+id, updateStudentDto);
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
+    var updateStudentInfo = await this.studentService.update(+id, updateStudentDto);
+    return new ApiBaseResponse('successfully uppdated', 200 , updateStudentInfo);
   }
 
   @Delete(':id')

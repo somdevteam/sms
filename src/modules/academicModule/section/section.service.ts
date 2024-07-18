@@ -80,4 +80,37 @@ export class SectionService {
     }
     return await this.sectionRepository.delete(id);
   }
+
+
+  async findSections1(payload: any) {
+    return await this.sectionRepository
+  .createQueryBuilder('sec')
+  .leftJoinAndSelect('sec.classSection', 'cs','cs.classId = :classId', {classId: payload.classId})
+  .leftJoin('cs.branchAcademic','ba','ba.academic')
+  .getMany();
+
+  }
+
+  async findSectionByFilter(payload: any): Promise<any[]> {
+    const sections = await this.sectionRepository.find({
+      relations: ['classSection'],
+      where: {
+        classSection: {
+          class : {classid : payload.classId},
+          branchAcademic: {
+            branch: {branchId : payload.branchId},
+          },
+        }
+      }
+    })
+
+    const existingSectionNumbers = sections.map(section => section.sectionid);
+    const allSections = await this.sectionRepository.find();
+
+    // Find missing sections
+    const missingSections = allSections.filter(section => !existingSectionNumbers.includes(section.sectionid));
+    return missingSections;
+  }
+
+  
 }

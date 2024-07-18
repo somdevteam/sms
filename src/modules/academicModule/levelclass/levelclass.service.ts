@@ -125,21 +125,35 @@ export class LevelclassService {
       
   }
 
-    async fetchClassesByBranchId(payload: BranchLevel) :Promise<any>{
-        return await this.levelclassRepository
-            .createQueryBuilder('levelClass')
-            .leftJoinAndSelect('levelClass.branch', 'branch')
-            .leftJoinAndSelect('levelClass.class', 'class')
-            .leftJoinAndSelect('levelClass.level', 'level')
-            .where('levelClass.branch = :branchId', {branchId: payload.branchId})
-            .andWhere('level.levelid = :levelId', {levelId: payload.levelId})
-            .andWhere('class.isactive = :isActive', {isActive:true})
-            // .select([
-            //     'class.classid',
-            //     'class.classname',
-            //     'class.datecreated',
-            //     'class.isactive',
-            // ])
-            .getMany();
-    }
+  async getLevelsByBranch(branchId: number): Promise<any>{
+    return await this.levelclassRepository
+    .createQueryBuilder('lc')
+    .innerJoin('lc.level', 'l')
+    .innerJoin('lc.class', 'c')
+    .innerJoin('lc.branch', 'b')
+    .select([
+      'DISTINCT l.levelid as levelId', 
+      'l.levelname as levelName',
+    ]) 
+    .where('b.branchId = :branchId', { branchId })
+    .getRawMany();
+  }
+
+  async getClassesByBranchAndLevel(payload: BranchLevel): Promise<any>{
+    return await this.levelclassRepository.find({
+      relations: ['level','class','branch'],
+      where: {branch: {branchId: payload.branchId},level: {levelid: payload.levelId}}
+    })
+  }
+  
+
+  async getLevelClassesWithLevel1(levelId: number) {
+    return await this.levelclassRepository
+      .createQueryBuilder('lc')
+      .innerJoin('lc.level', 'l')
+      .innerJoinAndSelect('lc.class', 'c')
+      .innerJoin('lc.branch', 'b')
+      .where('l.levelid = :levelId', { levelId })
+      .getMany();
+  }
 }

@@ -1,19 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {FindManyOptions, Repository} from 'typeorm';
 import { UserRolesEntity } from './entities/userroles.entity';
-import {UserEntity} from "../user/user.entity";
+import { RolesService } from '../roles/roles.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class UserRolesService {
     constructor(
       @InjectRepository(UserRolesEntity)
       private readonly userRolesRepository: Repository<UserRolesEntity>,
+      private readonly roleService: RolesService,
+      @Inject(forwardRef(() => UserService))
+      private readonly userService: UserService,
     ) {}
 
     async findAllUserRoles(): Promise<UserRolesEntity[]> {
         return await this.userRolesRepository.find();
     }
+
+
+    async createUserRole(roleId: number, userId: number): Promise<UserRolesEntity> {
+        const role = await this.roleService.getRoleById(roleId);
+        const user = await this.userService.getById(userId);
+        
+        const userRole = new UserRolesEntity()
+        userRole.role = role;
+        userRole.user = user;
+        
+        return await this.userRolesRepository.save(userRole);
+      }
+
+      async update(userId: number, roleId: any): Promise<any> {
+        const existingUser = await this.userRolesRepository.findOneBy({
+             user: {userId: userId}
+          });
+        existingUser.role = roleId;
+
+        const updatedRole = await this.userRolesRepository.update(existingUser.userRoleId,existingUser);
+        return updatedRole;
+      }
 
     // async findUserRolesByUserId(user: number): Promise<UserRolesEntity[]> {
     //     return await this.userRolesRepository.find( {where: {user:user}});
@@ -22,7 +48,7 @@ export class UserRolesService {
         const options: FindManyOptions<UserRolesEntity> = {
             where: { user: user } as any,
         };
-        return await this.userRolesRepository.find(options);
+      return await this.userRolesRepository.find(options);
     }
 
 }

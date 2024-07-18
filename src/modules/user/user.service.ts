@@ -1,9 +1,11 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
@@ -15,6 +17,7 @@ import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { Loginhistories } from '../auth/loginhistories.entity';
 import { UserFilterDto } from './Dto/search-user.dto';
 import { ResetPasswordDto } from './Dto/reset-password.dto';
+import { UserRolesService } from '../userroles/userroles.service';
 
 @Injectable()
 export class UserService {
@@ -25,6 +28,8 @@ export class UserService {
     private userProfileRepository: Repository<UserProfile>,
     @InjectRepository(Loginhistories)
     private loginRepository: Repository<Loginhistories>,
+    @Inject(forwardRef(() => UserRolesService))
+    private readonly userRoleService: UserRolesService,
   ) {}
 
   private readonly users: any[] = [];
@@ -67,6 +72,7 @@ export class UserService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.userRoles','userRoles')
       .where('user.isActive = :isActive', { isActive: data.isActive })
       .select([
         'user.userId as userId',
@@ -76,6 +82,7 @@ export class UserService {
         'profile.middleName as middleName',
         'profile.lastName as lastName',
         'profile.mobile as mobile',
+        'userRoles.role as roleId',
         'profile.branchId as branchId',
         'profile.userProfileId as userProfileId',
       ]);
@@ -256,6 +263,8 @@ export class UserService {
 
       await this.userProfileRepository.save(userProfile);
 
+      await this.userRoleService.createUserRole(payload.roleId,savedUser.userId)
+
       return savedUser;
     } catch (error) {
       if (error) {
@@ -294,10 +303,12 @@ export class UserService {
       foundUser.userId,
       foundUser,
     );
-    const updateUserProfile = await this.userProfileRepository.update(
+     await this.userProfileRepository.update(
       { user: { userId: foundUser.userId } },
       existingUserProfile,
     );
+
+    await this.userRoleService.update(foundUser.userId,payload.roleId)
     return updatedUser;
   }
 

@@ -24,10 +24,22 @@ export class LevelclassController {
     return this.levelclassService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/lvl/:id')
   findLevelByclass(@Param('id') id: string) {
-    return this.levelclassService.getLevelClassesWithLevel(+id);
+    return this.levelclassService.getLevelClassesWithLevel1(+id);
+  }
+
+  @Get('/levelbybranch/:id')
+  async findLevelByBranch(@Param('id') id: string) : Promise<ApiBaseResponse> {
+    const levels = await this.levelclassService.getLevelsByBranch(+id);
+    return new ApiBaseResponse(null,HttpStatus.OK,levels)
+  }
+
+  @Post('/classbybranchandlevel')
+  async findClassByBranchAndLevel(@Body() payload:BranchLevel) : Promise<ApiBaseResponse> {
+    const levels = await this.levelclassService.getClassesByBranchAndLevel(payload);
+    return new ApiBaseResponse(null,HttpStatus.OK,levels)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,13 +59,6 @@ export class LevelclassController {
   async remove(@Param('id') id: number): Promise<ApiBaseResponse>  {
     await this.levelclassService.remove(id);
     return new ApiBaseResponse('deleted succesfuuly',HttpStatus.OK,null);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('classByBranchAndLevel')
- async findClassesByBranchIdAndLevel(@Body() payload: BranchLevel):Promise<ApiBaseResponse> {
-  const data = await this.levelclassService.fetchClassesByBranchId(payload);
-  return new ApiBaseResponse(null,HttpStatus.OK,data);
   }
   
 }
