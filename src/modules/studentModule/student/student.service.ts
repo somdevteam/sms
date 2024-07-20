@@ -100,7 +100,7 @@ export class StudentService {
     }
 
     async findByRollNumber(rollNumber: number): Promise<Student> {
-        return this.studentRepository.findOne({ where: { rollNumber } });
+        return this.studentRepository.findOne({ where: { rollNumber },relations:['studentClass'] });
     }
 
     async update(id: number, payload: UpdateStudentDto) {

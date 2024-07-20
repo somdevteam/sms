@@ -5,6 +5,7 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
+import { GetRollNumberDto } from "./dto/getRollNumber.dto";
 
 @Controller('student')
 export class StudentController {
@@ -56,4 +57,15 @@ export class StudentController {
     const count = await this.studentService.getStudentCountByBranchAndAcademic(branchId, academicId);
     return { count };
   }
+
+ @UseGuards(JwtAuthGuard)
+  @Post('getStudentByRollNumber')
+  async findByRollNumber(@Request() req) {
+    console.log("We reached here"+req.body);
+
+    let studentData = await this.studentService.findByRollNumber(req.body.rollNumber);
+    //console.log(studentData);
+    return new ApiBaseResponse('successfully saved', 200, studentData);
+  }
+
 }
