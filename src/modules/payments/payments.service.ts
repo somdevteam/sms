@@ -51,6 +51,10 @@ export class PaymentsService {
     return `This action returns all payments`;
   }
 
+  async findAllPaymentTypes() {
+    return await this.paymentTypesRepository.find();
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} payment`;
   }

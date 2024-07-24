@@ -33,4 +33,10 @@ export class PaymentsController {
   remove(@Param('id') id: string) {
     return this.paymentsService.remove(+id);
   }
+
+  @Get('findAllPaymentTypes')
+  async findAllPaymentTypes():Promise<ApiBaseResponse>  {
+    const data = await this.paymentsService.findAllPaymentTypes();
+    return new ApiBaseResponse('Success',200,data);
+  }
 }
