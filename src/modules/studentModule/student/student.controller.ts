@@ -58,7 +58,7 @@ export class StudentController {
     return { count };
   }
 
- @UseGuards(JwtAuthGuard)
+ //@UseGuards(JwtAuthGuard)
   @Post('getStudentByRollNumber')
   async findByRollNumber(@Request() req) {
     console.log("We reached here"+req.body);
