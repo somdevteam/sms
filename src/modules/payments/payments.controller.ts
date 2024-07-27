@@ -39,4 +39,10 @@ export class PaymentsController {
     const data = await this.paymentsService.findAllPaymentTypes();
     return new ApiBaseResponse('Success',200,data);
   }
+
+  @Get('findAllPaymentStates')
+  async findAllPaymentStates():Promise<ApiBaseResponse>  {
+    const data = await this.paymentsService.findAllPaymentStates();
+    return new ApiBaseResponse('Success',200,data);
+  }
 }

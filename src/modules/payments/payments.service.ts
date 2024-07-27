@@ -8,12 +8,14 @@ import { Branch } from "../branch/branch.entity";
 import { Paymenttypes } from "./entities/paymenttype.entity";
 import { ClassSectionService } from "../academicModule/class-section/class-section.service";
 import { StudentClassService } from "../studentModule/studentclass/studentclass.service";
+import { PaymentStates } from "./entities/paymentstates.entity";
 
 @Injectable()
 export class PaymentsService {
   constructor(
     @InjectRepository(Payment) private paymentRepository: Repository<Payment>,
     @InjectRepository(Paymenttypes) private paymentTypesRepository: Repository<Paymenttypes>,
+    @InjectRepository(Paymenttypes) private paymentStateRepository: Repository<PaymentStates>,
     private readonly studentClassService: StudentClassService,
   ) {
   }
@@ -52,6 +54,10 @@ export class PaymentsService {
   }
 
   async findAllPaymentTypes() {
+    return await this.paymentTypesRepository.find();
+  }
+
+  async findAllPaymentStates() {
     return await this.paymentTypesRepository.find();
   }
 
