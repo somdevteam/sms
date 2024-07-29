@@ -62,10 +62,10 @@ export class StudentController {
   @Post('getStudentByRollNumber')
   async findByRollNumber(@Request() req) {
     console.log("We reached here"+req.body);
-
+    console.log()
     let studentData = await this.studentService.findByRollNumber(req.body.rollNumber);
-    //console.log(studentData);
-    return new ApiBaseResponse('successfully saved', 200, studentData);
+    console.log(studentData);
+    return new ApiBaseResponse('success', 200, studentData);
   }
 
 }

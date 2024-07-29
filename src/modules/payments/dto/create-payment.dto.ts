@@ -11,7 +11,13 @@ export class CreatePaymentDto {
     required: true,
   })
   @IsNotEmpty()
-  studentFeeTypeId: number;
+  paymentTypeId: number;
+  @ApiProperty({
+    required: true,
+  })
+
+  @IsNotEmpty()
+  paymentStateId: number;
   @ApiProperty({
     required: true,
   })
@@ -23,5 +29,8 @@ export class CreatePaymentDto {
   })
   monthId:1;
   monthName:string
+
+  @ApiProperty({required:true})
+  rollNo:string
 
 }

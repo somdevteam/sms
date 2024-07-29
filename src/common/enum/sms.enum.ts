@@ -12,7 +12,7 @@ export enum FeesPermissions {
     VIEW_FEES = 'userCanViewFees',
     ADD_FEES ='userCanAddFees',
 }
-export enum Months {
+export enum Month {
     'jan' = 1,
     'fab' = 2,
     'mar' = 3,

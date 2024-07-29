@@ -103,6 +103,7 @@ export class StudentService {
         return this.studentRepository.findOne({ where: { rollNumber },relations:['studentClass'] });
     }
 
+
     async update(id: number, payload: UpdateStudentDto) {
         const studentToUpdate = await this.studentRepository.findOne({ where: { studentid: id } });
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, BadRequestException } from "@nestjs/common";
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
@@ -45,4 +45,28 @@ export class PaymentsController {
     const data = await this.paymentsService.findAllPaymentStates();
     return new ApiBaseResponse('Success',200,data);
   }
+  @Get('findAllMonths')
+  async findAllMonths():Promise<ApiBaseResponse>  {
+    const data = await this.paymentsService.findAllMonths();
+    return new ApiBaseResponse('Success',200,data);
+  }
+  @Post('getPaymentByFilter')
+  async getPayments(@Request() req): Promise<ApiBaseResponse> {
+    // Validate date format
+    const Date =req.body.startDate ;
+    const rollNo = req.body.rollNo
+    if (Date && !this.isValidDate(Date)) {
+      throw new BadRequestException('Invalid date format. Use YYYY-MM-DD.');
+    }
+    const payment = await  this.paymentsService.getPayments(Date, rollNo);
+    return new ApiBaseResponse('success',200,payment);
+  }
+
+  private isValidDate(dateString: string): boolean {
+    const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
+    return regex.test(dateString) && !isNaN(new Date(dateString).getTime());
+  }
+
+
+
 }
