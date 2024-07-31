@@ -53,8 +53,8 @@ export class PaymentsController {
   @Post('getPaymentByFilter')
   async getPayments(@Request() req): Promise<ApiBaseResponse> {
     // Validate date format
-    const Date =req.body.startDate ;
-    const rollNo = req.body.rollNo
+    const Date =req.body.date ;
+    const rollNo = req.body.rollNumber
     if (Date && !this.isValidDate(Date)) {
       throw new BadRequestException('Invalid date format. Use YYYY-MM-DD.');
     }
