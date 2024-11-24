@@ -104,6 +104,29 @@ export class StudentService {
     }
 
 
+    async findStudentByResponsibleId(responsibleId: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .where("student.responsibleid = :responsibleId", { responsibleId })
+          .getMany();
+    }
+    async findStudentByStudentId(responsibleId: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .where("student.responsibleid = :responsibleId", { responsibleId })
+          .getMany();
+    }
+    // async findStudentByResponsibleId(responsibleId: number): Promise<Student> {
+    //     return this.studentRepository.findOne({ where: { responsible : responsibleId  },relations:['studentClass'] });
+    // }
+
+
     async update(id: number, payload: UpdateStudentDto) {
         const studentToUpdate = await this.studentRepository.findOne({ where: { studentid: id } });
 

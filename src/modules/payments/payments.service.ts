@@ -16,6 +16,7 @@ import { ClassSectionService } from "../academicModule/class-section/class-secti
 import { StudentClassService } from "../studentModule/studentclass/studentclass.service";
 import { PaymentStates } from "./entities/paymentstates.entity";
 import { Months } from "../../common/months.entity";
+import { Feetypes } from "./entities/feetypes.entity";
 
 @Injectable()
 export class PaymentsService {
@@ -24,6 +25,7 @@ export class PaymentsService {
     @InjectRepository(Paymenttypes) private paymentTypesRepository: Repository<Paymenttypes>,
     @InjectRepository(PaymentStates) private paymentStateRepository: Repository<PaymentStates>,
     @InjectRepository(Months) private monthsRepository: Repository<Months>,
+    @InjectRepository(Feetypes) private feeTypesRepository: Repository<Feetypes>,
     private readonly studentClassService: StudentClassService,
   ) {
   }
@@ -161,6 +163,10 @@ export class PaymentsService {
 
   async findAllPaymentStates() {
     return await this.paymentStateRepository.find();
+  }
+
+  async findAllFeeTypes():Promise<Feetypes[]> {
+    return await this.feeTypesRepository.find();
   }
 
   async findAllMonths() {

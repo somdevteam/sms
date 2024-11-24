@@ -6,6 +6,8 @@ import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
 import { GetRollNumberDto } from "./dto/getRollNumber.dto";
+import * as util from "util";
+import { createFullName } from "../../../common/enum/sms.enum";
 
 @Controller('student')
 export class StudentController {
@@ -21,10 +23,14 @@ export class StudentController {
   @UseGuards(JwtAuthGuard)
   @Post('getStudentByClassAndSection')
   async findStudentByClassAndSection(@Request() req,@Body() createStudentDto:StudentsByClassSectionDto) {
-    const data =  await this.studentService.getStudentsByClassIdAndSectionId(createStudentDto,req.user.user);
+    console.warn("we reached here. ");
+    const data =  await this.studentService.getStudentsByClassIdAndSectionId(createStudentDto,req.user.user)
     console.log(data);
     return data;
   }
+
+
+
 
   @UseGuards(JwtAuthGuard)
   @Get('allstudents')
@@ -67,5 +73,70 @@ export class StudentController {
     console.log(studentData);
     return new ApiBaseResponse('success', 200, studentData);
   }
+
+  // @Post('getStudentsByResponsibleId')
+  // async findStudentByResponsible(@Request() req) {
+  //   console.log("We reached here"+req.body);
+  //   console.log()
+  //   let studentData = await this.studentService.findStudentByResponsibleId(req.body.responsibleId);
+  //   console.log(studentData);
+  //
+  //   return new ApiBaseResponse('success', 200, studentData);
+  // }
+
+  @Post('getStudentsByResponsibleId')
+  async findStudentByResponsible(@Request() req) {
+    console.log("We reached here with data:", req.body);
+
+    // Call the service method
+    const studentData = await this.studentService.findStudentByResponsibleId(req.body.responsibleId);
+
+    // Transform the data on the controller side
+    // const transformedData = studentData.map(student => ({
+    //   studentid: student.studentid,
+    //   rollNumber: student.rollNumber,
+    //   firstname: student.firstname,
+    //   middlename: student.middlename,
+    //   lastname: student.lastname,
+    //   Sex: student.Sex,
+    //   dob: student.dob,
+    //   bob: student.bob,
+    //   responsible: student.responsible,
+    //   studentClass: student.studentClass,
+    //   //classSection:studentClass.classSection
+    //   fullName: createFullName(student.firstname, student.middlename, student.lastname),
+    // }));
+
+    const transformedData = studentData.map(student => ({
+      studentid: student.studentid,
+      rollNumber: student.rollNumber,
+      firstname: student.firstname,
+      middlename: student.middlename,
+      lastname: student.lastname,
+      Sex: student.Sex,
+      dob: student.dob,
+      bob: student.bob,
+      responsible: student.responsible,
+      fullName: createFullName(student.firstname, student.middlename, student.lastname),
+      studentClass: student.studentClass.map(studentClass => ({
+        studentClassId: studentClass.studentClassId,
+        classId: studentClass.classSection.class.classid,
+        className: studentClass.classSection.class.classname,
+        sectionId: studentClass.classSection.section.sectionid,
+        sectionName: studentClass.classSection.section.sectionname,
+        classSectionId: studentClass.classSection.classSectionId,
+        levelClassId: studentClass.classSection.class.levelclass[0].levelclassid,
+        levelId: studentClass.classSection.class.levelclass[0].level.levelid,
+        levelName: studentClass.classSection.class.levelclass[0].level.levelname,
+        levelFee: studentClass.classSection.class.levelclass[0].level.levelFee,
+        isActive: studentClass.classSection.class.isactive
+      }))
+    }));
+
+    console.log("Transformed data:", transformedData);
+
+    return new ApiBaseResponse('success', 200, transformedData);
+  }
+
 
 }

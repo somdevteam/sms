@@ -7,10 +7,11 @@ import { Paymenttypes } from "./entities/paymenttype.entity";
 import { Months } from "../../common/months.entity";
 import { StudentclassModule } from "../studentModule/studentclass/studentclass.module";
 import { PaymentStates } from "./entities/paymentstates.entity";
+import { Feetypes } from "./entities/feetypes.entity";
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment,Paymenttypes,Months,PaymentStates]),StudentclassModule],
+  imports: [TypeOrmModule.forFeature([Payment,Paymenttypes,Months,PaymentStates,Feetypes]),StudentclassModule],
   controllers: [PaymentsController],
   providers: [PaymentsService],
 })

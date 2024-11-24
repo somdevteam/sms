@@ -3,6 +3,7 @@ import { ResponsibleService } from './responsible.service';
 import { CreateResponsibleDto } from './dto/create-responsible.dto';
 import { UpdateResponsibleDto } from './dto/update-responsible.dto';
 import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
+import { ApiBaseResponse } from "../../../common/dto/apiresponses.dto";
 
 @Controller('responsible')
 export class ResponsibleController {
@@ -21,6 +22,14 @@ export class ResponsibleController {
   @Get('getResponsibleById/:id')
   findOne(@Param('id') id: string) {
     return this.responsibleService.findOne(+id);
+  }
+
+  @Get('getResponsibleByPhone/:phone')
+  async findResponsibleByMobile(@Param('phone') phone: string) {
+    console.log("responsiblephone "+phone);
+    const  result =await this.responsibleService.findResponsibleByPhone(phone);
+    return new ApiBaseResponse('Success',200,result)
+
   }
 
   //@UseGuards(JwtAuthGuard)

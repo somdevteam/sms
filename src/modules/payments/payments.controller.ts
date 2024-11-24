@@ -45,6 +45,13 @@ export class PaymentsController {
     const data = await this.paymentsService.findAllPaymentStates();
     return new ApiBaseResponse('Success',200,data);
   }
+
+  @Get('findAllFeeTypes')
+  async findAllFeeTypes():Promise<ApiBaseResponse>  {
+    const data = await this.paymentsService.findAllFeeTypes();
+    return new ApiBaseResponse('Success',200,data);
+  }
+
   @Get('findAllMonths')
   async findAllMonths():Promise<ApiBaseResponse>  {
     const data = await this.paymentsService.findAllMonths();

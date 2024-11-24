@@ -10,6 +10,10 @@ export class Responsible extends  BaseEntity {
     responsiblename: string;
     @Column()
     phone: string;
+    @Column()
+    phone2 :string;
+    @Column()
+    address :string;
     @OneToMany(() => Student, student => student.responsible)
     student: Student[];
 
