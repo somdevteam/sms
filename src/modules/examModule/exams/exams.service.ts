@@ -36,7 +36,7 @@ export class ExamsService {
       relations: ['examsInfo', 'examsInfo.academicBranch.branch'],
       where: {
         examsInfo: {
-          academicBranch: currentAcademicBranch
+          academicBranch: {academicBranchId: currentAcademicBranch.academicBranchId}
         },
 
         isActive: true
@@ -64,7 +64,7 @@ export class ExamsService {
 
     const isRecordExists = await this.examInfoRepository.findOne({
       where: {
-        academicBranch: existingBranchAcademic,
+        academicBranch: {academicBranchId: existingBranchAcademic.academicBranchId},
         exam: { examId },
       }
     });
@@ -103,7 +103,7 @@ export class ExamsService {
         throw new NotFoundException(`Exam with ID ${examId} not found`);
       });
 
-    examInfo.exam = exam;
+    // examInfo.exam = {examId: exam.examId};
     examInfo.academicBranch = currentBranchAcademic;
     examInfo.startDate = startDate;
     examInfo.endDate = endDate;

@@ -2,10 +2,10 @@ import {DataSource, DataSourceOptions} from "typeorm";
 
 export const dataSourceOptions : DataSourceOptions ={
     type: 'mysql',
-    host: '127.0.0.1',
+    host: 'localhost',
     username: 'root',
-    password: 'mypassword',
-    database: 'sms',
+    password: 'password',
+    database: 'smsupdate',
     synchronize:true,
     //entities: [],
     //entities: ['dist/src/**/*.entity{.ts,.js}'],
