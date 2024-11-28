@@ -7,7 +7,6 @@ import { BranchService } from 'src/modules/branch/branch.service';
 import { LevelService } from '../level/level.service';
 import { ClassService } from '../class/class.service';
 import { LevelClassDto } from './dto/level-class.dto';
-import { BranchLevel } from './dto/branch-class.dto';
 
 @Injectable()
 export class LevelclassService {
@@ -125,24 +124,10 @@ export class LevelclassService {
       
   }
 
-  async getLevelsByBranch(branchId: number): Promise<any>{
-    return await this.levelclassRepository
-    .createQueryBuilder('lc')
-    .innerJoin('lc.level', 'l')
-    .innerJoin('lc.class', 'c')
-    .innerJoin('lc.branch', 'b')
-    .select([
-      'DISTINCT l.levelid as levelId', 
-      'l.levelname as levelName',
-    ]) 
-    .where('b.branchId = :branchId', { branchId })
-    .getRawMany();
-  }
-
-  async getClassesByBranchAndLevel(payload: BranchLevel): Promise<any>{
+  async getClassesByBranchAndLevel(branchId: number): Promise<any>{
     return await this.levelclassRepository.find({
       relations: ['level','class','branch'],
-      where: {branch: {branchId: payload.branchId},level: {levelid: payload.levelId}}
+      where: {branch: {branchId}}
     })
   }
   

@@ -30,7 +30,6 @@ import { UserRolesModule } from './modules/userroles/userroles.module';
 import { dataSourceOptions } from "../db/data-source";
 import { RolePermissionsModule } from "./modules/rolePermissions/rolePermissions.module";
 import { ExamsModule } from './modules/examModule/exams/exams.module';
-import { ExamInfoModule } from './modules/examModule/exam-info/exam-info.module';
 import { PaymentsModule } from "./modules/payments/payments.module";
 
 
@@ -46,7 +45,7 @@ import { PaymentsModule } from "./modules/payments/payments.module";
     MenusModule, TabsModule, PermissionsModule, TabPermissions,
     RolesModule, UserTypesModule, UserTypePermissions, TabPermissionsModule,
     UserRolesModule, RolePermissionsModule,
-    ExamsModule, ExamInfoModule,PaymentsModule],
+    ExamsModule,PaymentsModule],
   controllers: [AppController],
   providers: [AppService],
 })

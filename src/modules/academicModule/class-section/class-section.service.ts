@@ -142,16 +142,15 @@ export class ClassSectionService {
   async getSectionIdByClassIdAndSectionId(
     classId: number,
     sectionId: number,
-    branchAcademicId: number
+    academicBranchId: number
   ): Promise<ClassSection> {
-    const classSection = await this.classSectionRepository
-      .createQueryBuilder()
-      .where('(classid = :classId AND sectionid=:sectionId and branchAcademicId=:branchAcademicId)', {
-        classId: classId,
-        sectionId: sectionId,
-        branchAcademicId: branchAcademicId
-      })
-      .getOne();
+    const classSection = await this.classSectionRepository.findOne({
+      where : {
+        class: {classid: classId},
+        section: {sectionid:  sectionId},
+        branchAcademic: {academicBranchId : academicBranchId}}
+      }
+    );
 
     if (!classSection) {
       throw new NotFoundException('Class With this section not found');

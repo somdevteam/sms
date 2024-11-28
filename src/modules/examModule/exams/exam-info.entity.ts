@@ -1,14 +1,15 @@
 // exams-info.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Exam } from '../exams/exam.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
+import { Exam } from './exam.entity';
 import { AcademicBranch } from 'src/modules/branch-academic/entities/branch-academic.entity';
+import { ClassExam } from '../class-exam/entities/class-exam.entity';
 
 @Entity()
 export class ExamsInfo {
     @PrimaryGeneratedColumn()
     examInfoId: number;
 
-    @ManyToOne(() => Exam, exam => exam.examsInfo)
+    @OneToOne(() => Exam, exam => exam.examsInfo)
     @JoinColumn({ name: 'examId' })
     exam: Exam;
 
@@ -27,4 +28,7 @@ export class ExamsInfo {
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateCreated: Date;
+
+    @OneToMany(() => ClassExam, classExam => classExam.exam)
+    classExams: ClassExam[];
 }

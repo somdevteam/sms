@@ -36,12 +36,11 @@ export class StudentService {
     async create(payload: CreateStudentDto, currentUser: CurrentUser): Promise<Student | null> {
         try {
             let savedResponsible = null;
-            const branchId = payload.branchId;
-            if (!branchId) {
+            if (!payload.branchId) {
                 throw new NotFoundException('Branch ID is required');
             }
 
-            const academicBranch = await this.academicBranchService.findActiveBranchAcademic(+branchId);
+            const academicBranch = await this.academicBranchService.findActiveBranchAcademic(payload.branchId);
             const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(
                 payload.classId,
                 payload.sectionId,
@@ -141,41 +140,47 @@ export class StudentService {
 
     async getStudentsByClassIdAndSectionId(
         payload: StudentsByClassSectionDto,
-        currentUser: CurrentUser,
     ): Promise<Student[]> {
-        const branchId = payload.branchId ?? currentUser.branchId;
-        if (!branchId) {
-            throw new NotFoundException('Branch ID is required');
+
+        const academicBranch = await this.academicBranchService.findActiveBranchAcademic(payload.branchId);
+        const queryBuilder = this.studentRepository
+        .createQueryBuilder('s')
+        .leftJoin('s.studentClass', 'sc')
+        .leftJoin('sc.classSection', 'cs')
+        .leftJoin('cs.section', 'sec')
+        .leftJoin('cs.class', 'c')
+        .leftJoin('cs.branchAcademic', 'ba')
+        .leftJoin('ba.branch', 'b')
+        .leftJoin('ba.academic', 'a')
+        .leftJoin('s.responsible', 'rp')
+        .select([
+            's.studentId AS studentId',
+            's.firstName AS firstName',
+            's.middleName AS middleName',
+            's.lastName AS lastName',
+            'c.classname as className',
+            'sec.sectionname as sectionName',
+            's.responsibleId AS responsibleId',
+            's.bob AS pob',
+            'a.academicYear AS academicYear',
+            's.rollNumber AS rollNumber',
+            'rp.responsibleName AS responsibleName',
+            'rp.phone AS responsiblePhone',
+            'b.branchId AS branchId',
+            'cs.sectionId AS sectionId',
+        ])
+        .where('ba.academicBranchId = :academicBranchId', { academicBranchId: academicBranch.academicBranchId });
+        if (payload.rollNumber) {
+            queryBuilder.andWhere('s.rollNumber = :rollNumber', { rollNumber: payload.rollNumber });
+        }  
+        if (payload.classId){
+            queryBuilder.andWhere('c.classId = :classId', { classId: payload.classId });
         }
+        if (payload.sectionId) {
+            queryBuilder.andWhere('cs.sectionId = :sectionId', {sectionId: payload.sectionId });
+        }
+        return queryBuilder.getRawMany();
 
-        const result = await this.studentRepository
-            .createQueryBuilder('s')
-            .leftJoinAndSelect('s.studentClass', 'sc')
-            .leftJoinAndSelect('sc.classSection', 'cs')
-            .leftJoinAndSelect('cs.class', 'c')
-            .leftJoinAndSelect('cs.branchAcademic', 'ba')
-            .leftJoinAndSelect('ba.branch', 'b')
-            .leftJoinAndSelect('ba.academic', 'a')
-            .leftJoinAndSelect('s.responsible', 'rp')
-            .where('c.classId = :classId', { classId: payload.classId })
-            .andWhere('b.branchid = :branchId', { branchId })
-            .select([
-                's.studentid as studentid',
-                's.firstname as firstName',
-                's.middlename as middleName',
-                's.lastname as lastName',
-                's.responsibleid as responsibleid',
-                's.bob as pob',
-                'a.academicYear as academicYear',
-                's.rollnumber as rollNumber',
-                'rp.responsiblename as responsibleName',
-                'rp.phone as responsiblePhone',
-                'b.branchId as branchId',
-                'cs.sectionid as sectionId',
-            ])
-            .getRawMany();
-
-        return result;
     }
 
     async getStudentCountByBranchAndAcademic(branchId: number, academicId: number): Promise<any> {
