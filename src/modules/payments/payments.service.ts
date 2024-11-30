@@ -81,6 +81,7 @@ export class PaymentsService {
     const feeTypeId = await this.paymentTypesRepository.findOne({ where: { paymenttypeid: payload.paymentTypeId } });
     const feeStateId = await this.paymentStateRepository.findOne({ where: { paymentstateid: payload.paymentStateId } });
     const studentClass = await this.studentClassService.findOne(payload.studentClassId);
+    const monthData = await this.monthsRepository.findOne({ where: { monthid: payload.monthId } });
 
     if (!feeTypeId || !feeStateId || !studentClass) {
       throw new ConflictException('Invalid references provided.');
@@ -89,6 +90,11 @@ export class PaymentsService {
     if (feeTypeId.amount !== payload.amount) {
       throw new ConflictException('Misconfigured Amounts');
     }
+
+    if (monthData.monthid !== payload.monthId) {
+      throw new ConflictException('Misconfigured Months');
+    }
+
 
     await this.validatePaymentNotExists(studentClass.studentClassId, payload.monthName);
 
