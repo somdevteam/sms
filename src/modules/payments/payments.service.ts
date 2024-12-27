@@ -17,6 +17,7 @@ import { StudentClassService } from "../studentModule/studentclass/studentclass.
 import { PaymentStates } from "./entities/paymentstates.entity";
 import { Months } from "../../common/months.entity";
 import { Feetypes } from "./entities/feetypes.entity";
+import { Responsible } from "../studentModule/responsible/entities/responsible.entity";
 
 @Injectable()
 export class PaymentsService {
@@ -26,6 +27,7 @@ export class PaymentsService {
     @InjectRepository(PaymentStates) private paymentStateRepository: Repository<PaymentStates>,
     @InjectRepository(Months) private monthsRepository: Repository<Months>,
     @InjectRepository(Feetypes) private feeTypesRepository: Repository<Feetypes>,
+    @InjectRepository(Responsible) private responsibleRepository: Repository<Responsible>,
     private readonly studentClassService: StudentClassService,
   ) {
   }
@@ -82,12 +84,13 @@ export class PaymentsService {
     const feeStateId = await this.paymentStateRepository.findOne({ where: { paymentstateid: payload.paymentStateId } });
     const studentClass = await this.studentClassService.findOne(payload.studentClassId);
     const monthData = await this.monthsRepository.findOne({ where: { monthid: payload.monthId } });
+    const responsibleId  = await this.responsibleRepository.findOne({where:{responsibleid:payload.responsibleId}});
 
     if (!feeTypeId || !feeStateId || !studentClass) {
       throw new ConflictException('Invalid references provided.');
     }
 
-    if (feeTypeId.amount !== payload.amount) {
+    if (Number(feeTypeId.amount) !== payload.amount) {
       throw new ConflictException('Misconfigured Amounts');
     }
 
@@ -106,6 +109,8 @@ export class PaymentsService {
       payment.paymentStateId = feeStateId;
       payment.amount = payload.amount;
       payment.datecreated = new Date();
+      payment.responsibleId = responsibleId;
+      payment.rollNo = payload.rollNo;
 
       return await this.paymentRepository.save(payment);
     } catch (error) {

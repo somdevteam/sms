@@ -2,9 +2,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class CreatePaymentDto {
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
+  @ApiProperty({ required: false })
+  //@IsNotEmpty()
   studentClassId: number;
+
+  @ApiProperty({ required: false })
+ // @IsNotEmpty()
+  sName: string; // Added sName field
 
   @ApiProperty({ required: true })
   @IsNotEmpty()
@@ -16,15 +20,15 @@ export class CreatePaymentDto {
 
   @ApiProperty({ required: true })
   @IsNotEmpty()
-  amount: number;
+  rollNo: string;
 
   @ApiProperty({ required: true })
   @IsNotEmpty()
-  rollNo: string;
+  amount: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  monthId: number;
+  description: string; // Updated to match 'details' in payload
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -32,27 +36,7 @@ export class CreatePaymentDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  department: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  date: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  invoiceNo: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  duration: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  details: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  sectionId: string;
+  monthId: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -66,23 +50,11 @@ export class CreatePaymentDto {
   @IsOptional()
   levelName: string;
 
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  responsibleName: string;
-
   @ApiProperty({ required: false })
-  @IsOptional()
-  responsibleTell: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  responsibleAddress: string;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  responsiblePhone: string;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
+ // @IsNotEmpty()
   studentId: number;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  responsibleId: number; // Added responsibleId field
 }
