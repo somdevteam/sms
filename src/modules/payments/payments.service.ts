@@ -199,6 +199,55 @@ export class PaymentsService {
     return `This action removes a #${id} payment`;
   }
 
+  async createMultiple(paymentDtos: CreatePaymentDto[]): Promise<void> {
+    const paymentEntities = [];
+
+    for (const paymentDto of paymentDtos) {
+      // Validate references and business logic
+      const feeType = await this.paymentTypesRepository.findOne({ where: { paymenttypeid: paymentDto.paymentTypeId } });
+      const feeState = await this.paymentStateRepository.findOne({ where: { paymentstateid: paymentDto.paymentStateId } });
+      const studentClass = await this.studentClassService.findOne(paymentDto.studentClassId);
+
+      if (!feeType || !feeState || !studentClass) {
+        throw new ConflictException("Invalid references provided.");
+      }
+
+      if (Number(feeType.amount) !== paymentDto.amount) {
+        throw new ConflictException("Misconfigured Amounts");
+      }
+      await this.validateDuplicatePayments(studentClass.studentClassId, paymentDto.monthName);
+
+      // Prepare payment entity
+      const payment = new Payment();
+      payment.studentClass = studentClass;
+      payment.monthName = paymentDto.monthName;
+      payment.studentFeeType = feeType;
+      payment.paymentStateId = feeState;
+      payment.amount = paymentDto.amount;
+      payment.datecreated = new Date();
+      payment.responsibleId = await this.responsibleRepository.findOne({ where: { responsibleid: paymentDto.responsibleId } });
+      payment.rollNo = paymentDto.rollNo;
+
+      paymentEntities.push(payment);
+    }
+
+    // Save all payments in a single transaction
+    try {
+      await this.paymentRepository.save(paymentEntities);
+    } catch (error) {
+      throw new InternalServerErrorException("Error creating payments: " + (error.message || error));
+    }
+  }
+
+  private async validateDuplicatePayments(studentClassId: number, monthName: string): Promise<void> {
+    const existingPayment = await this.paymentRepository.findOne({
+      where: { studentClass: { studentClassId }, monthName },
+    });
+    if (existingPayment) {
+      throw new ConflictException("Duplicate payment for the same student and month.");
+    }
+  }
+
 
 
 }

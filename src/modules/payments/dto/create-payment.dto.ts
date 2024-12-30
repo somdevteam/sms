@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
 export class CreatePaymentDto {
   @ApiProperty({ required: false })
@@ -57,4 +58,12 @@ export class CreatePaymentDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   responsibleId: number; // Added responsibleId field
+}
+
+export class CreateMultiplePaymentsDto {
+  @ApiProperty({ type: [CreatePaymentDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreatePaymentDto)
+  payments: CreatePaymentDto[];
 }

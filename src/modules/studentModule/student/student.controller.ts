@@ -109,7 +109,7 @@ export class StudentController {
 
     const transformedData = studentData.map(student => ({
       studentid: student.studentid,
-      rollNumber: student.rollNumber,
+      rollNumber: (student.rollNumber).toString(),
       firstname: student.firstname,
       middlename: student.middlename,
       lastname: student.lastname,

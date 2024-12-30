@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Request, BadRequestException } from "@nestjs/common";
 import { PaymentsService } from './payments.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreateMultiplePaymentsDto, CreatePaymentDto } from "./dto/create-payment.dto";
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { ApiBaseResponse } from "../../common/dto/apiresponses.dto";
 
@@ -12,6 +12,13 @@ export class PaymentsController {
   async create(@Body() createPaymentDto: CreatePaymentDto):Promise<ApiBaseResponse> {
     await this.paymentsService.create(createPaymentDto);
     return new ApiBaseResponse('Payment created successfully',200,null);
+  }
+
+  @Post("add-multiple")
+  async createMultiplePayments(@Body() createMultiplePaymentsDto: CreateMultiplePaymentsDto): Promise<ApiBaseResponse> {
+    const result = await this.paymentsService.createMultiple(createMultiplePaymentsDto.payments);
+    console.log(result);
+    return new ApiBaseResponse("Payments created successfully", 200, null);
   }
 
   @Get()
