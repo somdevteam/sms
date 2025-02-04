@@ -12,6 +12,7 @@ import { StudentClass } from "../../studentModule/studentclass/entities/studentc
 import { Months } from "../../../common/months.entity";
 import { PaymentStates } from "./paymentstates.entity";
 import { Responsible } from "../../studentModule/responsible/entities/responsible.entity";
+import { Student } from "../../studentModule/student/entities/student.entity";
 
 @Entity()
 export class Payment {
@@ -48,5 +49,9 @@ export class Payment {
 
   @Column()
   rollNo:string;
+
+  @ManyToOne(() => Student)
+  @JoinColumn({ name: "studentid" })
+  student: Student;
 
 }

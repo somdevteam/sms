@@ -18,6 +18,8 @@ import { PaymentStates } from "./entities/paymentstates.entity";
 import { Months } from "../../common/months.entity";
 import { Feetypes } from "./entities/feetypes.entity";
 import { Responsible } from "../studentModule/responsible/entities/responsible.entity";
+import { StudentService } from "../studentModule/student/student.service";
+import { createFullName } from "../../common/enum/sms.enum";
 
 @Injectable()
 export class PaymentsService {
@@ -29,6 +31,7 @@ export class PaymentsService {
     @InjectRepository(Feetypes) private feeTypesRepository: Repository<Feetypes>,
     @InjectRepository(Responsible) private responsibleRepository: Repository<Responsible>,
     private readonly studentClassService: StudentClassService,
+    private readonly studentService: StudentService,
   ) {
   }
 
@@ -199,7 +202,7 @@ export class PaymentsService {
     return `This action removes a #${id} payment`;
   }
 
-  async createMultiple(paymentDtos: CreatePaymentDto[]): Promise<void> {
+  async createMultiple(paymentDtos: CreatePaymentDto[]): Promise<{ payments: Payment[]; receipts: any[] }> {
     const paymentEntities = [];
 
     for (const paymentDto of paymentDtos) {
@@ -212,10 +215,7 @@ export class PaymentsService {
         throw new ConflictException("Invalid references provided.");
       }
 
-      if (Number(feeType.amount) !== paymentDto.amount) {
-        throw new ConflictException("Misconfigured Amounts");
-      }
-      await this.validateDuplicatePayments(studentClass.studentClassId, paymentDto.monthName);
+      await this.validatePaymentNotExists(studentClass.studentClassId, paymentDto.monthName);
 
       // Prepare payment entity
       const payment = new Payment();
@@ -223,6 +223,7 @@ export class PaymentsService {
       payment.monthName = paymentDto.monthName;
       payment.studentFeeType = feeType;
       payment.paymentStateId = feeState;
+      payment.student = await  this.studentService.findOne(paymentDto.studentId);
       payment.amount = paymentDto.amount;
       payment.datecreated = new Date();
       payment.responsibleId = await this.responsibleRepository.findOne({ where: { responsibleid: paymentDto.responsibleId } });
@@ -233,11 +234,68 @@ export class PaymentsService {
 
     // Save all payments in a single transaction
     try {
-      await this.paymentRepository.save(paymentEntities);
+       const savedPayments = await this.paymentRepository.save(paymentEntities);
+      // let paymentInfo = {
+      //   fullname: createFullName(savedPayments[0].student.firstname,savedPayments[0].student.middlename,savedPayments[0].student.lastname),
+      //   monthName: savedPayments[0].monthName,
+      //   paymentState: savedPayments[0].paymentStateId.description,
+      //   amount:savedPayments[0].amount,
+      //   rollNo:savedPayments[0].student.rollNumber,
+      //   dateCreated: savedPayments[0].dateCreated,
+      //   responsibleName : savedPayments[0].responsibleId.responsiblename
+      // };
+      // let receipt = {
+      //   fullname: createFullName(
+      //     savedPayments[0].student.firstname,
+      //     savedPayments[0].student.middlename,
+      //     savedPayments[0].student.lastname
+      //   ),
+      //   monthName: savedPayments[0].monthName,
+      //   paymentState: savedPayments[0].paymentStateId.description,
+      //   amount: savedPayments[0].amount,
+      //   rollNo: savedPayments[0].student.rollNumber,
+      //   dateCreated: savedPayments[0].datecreated,
+      //   responsibleName: savedPayments[0].responsibleId.responsiblename,
+      // };
+      let receipts = savedPayments.map(payment => ({
+        fullname: createFullName(
+          payment.student.firstname,
+          payment.student.middlename,
+          payment.student.lastname
+        ),
+        monthName: payment.monthName,
+        paymentState: payment.paymentStateId.description,
+        amount: payment.amount,
+        rollNo: payment.student.rollNumber,
+        dateCreated: payment.datecreated,
+        responsibleName: payment.responsibleId.responsiblename
+      }));
+
+
+      // Generate a receipt after saving
+     // const receipt = this.generateReceipt(paymentInfo);
+
+      // Return the saved payments and the receipt
+      return { payments: savedPayments, receipts };
     } catch (error) {
       throw new InternalServerErrorException("Error creating payments: " + (error.message || error));
     }
   }
+
+  private generateReceipt(payments: Payment[]): any {
+    return {
+      receiptId: `REC-${Date.now()}`,
+      date: new Date(),
+      totalAmount: payments.reduce((sum, payment) => sum + payment.amount, 0),
+      paymentDetails: payments.map(payment => ({
+     //   studentName: payment.studentClass.studentName, // Assuming `studentName` exists in `studentClass`
+        rollNo: payment.rollNo,
+        amount: payment.amount,
+        monthName: payment.monthName,
+      })),
+    };
+  }
+
 
   private async validateDuplicatePayments(studentClassId: number, monthName: string): Promise<void> {
     const existingPayment = await this.paymentRepository.findOne({

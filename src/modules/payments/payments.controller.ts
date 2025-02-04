@@ -18,7 +18,7 @@ export class PaymentsController {
   async createMultiplePayments(@Body() createMultiplePaymentsDto: CreateMultiplePaymentsDto): Promise<ApiBaseResponse> {
     const result = await this.paymentsService.createMultiple(createMultiplePaymentsDto.payments);
     console.log(result);
-    return new ApiBaseResponse("Payments created successfully", 200, null);
+    return new ApiBaseResponse("Payments created successfully", 200, result);
   }
 
   @Get()

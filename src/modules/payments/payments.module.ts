@@ -9,10 +9,11 @@ import { StudentclassModule } from "../studentModule/studentclass/studentclass.m
 import { PaymentStates } from "./entities/paymentstates.entity";
 import { Feetypes } from "./entities/feetypes.entity";
 import { Responsible } from "../studentModule/responsible/entities/responsible.entity";
+import { StudentModule } from "../studentModule/student/student.module";
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment,Paymenttypes,Months,PaymentStates,Feetypes,Responsible]),StudentclassModule],
+  imports: [TypeOrmModule.forFeature([Payment,Paymenttypes,Months,PaymentStates,Feetypes,Responsible]),StudentclassModule,StudentModule],
   controllers: [PaymentsController],
   providers: [PaymentsService],
 })
