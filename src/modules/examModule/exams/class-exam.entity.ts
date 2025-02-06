@@ -1,6 +1,7 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Class } from "src/modules/academicModule/class/entities/class.entity";
-import { ExamsInfo } from "../../exams/exam-info.entity";
+import { ExamsInfo } from "./exam-info.entity";
+
 
 @Entity()
 export class ClassExam {

@@ -81,4 +81,14 @@ export class LevelService {
      await this.findOne(id);
     return await this.levelRepository.delete(id);
   }
+
+  async findLevelsByBranchId(branchId: number) {
+    return await this.levelRepository.find({
+      where: {
+        levelclass: {
+          branch: {branchId}
+        }
+      }
+    });
+  }
 }

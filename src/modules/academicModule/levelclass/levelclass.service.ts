@@ -124,11 +124,22 @@ export class LevelclassService {
       
   }
 
-  async getClassesByBranchAndLevel(branchId: number): Promise<any>{
+  async getClassesByBranchAndLevel(payload: any): Promise<any>{
+    payload.isActive = !payload.isActive || payload.isActive == 1;
     return await this.levelclassRepository.find({
       relations: ['level','class','branch'],
-      where: {branch: {branchId}}
-    })
+      where: {
+        branch: {
+        branchId :payload.branchId
+      },
+      level: {
+        levelid: payload.levelId
+      },
+      class: {
+        isactive: payload.isActive
+      }
+    }
+  })
   }
   
 

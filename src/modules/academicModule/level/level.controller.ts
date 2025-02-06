@@ -40,4 +40,10 @@ export class LevelController {
   remove(@Param('id') id: string) {
     return this.levelService.remove(+id);
   }
+
+  @Get('findLevelsByBranchId/:branchId')
+  async findLevelsByBranchId(@Param('branchId') branchId: number) {
+    const levels = await this.levelService.findLevelsByBranchId(branchId)
+    return new ApiBaseResponse('levels',HttpStatus.OK,levels);
+  }
 }

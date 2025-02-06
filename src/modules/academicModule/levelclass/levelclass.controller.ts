@@ -31,8 +31,8 @@ export class LevelclassController {
 
 
   @Post('/classbybranchandlevel')
-  async findClassByBranchAndLevel(@Query('branchId', new ParseIntPipe()) branchId: number,) : Promise<ApiBaseResponse> {
-    const levels = await this.levelclassService.getClassesByBranchAndLevel(branchId);
+  async findClassByBranchAndLevel(@Body() payload: any) : Promise<ApiBaseResponse> {
+    const levels = await this.levelclassService.getClassesByBranchAndLevel(payload);
     return new ApiBaseResponse(null,HttpStatus.OK,levels)
   }
 

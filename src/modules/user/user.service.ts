@@ -318,7 +318,7 @@ export class UserService {
   ): Promise<UserEntity> {
     const hashedPassword = crypto.createHmac('sha256', password).digest('hex');
 
-    return this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: {
         username,
         password: hashedPassword,

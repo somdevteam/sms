@@ -45,7 +45,7 @@ import { PaymentsModule } from "./modules/payments/payments.module";
     MenusModule, TabsModule, PermissionsModule, TabPermissions,
     RolesModule, UserTypesModule, UserTypePermissions, TabPermissionsModule,
     UserRolesModule, RolePermissionsModule,
-    ExamsModule,PaymentsModule],
+    ExamsModule,PaymentsModule,],
   controllers: [AppController],
   providers: [AppService],
 })

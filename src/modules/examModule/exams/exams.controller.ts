@@ -36,4 +36,10 @@ export class ExamsController {
     await this.examsService.updateExamInfo(+id, payload);
     return new ApiBaseResponse('exam updated', 200, null);
   }
+
+  @Post('/addclassexam')
+  async addClassExam(@Body() payload: any): Promise<ApiBaseResponse> {
+    await this.examsService.addClassExam(payload);
+    return new ApiBaseResponse('created successfully', 200, null);
+  }
 }
