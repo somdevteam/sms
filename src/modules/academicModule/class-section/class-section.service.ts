@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AcademicService } from '../academic/academic.service';
@@ -161,17 +161,34 @@ export class ClassSectionService {
   async assignSectionToClass(payload: SectionByClassDto) {
     const { branchId, classId, sections } = payload;
 
-    const academicBranch = await this.branchAcademicService.findActiveBranchAcademic(branchId)
-    const newClassSections = await Promise.all(sections.map(async (data) => {
-      const sectionClass = this.classSectionRepository.create({
-        class: { classid: classId },
-        section: { sectionid: data.sectionid },
-        branchAcademic: academicBranch,
-        dateCreated: new Date()
-      })
-      return sectionClass;
+    // Find the active branch academic
+    const academicBranch = await this.branchAcademicService.findActiveBranchAcademic(branchId);
+
+    // Check if any of the section-class combinations already exist
+    const existingClassSections = await Promise.all(sections.map(async (data) => {
+        const existingSectionClass = await this.classSectionRepository.findOne({
+            where: {
+                class: { classid: classId },
+                section: { sectionid: data.sectionid },
+                branchAcademic: academicBranch,
+            },
+        });
+
+        if (existingSectionClass) {
+            throw new NotAcceptableException(`Section with ID ${data.sectionid} is already assigned to class with ID ${classId} in branch ${branchId}.`);
+        }
+
+        const sectionClass = this.classSectionRepository.create({
+            class: { classid: classId },
+            section: { sectionid: data.sectionid },
+            branchAcademic: academicBranch,
+            dateCreated: new Date(),
+        });
+
+        return sectionClass;
     }));
 
-    return await this.classSectionRepository.save(newClassSections);
-  }
+    // Save the new section-class combinations
+    return await this.classSectionRepository.save(existingClassSections);
+}
 }

@@ -6,17 +6,17 @@ import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } fro
 @Entity()
 export class ClassSubject extends BaseEntity{
     @PrimaryGeneratedColumn()
-    classSubjectId:number;
+    class_subject_id:number;
     @ManyToOne(() => Branch, branch => branch.classSubject)
-    @JoinColumn({name: 'branchid'}) // Specify the foreign key column
+    @JoinColumn({name: 'branch_id'}) // Specify the foreign key column
     branch: Branch;
 
     @ManyToOne(() => Class, cls => cls.classSubject)
-    @JoinColumn({name: 'classid'}) // Specify the foreign key column
+    @JoinColumn({name: 'class_id'}) // Specify the foreign key column
     class: Class;
 
     @ManyToOne(() => Subject, sub => sub.classSubject)
-    @JoinColumn({name: 'subjectid'}) // Specify the foreign key column
+    @JoinColumn({name: 'subject_id'}) // Specify the foreign key column
     subject: Subject;
 
 }

@@ -17,17 +17,6 @@ export class ClassSubjectController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.classSubjectService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.classSubjectService.findOne(+id);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Patch()
   update(@Body() updateClassSubjectDto: UpdateClassSubjectDto) {
     return this.classSubjectService.update(updateClassSubjectDto);
@@ -37,5 +26,10 @@ export class ClassSubjectController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.classSubjectService.remove(+id);
+  }
+
+  @Get('unassigned')
+  async findUnassignedSubjects(@Body() payload: number) {
+    return this.classSubjectService.findUnassignedSubjects(payload);
   }
 }

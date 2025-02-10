@@ -1,8 +1,8 @@
 // exams-info.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
-import { Exam } from './exam.entity';
+import { Exam } from './entities/exam.entity';
 import { AcademicBranch } from 'src/modules/branch-academic/entities/branch-academic.entity';
-import { ClassExam } from './class-exam.entity';
+import { ClassExam } from './entities/class-exam.entity';
 
 @Entity()
 export class ExamsInfo {

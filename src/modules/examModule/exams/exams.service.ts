@@ -1,13 +1,14 @@
 import { Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
-import { Exam } from './exam.entity';
+import { Exam } from './entities/exam.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
 import { ExamsInfo } from './exam-info.entity';
-import { ClassExam } from './class-exam.entity';
+
 import { Class } from 'src/modules/academicModule/class/entities/class.entity';
+import { ClassExam } from './entities/class-exam.entity';
 
 @Injectable()
 export class ExamsService {

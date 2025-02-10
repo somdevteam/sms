@@ -3,10 +3,10 @@ import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique} f
 @Entity('subject')
 export class Subject extends BaseEntity{
     @PrimaryGeneratedColumn()
-    subjectid:number;
+    subject_id:number;
     @Column()
-    @Unique(['sectionname'])
-    subjectname:string;
+    @Unique(['subject_name'])
+    subject_name:string;
     @Column()
     datecreated: Date;
     @Column({default: true})

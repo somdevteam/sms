@@ -6,9 +6,10 @@ import { ClassSubject } from './entities/class-subject.entity';
 import { BranchModule } from '../../branch/branch.module';
 import { SubjectModule } from '../subject/subject.module';
 import { ClassModule } from '../class/class.module';
+import { Subject } from '../subject/entities/subject.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([ClassSubject]),BranchModule,ClassModule,SubjectModule],
+  imports:[TypeOrmModule.forFeature([ClassSubject,Subject]),BranchModule,ClassModule,SubjectModule],
   controllers: [ClassSubjectController],
   providers: [ClassSubjectService,ClassSubject]
 })

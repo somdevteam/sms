@@ -1,25 +1,29 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { BranchService } from '../../branch/branch.service';
 import { ClassService } from '../class/class.service';
 import { SubjectService } from '../subject/subject.service';
 import { CreateClassSubjectDto } from './dto/create-class-subject.dto';
 import { UpdateClassSubjectDto } from './dto/update-class-subject.dto';
 import { ClassSubject } from './entities/class-subject.entity';
+import { Subject } from '../subject/entities/subject.entity';
 
 @Injectable()
 export class ClassSubjectService {
 
   constructor(
-    @InjectRepository(ClassSubject) private classSubjectRepository: Repository<ClassSubject>,
+    @InjectRepository(ClassSubject) 
+    private classSubjectRepository: Repository<ClassSubject>,
+    @InjectRepository(Subject) 
+    private subjectRepository: Repository<Subject>,
     private readonly branchService :BranchService,
     private readonly classService :ClassService,
     private readonly subjectService :SubjectService,
   ) {}
 
   getById(id: number): Promise<ClassSubject> {
-    return this.classSubjectRepository.findOne({ where: { classSubjectId: id } });
+    return this.classSubjectRepository.findOne({ where: { class_subject_id: id } });
   }
 
  async create(payload: CreateClassSubjectDto) {
@@ -61,15 +65,6 @@ export class ClassSubjectService {
 
   }
 
-  findAll() {
-    return `This action returns all classSubject`;
-  }
-
-  
-  findOne(id: number) {
-    return `This action returns a #${id} classSubject`;
-  }
-
   async update(payload: UpdateClassSubjectDto) {
     const branch = await this.branchService.getById(payload.branchid);
    if (!branch) {
@@ -92,7 +87,7 @@ export class ClassSubjectService {
    foundClassSubject.class = clas;
    foundClassSubject.subject = subject;
 
-   return await this.classSubjectRepository.update(foundClassSubject.classSubjectId,foundClassSubject);
+   return await this.classSubjectRepository.update(foundClassSubject.class_subject_id,foundClassSubject);
 
 
 
@@ -105,5 +100,25 @@ export class ClassSubjectService {
       throw new NotFoundException('Branch Not found');
     }
     return this.classSubjectRepository.delete(id);
+  }
+
+  async findUnassignedSubjects(payload: any): Promise<any> {
+    const { classId,branchId } = payload;
+    const assignedSubjects = await this.classSubjectRepository.find(
+      { 
+        relations: ['class', 'branch'],
+        where: { 
+        class: { classid: classId } ,
+        branch: { branchId: branchId }
+      } 
+      }
+    );
+
+    const assignedSubjectIds = assignedSubjects.map((cs) => cs.subject.subject_id);
+
+
+    return this.subjectRepository.find({
+      where: assignedSubjectIds.length > 0 ? { subject_id: Not(In(assignedSubjectIds)) } : {},
+    });
   }
 }

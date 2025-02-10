@@ -13,11 +13,11 @@ export class SubjectService {
   ) {}
 
   getBySectionname(subjectname: string): Promise<Subject> {
-    return this.subjectRepository.findOne({ where: { subjectname: subjectname } });
+    return this.subjectRepository.findOne({ where: { subject_name: subjectname } });
   }
 
   getById(id: number): Promise<Subject> {
-    return this.subjectRepository.findOne({ where: { subjectid: id } });
+    return this.subjectRepository.findOne({ where: { subject_id: id } });
   }
 
   create(payload: CreateSubjectDto) {
@@ -29,7 +29,7 @@ export class SubjectService {
     }
 
     let subject = new Subject();
-    subject.subjectname = payload.subjectname;
+    subject.subject_name = payload.subjectname;
     subject.datecreated = new Date();
     try {
       const savedClass = this.subjectRepository.save(subject);
@@ -60,8 +60,8 @@ export class SubjectService {
     }
 
     try {
-      foundsubject.subjectname = payload.subjectname;
-      return await this.subjectRepository.update(foundsubject.subjectid, foundsubject);
+      foundsubject.subject_name = payload.subjectname;
+      return await this.subjectRepository.update(foundsubject.subject_id, foundsubject);
     } catch (error) {
       if (error) {
         throw new ConflictException(error.message);
