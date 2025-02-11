@@ -121,4 +121,8 @@ export class ClassSubjectService {
       where: assignedSubjectIds.length > 0 ? { subject_id: Not(In(assignedSubjectIds)) } : {},
     });
   }
+
+  async assignedSubjects(payload: any): Promise<any> {
+    
+  }
 }

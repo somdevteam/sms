@@ -28,8 +28,13 @@ export class ClassSubjectController {
     return this.classSubjectService.remove(+id);
   }
 
-  @Get('unassigned')
-  async findUnassignedSubjects(@Body() payload: number) {
-    return this.classSubjectService.findUnassignedSubjects(payload);
+  @Post('unassignedsubjects')
+  async findUnassignedSubjects(@Body() payload: any) {
+    return await this.classSubjectService.findUnassignedSubjects(payload);
+  }
+
+  @Post('assignedsubjects')
+  async assignedSubjects(@Body() payload: any) {
+    return await this.classSubjectService.assignedSubjects(payload);
   }
 }
