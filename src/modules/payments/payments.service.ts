@@ -210,17 +210,19 @@ export class PaymentsService {
       const feeType = await this.paymentTypesRepository.findOne({ where: { paymenttypeid: paymentDto.paymentTypeId } });
       const feeState = await this.paymentStateRepository.findOne({ where: { paymentstateid: paymentDto.paymentStateId } });
       const studentClass = await this.studentClassService.findOne(paymentDto.studentClassId);
+      const monthData = await this.monthsRepository.findOne({ where: { monthid: paymentDto.monthId } });
+      const responsibleId  = await this.responsibleRepository.findOne({where:{responsibleid:paymentDto.responsibleId}});
 
       if (!feeType || !feeState || !studentClass) {
         throw new ConflictException("Invalid references provided.");
       }
 
-      await this.validatePaymentNotExists(studentClass.studentClassId, paymentDto.monthName);
+      await this.validatePaymentNotExists(studentClass.studentClassId, monthData.monthname);
 
       // Prepare payment entity
       const payment = new Payment();
       payment.studentClass = studentClass;
-      payment.monthName = paymentDto.monthName;
+      payment.monthName = monthData.monthname;
       payment.studentFeeType = feeType;
       payment.paymentStateId = feeState;
       payment.student = await  this.studentService.findOne(paymentDto.studentId);

@@ -4,7 +4,7 @@ export const dataSourceOptions : DataSourceOptions ={
     type: 'mysql',
     host: 'localhost',
     username: 'root',
-    password: 'pASSWORD',
+    password: 'password',
     database: 'smsupd',
     synchronize:true,
     //entities: [],
