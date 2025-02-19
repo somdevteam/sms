@@ -15,5 +15,5 @@ export class ClassExam {
 
   @ManyToOne(() => ExamsInfo, exam => exam.classExams)
   @JoinColumn({ name: 'examid' })
-  exam: ExamsInfo;
+  examInfo: ExamsInfo;
 }

@@ -29,6 +29,6 @@ export class ExamsInfo {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateCreated: Date;
 
-    @OneToMany(() => ClassExam, classExam => classExam.exam)
+    @OneToMany(() => ClassExam, classExam => classExam.examInfo)
     classExams: ClassExam[];
 }

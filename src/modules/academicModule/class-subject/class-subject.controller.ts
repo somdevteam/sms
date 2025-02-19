@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, NotFoundException } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { ClassSubjectService } from './class-subject.service';
-import { CreateClassSubjectDto } from './dto/create-class-subject.dto';
-import { UpdateClassSubjectDto } from './dto/update-class-subject.dto';
 import {ApiTags} from "@nestjs/swagger";
+import { CreateClassSubjectDto } from './dto/create-class-subject.dto';
+import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
 
 @Controller('class-subject')
 @ApiTags('Class Subject Controller')
@@ -12,29 +12,35 @@ export class ClassSubjectController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createClassSubjectDto: CreateClassSubjectDto) {
-    return this.classSubjectService.create(createClassSubjectDto);
+  async create(@Body() createClassSubjectDto: CreateClassSubjectDto) {
+    const resp = await this.classSubjectService.createClassSubject(createClassSubjectDto);
+    return new ApiBaseResponse('Class Subject Created',200, null);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Patch()
-  update(@Body() updateClassSubjectDto: UpdateClassSubjectDto) {
-    return this.classSubjectService.update(updateClassSubjectDto);
-  }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.classSubjectService.remove(+id);
-  }
 
   @Post('unassignedsubjects')
   async findUnassignedSubjects(@Body() payload: any) {
-    return await this.classSubjectService.findUnassignedSubjects(payload);
+    const subjects =  await this.classSubjectService.findUnassignedSubjects(payload);
+    return new ApiBaseResponse(null ,200, subjects);
   }
 
-  @Post('assignedsubjects')
-  async assignedSubjects(@Body() payload: any) {
-    return await this.classSubjectService.assignedSubjects(payload);
+  @Get('subjects')
+  async findSubjectsByClass(
+    @Query('classId') classId: number,
+    @Query('branchId') branchId: number,
+  ) {
+
+    if (!classId || !branchId) {
+      throw new NotFoundException('Class ID and Branch ID are required');
+    }
+
+    let subjects = await this.classSubjectService.findSubjectsByClass(
+      classId, 
+      branchId, 
+    );
+    subjects = subjects.map((subject:any) => subject.subject);
+    return new ApiBaseResponse(null,200, subjects);
   }
+
 }

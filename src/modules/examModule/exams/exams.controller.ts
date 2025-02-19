@@ -42,4 +42,10 @@ export class ExamsController {
     await this.examsService.addClassExam(payload);
     return new ApiBaseResponse('created successfully', 200, null);
   }
+
+  @Get('/getclassbyexam')
+  async getClassByExam(@Query('examId', new ParseIntPipe()) examId: number): Promise<ApiBaseResponse> {
+    const classes = await this.examsService.getClassByExam(examId);
+    return new ApiBaseResponse('classes fetched successfully', 200, classes);
+  }
 }

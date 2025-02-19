@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { CreateExamDto } from './dto/create-exam.dto';
-import { UpdateExamDto } from './dto/update-exam.dto';
 import { Exam } from './entities/exam.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -122,8 +121,8 @@ export class ExamsService {
   async addClassExam(payload: any) {
       const { examInfoId, classIds } = payload;
       const classExams: ClassExam[] = [];
-      const exam = await this.examInfoRepository.findOne({ where: { examInfoId: examInfoId } });
-      if (!exam) {
+      const examInfo = await this.examInfoRepository.findOne({ where: { examInfoId: examInfoId } });
+      if (!examInfo) {
         throw new NotFoundException('ExamInfo not found');
       }
   
@@ -134,7 +133,7 @@ export class ExamsService {
             throw new NotFoundException(`Class with ID ${classId} not found`);
           }
           const classExam = new ClassExam();
-          classExam.exam = exam;
+          classExam.examInfo = examInfo;
           classExam.class = classEntity;
           classExams.push(classExam);
         }
@@ -142,5 +141,19 @@ export class ExamsService {
       } catch (error) {
         throw new InternalServerErrorException(`Error creating ClassExam: ${error.message}`);
       }
+  }
+
+  async getClassByExam(examId: number) {
+    const exam = await this.examRepository.findOne({ where: { examId: examId } });
+    if (!exam) {
+      throw new NotFoundException('Exam not found');
     }
+
+    const classExams = await this.classExamRepository.find(
+      { 
+        where: { examInfo: { exam: { examId: examId } } }, relations: ['class'] 
+      }
+    );
+    return classExams.map(classExam => classExam.class);
+  }
 }
