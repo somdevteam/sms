@@ -12,42 +12,55 @@ export class ClassController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createClassDto: CreateClassDto) {
-    return this.classService.create(createClassDto);
+  async create(@Body() createClassDto: CreateClassDto): Promise<ApiBaseResponse> {
+    const result = await this.classService.create(createClassDto);
+    return new ApiBaseResponse('Class created successfully', HttpStatus.CREATED, result);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.classService.findAll();
+  async findAll(): Promise<ApiBaseResponse> {
+    const classes = await this.classService.findAll();
+    return new ApiBaseResponse('Classes retrieved successfully', HttpStatus.OK, classes);
   }
 
   @Get('classesNotInLevel/:branchId')
   async findClassesNotInLevelClass(@Param('branchId') branchId: number): Promise<ApiBaseResponse> {
     const classes = await this.classService.findClassesNotInLevelClassWithBranch(branchId);
-    return new ApiBaseResponse('classes',HttpStatus.OK,classes);
+    return new ApiBaseResponse('Classes retrieved successfully', HttpStatus.OK, classes);
   }
 
   @Get('allsections')
-  async getClassWithSections() {
-    return this.classService.getClassWithSections();
+  async getClassWithSections(): Promise<ApiBaseResponse> {
+    const classes = await this.classService.getClassWithSections();
+    return new ApiBaseResponse('Class sections retrieved successfully', HttpStatus.OK, classes);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.classService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ApiBaseResponse> {
+    const result = await this.classService.findOne(+id);
+    return new ApiBaseResponse('Class retrieved successfully', HttpStatus.OK, result);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch()
-  update(@Body() updateClassDto) {
-    return this.classService.update(updateClassDto);
+  async update(@Body() updateClassDto): Promise<ApiBaseResponse> {
+    const result = await this.classService.update(updateClassDto);
+    return new ApiBaseResponse('Class updated successfully', HttpStatus.OK, result);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.classService.remove(+id);
+  async remove(@Param('id') id: string): Promise<ApiBaseResponse> {
+    const result = await this.classService.remove(+id);
+    return new ApiBaseResponse('Class deleted successfully', HttpStatus.OK, result);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('list/all')
+  async findAllClasses(): Promise<ApiBaseResponse> {
+    const classes = await this.classService.findAllClasses();
+    return new ApiBaseResponse('Classes list retrieved successfully', HttpStatus.OK, classes);
   }
 }

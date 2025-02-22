@@ -138,22 +138,52 @@ export class PaymentsService {
     }
   }
 
-  async getPayments(date?: string, rollNumber?: number): Promise<Payment[]> {
+  async getPayments(
+    startDate: string,
+    endDate: string,
+    type?: string,
+    status?: number,
+    classId?: number,
+    sectionId?: number,
+    paymentStateId?: number,
+    searchFilter?: string
+  ): Promise<Payment[]> {
     try {
       const queryBuilder = this.paymentRepository.createQueryBuilder('payment')
         .leftJoinAndSelect('payment.studentClass', 'studentClass')
         .leftJoinAndSelect('studentClass.student', 'student')
         .leftJoinAndSelect('studentClass.classSection', 'classSection')
+        .leftJoinAndSelect('classSection.class', 'class')
+        .leftJoinAndSelect('classSection.section', 'section')
+        .leftJoinAndSelect('student.responsible', 'responsible')
         .leftJoinAndSelect('payment.studentFeeType', 'feeType')
         .leftJoinAndSelect('payment.paymentStateId', 'paymentState');
 
-      if (date) {
-        queryBuilder.andWhere('DATE(payment.datecreated) = :date', { date });
+      queryBuilder.andWhere('DATE(payment.datecreated) BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate
+      });
+
+      if (type === 'rollNumber' && searchFilter) {
+        queryBuilder.andWhere('payment.rollNo = :rollNumber', { searchFilter });
       }
 
-      if (rollNumber) {
-        queryBuilder.andWhere('student.rollNumber = :rollNumber', { rollNumber });
+      if (type === 'mobileNumber' && searchFilter) {
+        queryBuilder.andWhere('responsible.phone = :mobileNumber', { searchFilter });
       }
+
+      if (classId) {
+        queryBuilder.andWhere('class.classId = :classId', { classId });
+      }
+      
+      if (sectionId) {
+        queryBuilder.andWhere('section.sectionId = :sectionId', { sectionId });
+      }
+
+         // Fixed this condition - using status instead of paymentStateId in the WHERE clause
+         if (status) {
+          queryBuilder.andWhere('paymentState.paymentstateid = :status', { status });
+        }
 
       const payments = await queryBuilder.getMany();
 
@@ -163,7 +193,10 @@ export class PaymentsService {
 
       return payments;
     } catch (error) {
-      throw new NotFoundException(`Error fetching payments: ${error.message}`);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error fetching payments: ${error.message}`);
     }
   }
 

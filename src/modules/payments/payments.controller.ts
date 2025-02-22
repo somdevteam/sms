@@ -3,6 +3,41 @@ import { PaymentsService } from './payments.service';
 import { CreateMultiplePaymentsDto, CreatePaymentDto } from "./dto/create-payment.dto";
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { ApiBaseResponse } from "../../common/dto/apiresponses.dto";
+import { IsDateString, IsNotEmpty, IsOptional, IsNumber, IsString } from 'class-validator';
+
+export class PaymentFilterDto {
+  @IsNotEmpty({ message: 'Start date is required' })
+  @IsDateString()
+  startDate: string;
+
+  @IsNotEmpty({ message: 'End date is required' })
+  @IsDateString()
+  endDate: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @IsOptional()
+  @IsNumber()
+  status?: number;
+
+  @IsOptional()
+  @IsNumber()
+  classId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  sectionId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  paymentStateId?: number;
+
+  @IsOptional()
+  @IsString()
+  searchFilter?: string;
+}
 
 @Controller('payment')
 export class PaymentsController {
@@ -65,15 +100,29 @@ export class PaymentsController {
     return new ApiBaseResponse('Success',200,data);
   }
   @Post('getPaymentByFilter')
-  async getPayments(@Request() req): Promise<ApiBaseResponse> {
-    // Validate date format
-    const Date =req.body.date ;
-    const rollNo = req.body.rollNumber
-    if (Date && !this.isValidDate(Date)) {
+  async getPayments(@Body() filterDto: PaymentFilterDto): Promise<ApiBaseResponse> {
+    // Validate date format for both start and end dates
+    if (!this.isValidDate(filterDto.startDate) || !this.isValidDate(filterDto.endDate)) {
       throw new BadRequestException('Invalid date format. Use YYYY-MM-DD.');
     }
-    const payment = await  this.paymentsService.getPayments(Date, rollNo);
-    return new ApiBaseResponse('success',200,payment);
+
+    // Validate that end date is not before start date
+    if (new Date(filterDto.endDate) < new Date(filterDto.startDate)) {
+      throw new BadRequestException('End date cannot be before start date');
+    }
+
+    const payments = await this.paymentsService.getPayments(
+      filterDto.startDate,
+      filterDto.endDate,
+      filterDto.type,
+      filterDto.status,
+      filterDto.classId,
+      filterDto.sectionId,
+      filterDto.paymentStateId,
+      filterDto.searchFilter
+    );
+
+    return new ApiBaseResponse('success', 200, payments);
   }
 
   private isValidDate(dateString: string): boolean {
