@@ -18,8 +18,10 @@ export class ClassSection {
     @ManyToOne(() => Section, sec => sec.classSection)
     @JoinColumn({name: 'sectionId'}) // Specify the foreign key column
     section: Section;
+
     @Column()
     dateCreated: Date
+    
     @OneToMany(()=>StudentClass,studentClass =>studentClass.classSection)
     @JoinColumn({name: 'studentClassId'})
     studentClass:StudentClass;

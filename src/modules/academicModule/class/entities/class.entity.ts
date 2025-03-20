@@ -1,7 +1,7 @@
 import { ClassSection } from "src/modules/academicModule/class-section/entities/class-section.entity";
 import { ClassSubject } from "src/modules/academicModule/class-subject/entities/class-subject.entity";
 import { Levelclass } from "src/modules/academicModule/levelclass/entities/levelclass.entity";
-import { ClassExam } from "src/modules/examModule/exams/entities/class-exam.entity";
+import { ClassExam } from "src/modules/exam-module/exams/entities/class-exam.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

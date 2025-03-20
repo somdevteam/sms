@@ -5,7 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./modules/auth/auth.module";
 import { BranchModule } from "./modules/branch/branch.module";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import configuration from "../config/configuration";
 import { ClassModule } from "./modules/academicModule/class/class.module";
 import { SubjectModule } from "./modules/academicModule/subject/subject.module";
@@ -29,8 +29,9 @@ import { TabPermissionsModule } from './modules/tabPermissions/tabPermissions.mo
 import { UserRolesModule } from './modules/userroles/userroles.module';
 import { dataSourceOptions } from "../db/data-source";
 import { RolePermissionsModule } from "./modules/rolePermissions/rolePermissions.module";
-import { ExamsModule } from './modules/examModule/exams/exams.module';
+import { ExamsModule } from './modules/exam-module/exams/exams.module';
 import { PaymentsModule } from "./modules/payments/payments.module";
+import { StudentExamMarksModule } from './modules/exam-module/student-exam-marks/student-exam-marks.module';
 
 
 @Module({
@@ -45,7 +46,7 @@ import { PaymentsModule } from "./modules/payments/payments.module";
     MenusModule, TabsModule, PermissionsModule, TabPermissions,
     RolesModule, UserTypesModule, UserTypePermissions, TabPermissionsModule,
     UserRolesModule, RolePermissionsModule,
-    ExamsModule,PaymentsModule,],
+    ExamsModule,PaymentsModule,  StudentExamMarksModule],
   controllers: [AppController],
   providers: [AppService],
 })

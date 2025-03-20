@@ -131,8 +131,8 @@ export class ClassService {
 
     const assignedExamClasses = await this.classRepository.createQueryBuilder('class')
     .innerJoin('class.classExams', 'classExam')
-    .innerJoin('classExam.exam', 'exam')
-    .where('exam.examInfoId = :examInfoId', { examInfoId })
+    .innerJoin('classExam.examInfo', 'examInfo')
+    .where('examInfo.examInfoId = :examInfoId', { examInfoId })
     .getMany();
     
     const currentAcademicBranchId = currentAcademic.academicBranchId;

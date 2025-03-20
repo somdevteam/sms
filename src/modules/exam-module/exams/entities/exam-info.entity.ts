@@ -1,9 +1,9 @@
 // exams-info.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
-import { Exam } from './entities/exam.entity';
 import { AcademicBranch } from 'src/modules/branch-academic/entities/branch-academic.entity';
-import { ClassExam } from './entities/class-exam.entity';
-
+import { Exam } from './exam.entity';
+import { ClassExam } from './class-exam.entity';
+import { StudentExamMarks } from '../../student-exam-marks/entities/student-exam-marks.entity';
 @Entity()
 export class ExamsInfo {
     @PrimaryGeneratedColumn()
@@ -14,7 +14,7 @@ export class ExamsInfo {
     exam: Exam;
 
     @ManyToOne(() => AcademicBranch, academicBranch => academicBranch.examInfo)
-    @JoinColumn({ name: 'academicBranch' })
+    @JoinColumn({ name: 'academicBranchId' })
     academicBranch: AcademicBranch;
 
     @Column({ type: 'text' })
@@ -26,9 +26,16 @@ export class ExamsInfo {
     @Column()
     endDate: Date;
 
+    @Column({nullable: true})
+    examMarks: number
+
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateCreated: Date;
 
     @OneToMany(() => ClassExam, classExam => classExam.examInfo)
     classExams: ClassExam[];
+
+    @OneToMany(() => StudentExamMarks, studentExamMarks => studentExamMarks.examInfo)
+    studentExamMarks: StudentExamMarks[];
 }

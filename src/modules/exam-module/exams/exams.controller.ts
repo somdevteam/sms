@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { ExamsService } from './exams.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { UpdateExamDto } from './dto/update-exam.dto';
 import { ApiBaseResponse } from 'src/common/dto/apiresponses.dto';
+import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('exams')
 export class ExamsController {
   constructor(private readonly examsService: ExamsService) { }

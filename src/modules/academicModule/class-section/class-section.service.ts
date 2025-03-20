@@ -191,4 +191,17 @@ export class ClassSectionService {
     // Save the new section-class combinations
     return await this.classSectionRepository.save(existingClassSections);
 }
+
+  async getSectionByClassAndBranch(payload: SectionByClassDto): Promise<any> {
+    const { branchId, classId } = payload;
+    const academicBranch = await this.branchAcademicService.findActiveBranchAcademic(branchId);
+    const classSection = await this.classSectionRepository.find({
+      where: {
+        class: { classid: classId },
+        branchAcademic: academicBranch,
+      },
+      relations: ['section'],
+    });
+    return classSection.map((item) => item.section);
+  }
 }

@@ -22,7 +22,7 @@ export class ClassSectionController {
   @UseGuards(JwtAuthGuard)
   @Post('section')
   findSectionByClass(@Body() payload:SectionByClassDto) {
-    return this.classSectionService.fetchSectionByClassId(payload);
+    // return this.classSectionService.fetchSectionByClassId(payload);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -49,6 +49,13 @@ export class ClassSectionController {
 
     const resp = await this.classSectionService.assignSectionToClass(createClassSectionDto);
     return new ApiBaseResponse('added successfully',200, resp);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('getSectionByClassAndBranch')
+  async getSectionByClassAndBranch(@Body() payload: any) : Promise<ApiBaseResponse> {
+    const resp = await this.classSectionService.getSectionByClassAndBranch(payload);
+    return new ApiBaseResponse('fetched successfully',200, resp);
   }
 
 }

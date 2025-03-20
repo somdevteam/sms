@@ -4,7 +4,7 @@ import { Exam } from './entities/exam.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
-import { ExamsInfo } from './exam-info.entity';
+import { ExamsInfo } from './entities/exam-info.entity';
 
 import { Class } from 'src/modules/academicModule/class/entities/class.entity';
 import { ClassExam } from './entities/class-exam.entity';
@@ -60,7 +60,7 @@ export class ExamsService {
   // exam info
 
   async createExamInfo(payload: any) {
-    const { examId, startDate, endDate, description, branchId } = payload;
+    const { examId, startDate, endDate, description, branchId,examMarks } = payload;
 
     const existingBranchAcademic = await this.branchAcademicService.findActiveBranchAcademic(branchId);
 
@@ -81,6 +81,7 @@ export class ExamsService {
     const createExamInfo = this.examInfoRepository.create({
       exam: { examId },
       startDate: startDate,
+      examMarks: examMarks,
       endDate: endDate,
       dateCreated: new Date(),
       description: description,
@@ -91,7 +92,7 @@ export class ExamsService {
   }
 
   async updateExamInfo(id: number, payload: any) {
-    const { branchId, examId, startDate, endDate, description } = payload;
+    const { branchId, examId, startDate, endDate, description,examMarks } = payload;
 
     const currentBranchAcademic = await this.branchAcademicService.findActiveBranchAcademic(branchId);
 
@@ -114,6 +115,7 @@ export class ExamsService {
     examInfo.startDate = startDate;
     examInfo.endDate = endDate;
     examInfo.description = description;
+    examInfo.examMarks = examMarks;
 
     return await this.examInfoRepository.update(examInfo.examInfoId, examInfo);
   }
