@@ -21,6 +21,7 @@ export class Branch  extends BaseEntity{
   coverLogo: string;
   @Column()
   dateCreated: Date;
+  
   @Column({default: true})
   isActive: boolean;
   @OneToMany(() => Levelclass, levelclass => levelclass.branch)
