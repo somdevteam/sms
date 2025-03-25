@@ -18,7 +18,8 @@ import { Loginhistories } from '../auth/loginhistories.entity';
 import { UserFilterDto } from './Dto/search-user.dto';
 import { ResetPasswordDto } from './Dto/reset-password.dto';
 import { UserRolesService } from '../userroles/userroles.service';
-
+import { RolePermissionsEntity } from '../rolePermissions/entities/rolePermissions.entity';
+import { Menus } from '../menus/entities/menus.entity';
 @Injectable()
 export class UserService {
   constructor(
@@ -30,6 +31,10 @@ export class UserService {
     private loginRepository: Repository<Loginhistories>,
     @Inject(forwardRef(() => UserRolesService))
     private readonly userRoleService: UserRolesService,
+    @InjectRepository(RolePermissionsEntity)
+    private readonly rolePermissionRepository: Repository<RolePermissionsEntity>,
+    @InjectRepository(Menus)
+    private readonly menusRepository: Repository<Menus>,
   ) { }
 
   private readonly users: any[] = [];
@@ -68,7 +73,7 @@ export class UserService {
 
   }
 
-  async fetchUsersByBranch(data: UserFilterDto) {
+  async fetchUsersByBranch(data: UserFilterDto,user: any) {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
@@ -87,6 +92,8 @@ export class UserService {
         'profile.userProfileId as userProfileId',
       ]);
 
+      query.where('user.userId != :userId', { userId: user.userId })
+
     if (data.branchId !== 0 && data.branchId !== null) {
       query.andWhere('profile.branchId = :branchId', {
         branchId: data.branchId,
@@ -96,23 +103,6 @@ export class UserService {
     return query.getRawMany();
   }
 
-  //  async fetchSingleUsersFullData(userId: number) {
-  //    return await this.userRepository
-  //     .createQueryBuilder('user')
-  //     .leftJoinAndSelect('user.profile', 'profile')
-  //     .where('user.userId = :userId', { userId })
-  //     .select([
-  //       'user.userId as userId',
-  //       'user.email as email',
-  //       'user.username as username',
-  //       'profile.firstName as firstName',
-  //       'profile.middleName as middleName',
-  //       'profile.lastName as lastName',
-  //       'profile.mobile as mobile',
-  //       'profile.branchId as branchId',
-  //       'profile.userProfileId as userProfileId',
-  //     ]).getRawOne();
-  // }
 
   async fetchUsersFullData(userId?: number) {
     const usersList = await this.userRepository
@@ -352,5 +342,58 @@ export class UserService {
   async getUserLoginHistory(userId) {
     const userLoginHistories = await this.loginRepository.find({ where: { userId } });
     return userLoginHistories;
+  }
+
+  async findRolePermissionById(roleId: number): Promise<any> {
+    const rolePermission = await this.rolePermissionRepository.find({
+      relations:['role','permission'],
+      where: { role: { roleId } }
+    });
+    return rolePermission;
+  }
+
+  private async getUserPermissionsById(userId: number): Promise<any[]> {
+    const userInfo = await this.userRepository.findOne({
+      where: { userId },
+      relations: ['userPermissions', 'userPermissions.permission'],
+    });
+
+    if (!userInfo) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return userInfo.userPermissions;
+  }
+
+  async getUserPermission(userId: number, user: any): Promise<any> {
+    const roleId = user.roleId;
+    const allPermissions = roleId 
+      ? await this.findRolePermissionById(roleId) 
+      : await this.getUserPermissionsById(userId);
+
+    return allPermissions.map(({ permission }) => ({
+      permissionId: permission.permissionId,
+      permission: permission.permission,
+      description: permission.description,
+    }));
+  }
+
+  async getMenusWithPermission(user: any): Promise<any> {
+    const { userId, roleId } = user;
+    const query = this.menusRepository.createQueryBuilder('menus')
+    .innerJoinAndSelect('menus.tabs', 'T')
+    .innerJoinAndSelect('T.tabPermission', 'TP')
+    .innerJoinAndSelect('TP.permission', 'p');
+    if(roleId){ 
+      query.innerJoinAndSelect('p.rolePermissions', 'rp')
+      .innerJoinAndSelect('rp.role', 'r')
+      .where('r.roleId = :roleId', { roleId })
+    }else{
+      query.innerJoinAndSelect('p.userPermissions', 'up')
+      .innerJoinAndSelect('up.user', 'u')
+      .where('u.userId = :userId', { userId })
+    }
+    return query.getMany();
+
   }
 }

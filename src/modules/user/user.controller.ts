@@ -37,8 +37,8 @@ export class UserController {
 
     @UseGuards(JwtAuthGuard)
     @Post("usersByFilter")
-    async getUsersByFilter(@Body() userDto: UserFilterDto): Promise<ApiBaseResponse> {
-        const usersList = await  this.userService.fetchUsersByBranch(userDto);
+    async getUsersByFilter(@Body() userDto: UserFilterDto, @Request() req: any): Promise<ApiBaseResponse> {
+        const usersList = await  this.userService.fetchUsersByBranch(userDto, req.user.user);
         return new ApiBaseResponse('users list',HttpStatus.OK,usersList);
     }
 
@@ -74,5 +74,19 @@ export class UserController {
     async fetchData(@Param('userId') userId): Promise<ApiBaseResponse> {
         const userLoginHistoryInfo = await this.userService.fetchSpecificUserData(userId,101);
         return new ApiBaseResponse('success', 200, userLoginHistoryInfo);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('permissions/:userId')
+    async getUserPermissions(@Param('userId') userId: number, @Request() req: any): Promise<ApiBaseResponse> {
+        const permissions = await this.userService.getUserPermission(userId, req.user.user);
+        return new ApiBaseResponse('success', 200, permissions);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/menuswithpermission')
+    async getMenusWithPermission(@Request() req): Promise<ApiBaseResponse> {
+        const menus = await this.userService.getMenusWithPermission(req.user.user);
+        return new ApiBaseResponse('menus',HttpStatus.OK,menus);
     }
 }

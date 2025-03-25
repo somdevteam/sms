@@ -44,7 +44,6 @@ export class AuthController {
 
         const rolePermission = await this.rolePermissionService.findRolePermissionById(userInfo.roleId);
         const permissions = rolePermission.map(item => item["permissionName"]);
-        console.log(rolePermission);
         const users = {
             id: user.userId,
             img: null,

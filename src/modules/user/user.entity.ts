@@ -39,8 +39,9 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => Loginhistories, loginHistory => loginHistory.user)
     loginHistory:Loginhistories[];
+
     @OneToMany(() => UserPermissions, userPermission => userPermission.user)
-    userPermissions: UserPermissions
+    userPermissions: UserPermissions[];
 
     @OneToOne(() => UserRolesEntity, (userRoles) => userRoles.user)
     userRoles: UserRolesEntity;
