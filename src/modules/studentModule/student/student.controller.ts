@@ -138,5 +138,78 @@ export class StudentController {
     return new ApiBaseResponse('success', 200, transformedData);
   }
 
+  @Post('getStudentsByRollNumber')
+  async findStudentByRollNumber(@Request() req) {
+    console.log("We reached here with data:", req.body);
+
+    const studentData = await this.studentService.findStudentRollNumber(req.body.rollNumber);
+
+    const transformedData = studentData.map(student => ({
+      studentid: student.studentid,
+      rollNumber: (student.rollNumber).toString(),
+      firstname: student.firstname,
+      middlename: student.middlename,
+      lastname: student.lastname,
+      Sex: student.Sex,
+      dob: student.dob,
+      bob: student.bob,
+      responsible: student.responsible,
+      fullName: createFullName(student.firstname, student.middlename, student.lastname),
+      studentClass: student.studentClass.map(studentClass => ({
+        studentClassId: studentClass.studentClassId,
+        classId: studentClass.classSection.class.classid,
+        className: studentClass.classSection.class.classname,
+        sectionId: studentClass.classSection.section.sectionid,
+        sectionName: studentClass.classSection.section.sectionname,
+        classSectionId: studentClass.classSection.classSectionId,
+        levelClassId: studentClass.classSection.class.levelclass[0].levelclassid,
+        levelId: studentClass.classSection.class.levelclass[0].level.levelid,
+        levelName: studentClass.classSection.class.levelclass[0].level.levelname,
+        levelFee: studentClass.classSection.class.levelclass[0].level.levelFee,
+        isActive: studentClass.classSection.class.isactive
+      }))
+    }));
+
+    console.log("Transformed data:", transformedData);
+
+    return new ApiBaseResponse('success', 200, transformedData);
+  }
+
+  @Post('getStudentsByResponsibleMobile')
+  async findStudentByResponsibleMobile(@Request() req) {
+    console.log("We reached here with data:", req.body);
+
+    const studentData = await this.studentService.findStudentByResponsibleMobile(req.body.mobile);
+
+    const transformedData = studentData.map(student => ({
+      studentid: student.studentid,
+      rollNumber: (student.rollNumber).toString(),
+      firstname: student.firstname,
+      middlename: student.middlename,
+      lastname: student.lastname,
+      Sex: student.Sex,
+      dob: student.dob,
+      bob: student.bob,
+      responsible: student.responsible,
+      fullName: createFullName(student.firstname, student.middlename, student.lastname),
+      studentClass: student.studentClass.map(studentClass => ({
+        studentClassId: studentClass.studentClassId,
+        classId: studentClass.classSection.class.classid,
+        className: studentClass.classSection.class.classname,
+        sectionId: studentClass.classSection.section.sectionid,
+        sectionName: studentClass.classSection.section.sectionname,
+        classSectionId: studentClass.classSection.classSectionId,
+        levelClassId: studentClass.classSection.class.levelclass[0].levelclassid,
+        levelId: studentClass.classSection.class.levelclass[0].level.levelid,
+        levelName: studentClass.classSection.class.levelclass[0].level.levelname,
+        levelFee: studentClass.classSection.class.levelclass[0].level.levelFee,
+        isActive: studentClass.classSection.class.isactive
+      }))
+    }));
+
+    console.log("Transformed data:", transformedData);
+
+    return new ApiBaseResponse('success', 200, transformedData);
+  }
 
 }

@@ -1,63 +1,68 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
+import { IsArray, IsNotEmpty, IsOptional, ValidateNested, IsNumber, IsString } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreatePaymentDto {
-  @ApiProperty({ required: false })
-  //@IsNotEmpty()
+  @IsNotEmpty()
+  @IsNumber()
+  studentId: number;
+
+  @IsOptional()
+  @IsNumber()
   studentClassId: number;
 
-  @ApiProperty({ required: false })
- // @IsNotEmpty()
-  sName: string; // Added sName field
-
-  @ApiProperty({ required: true })
   @IsNotEmpty()
-  paymentTypeId: number;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  paymentStateId: number;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  rollNo: string;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
+  @IsNumber()
   amount: number;
 
-  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @IsNumber()
+  paymentTypeId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  paymentStateId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  monthId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  rollNo: string;
+
   @IsOptional()
-  description: string; // Updated to match 'details' in payload
+  @IsNumber()
+  responsibleId: number;
+
+  @IsOptional()
+  @IsString()
+  details?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
+  sName: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
   monthName: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  monthId: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
+  @IsString()
   className: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
   sectionName: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
   levelName: string;
-
-  @ApiProperty({ required: false })
- // @IsNotEmpty()
-  studentId: number;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  responsibleId: number; // Added responsibleId field
 }
 
 export class CreateMultiplePaymentsDto {
@@ -66,4 +71,10 @@ export class CreateMultiplePaymentsDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePaymentDto)
   payments: CreatePaymentDto[];
+}
+
+export class GenerateReceiptDto {
+  @ApiProperty({ type: Number })
+  @IsNotEmpty()
+  paymentIds: number;
 }

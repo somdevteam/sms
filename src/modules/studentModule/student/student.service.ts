@@ -116,6 +116,46 @@ export class StudentService {
           .where("student.responsibleid = :responsibleId", { responsibleId })
           .getMany();
     }
+
+    async findStudentByMobile(responsibleId: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .where("student.responsibleid = :responsibleId", { responsibleId })
+          .getMany();
+    }
+
+    async findStudentRollNumber(rollNumber: string): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .where("student.rollNumber = :rollNumber", { rollNumber })
+          .getMany();
+    }
+
+    async findStudentByResponsibleMobile(mobile: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .leftJoinAndSelect("student.responsible","responsible")
+          .where("responsible.phone = :mobile", { mobile })
+          .getMany();
+    }
     async findStudentByStudentId(responsibleId: number): Promise<Student[ ] | undefined> {
         return this.studentRepository.createQueryBuilder("student")
           .leftJoinAndSelect("student.studentClass", "studentClass")

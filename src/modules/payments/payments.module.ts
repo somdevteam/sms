@@ -10,10 +10,22 @@ import { PaymentStates } from "./entities/paymentstates.entity";
 import { Feetypes } from "./entities/feetypes.entity";
 import { Responsible } from "../studentModule/responsible/entities/responsible.entity";
 import { StudentModule } from "../studentModule/student/student.module";
-
+import { Student } from "../studentModule/student/entities/student.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment,Paymenttypes,Months,PaymentStates,Feetypes,Responsible]),StudentclassModule,StudentModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Payment,
+      Paymenttypes,
+      Months,
+      PaymentStates,
+      Feetypes,
+      Responsible,
+      Student
+    ]),
+    StudentclassModule,
+    StudentModule
+  ],
   controllers: [PaymentsController],
   providers: [PaymentsService],
 })

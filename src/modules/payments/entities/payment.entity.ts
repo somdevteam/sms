@@ -5,7 +5,9 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate
 } from "typeorm";
 import { Paymenttypes } from "./paymenttype.entity";
 import { StudentClass } from "../../studentModule/studentclass/entities/studentclass.entity";
@@ -19,39 +21,53 @@ export class Payment {
   @PrimaryGeneratedColumn()
   studentfeeid: number;
 
-  @ManyToOne(() => StudentClass)
-  @JoinColumn({ name: "studentclassid" })
-  studentClass: StudentClass;
-
-  @ManyToOne(() => Paymenttypes)
-  @JoinColumn({ name: "paymenttypeid" })
-  studentFeeType: Paymenttypes;
-
-  @ManyToOne(() => PaymentStates)
-  @JoinColumn({ name: "paymentstateid" })
-  paymentStateId: PaymentStates;
-
-  @ManyToOne(() => Responsible)
-  @JoinColumn({ name: "responsibleid" })
-  responsibleId: Responsible;
-
-  @Column("decimal", { precision: 10, scale: 2 })
-  amount: number;
-
-  @Column()
-  monthName: string;
-
-  @CreateDateColumn()
-  datecreated: Date;
-
-  @UpdateDateColumn()
-  dateupdated: Date;
-
-  @Column()
-  rollNo:string;
-
-  @ManyToOne(() => Student)
+  @ManyToOne(() => Student, { nullable: true })
   @JoinColumn({ name: "studentid" })
   student: Student;
 
+  @ManyToOne(() => StudentClass, { nullable: false })
+  @JoinColumn({ name: "studentclassid" })
+  studentClass: StudentClass;
+
+  @Column("decimal", { precision: 10, scale: 2, nullable: false })
+  amount: number;
+
+  @ManyToOne(() => Months, { nullable: true })
+  @JoinColumn({ name: "monthid" })
+  month: Months;
+
+  @Column({ nullable: false })
+  monthName: string;
+
+  @ManyToOne(() => Paymenttypes, { nullable: false })
+  @JoinColumn({ name: "paymenttypeid" })
+  paymentType: Paymenttypes;
+
+  @ManyToOne(() => PaymentStates, { nullable: false })
+  @JoinColumn({ name: "paymentstateid" })
+  paymentState: PaymentStates;
+
+  @Column({ nullable: false })
+  rollNo: string;
+
+  @Column({ nullable: true })
+  details: string;
+
+  @CreateDateColumn({ nullable: false })
+  datecreated: Date;
+
+  @UpdateDateColumn({ nullable: true })
+  dateupdated: Date;
+
+  @ManyToOne(() => Responsible, { nullable: true })
+  @JoinColumn({ name: "responsibleid" })
+  responsible: Responsible;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  validateAmount() {
+    if (this.amount <= 0) {
+      throw new Error('Amount must be greater than 0');
+    }
+  }
 }

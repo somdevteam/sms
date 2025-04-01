@@ -18,7 +18,7 @@ export class Responsible extends  BaseEntity {
     @OneToMany(() => Student, student => student.responsible)
     student: Student[];
 
-    @OneToMany(() => Payment, payment => payment.responsibleId)
+    @OneToMany(() => Payment, payment => payment.responsible)
     payment: Payment[];
 
 }

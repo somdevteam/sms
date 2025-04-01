@@ -5,30 +5,41 @@ import {StudentClass} from "../../studentclass/entities/studentclass.entity";
 import { Payment } from "../../../payments/entities/payment.entity";
 
 @Entity()
-
 export class Student extends BaseEntity {
-
     @PrimaryGeneratedColumn()
     studentid: number;
-    @Column({unique: true})
-    rollNumber: number
-    @Column()
+
+    @Column({unique: true, nullable: true})
+    rollNumber: number;
+
+    @Column({nullable: false})
     firstname: string;
-    @Column()
+
+    @Column({nullable: true})
     middlename: string;
-    @Column()
+
+    @Column({nullable: false})
     lastname: string;
-    @Column()
+
+    @Column({nullable: false})
     Sex: string;
-    @Column()
+
+    @Column({nullable: false})
     dob: Date;
-    @Column()
+
+    @Column({nullable: true})
     bob: string;
+
+    @Column({ default: true, nullable: false })
+    isActive: boolean;
+
     @ManyToOne(() => Responsible, responsible => responsible.student)
     @JoinColumn({name:'responsibleid'})
-    responsible: Responsible
+    responsible: Responsible;
+
     @OneToMany(() => StudentClass, studentClass => studentClass.student)
     studentClass: StudentClass[];
+
     @OneToMany(()=>Payment,payment =>payment.student)
     payment: Payment;
 }

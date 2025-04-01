@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Request, BadRequestException } from "@nestjs/common";
 import { PaymentsService } from './payments.service';
-import { CreateMultiplePaymentsDto, CreatePaymentDto } from "./dto/create-payment.dto";
+import { CreateMultiplePaymentsDto, CreatePaymentDto, GenerateReceiptDto } from "./dto/create-payment.dto";
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { ApiBaseResponse } from "../../common/dto/apiresponses.dto";
 import { IsDateString, IsNotEmpty, IsOptional, IsNumber, IsString } from 'class-validator';
@@ -44,9 +44,11 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post('add')
-  async create(@Body() createPaymentDto: CreatePaymentDto):Promise<ApiBaseResponse> {
-    await this.paymentsService.create(createPaymentDto);
-    return new ApiBaseResponse('Payment created successfully',200,null);
+  async create(@Body() createPaymentDto: CreatePaymentDto): Promise<ApiBaseResponse> {
+    const payment = await this.paymentsService.create(createPaymentDto);
+    const receipt = await this.paymentsService.generateReceipts(payment.studentfeeid);
+    const data = {payment:payment,receipt:receipt};
+    return new ApiBaseResponse('Payment created successfully', 200, data);
   }
 
   @Post("add-multiple")
@@ -125,11 +127,26 @@ export class PaymentsController {
     return new ApiBaseResponse('success', 200, payments);
   }
 
+  @Post('generate-receipts')
+  async generateReceipts(@Body() generateReceiptDto: GenerateReceiptDto): Promise<ApiBaseResponse> {
+    const receipts = await this.paymentsService.generateReceipts(generateReceiptDto.paymentIds);
+    return new ApiBaseResponse('Receipts generated successfully', 200, receipts);
+  }
+
+  @Get('student/:rollNumber')
+  async getStudentByRollNumber(@Param('rollNumber') rollNumber: string): Promise<ApiBaseResponse> {
+    const student = await this.paymentsService.getStudentByRollNumber(rollNumber);
+    return new ApiBaseResponse('Student found', 200, student);
+  }
+
+  @Get('responsible/:mobile')
+  async getResponsibleByMobile(@Param('mobile') mobile: string): Promise<ApiBaseResponse> {
+    const responsible = await this.paymentsService.getResponsibleByMobile(mobile);
+    return new ApiBaseResponse('Responsible found', 200, responsible);
+  }
+
   private isValidDate(dateString: string): boolean {
     const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
     return regex.test(dateString) && !isNaN(new Date(dateString).getTime());
   }
-
-
-
 }
