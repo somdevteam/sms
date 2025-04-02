@@ -15,6 +15,7 @@ import { Months } from "../../../common/months.entity";
 import { PaymentStates } from "./paymentstates.entity";
 import { Responsible } from "../../studentModule/responsible/entities/responsible.entity";
 import { Student } from "../../studentModule/student/entities/student.entity";
+import { PaymentChargeRequest } from "./payment-charge-request.entity";
 
 @Entity()
 export class Payment {
@@ -62,6 +63,10 @@ export class Payment {
   @ManyToOne(() => Responsible, { nullable: true })
   @JoinColumn({ name: "responsibleid" })
   responsible: Responsible;
+
+  @ManyToOne(() => PaymentChargeRequest, chargeRequest => chargeRequest.payments, { nullable: true })
+  @JoinColumn({ name: "charge_request_id" })
+  chargeRequest: PaymentChargeRequest;
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -1,32 +1,39 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Payment } from "./entities/payment.entity";
-import { Paymenttypes } from "./entities/paymenttype.entity";
-import { Months } from "../../common/months.entity";
-import { StudentclassModule } from "../studentModule/studentclass/studentclass.module";
-import { PaymentStates } from "./entities/paymentstates.entity";
-import { Feetypes } from "./entities/feetypes.entity";
-import { Responsible } from "../studentModule/responsible/entities/responsible.entity";
-import { StudentModule } from "../studentModule/student/student.module";
-import { Student } from "../studentModule/student/entities/student.entity";
+import { Payment } from './entities/payment.entity';
+import { Paymenttypes } from './entities/paymenttype.entity';
+import { PaymentStates } from './entities/paymentstates.entity';
+import { Months } from '../../common/months.entity';
+import { Feetypes } from './entities/feetypes.entity';
+import { Responsible } from '../studentModule/responsible/entities/responsible.entity';
+import { StudentclassModule } from '../studentModule/studentclass/studentclass.module';
+import { StudentModule } from '../studentModule/student/student.module';
+import { PaymentChargeRequest } from './entities/payment-charge-request.entity';
+import { PaymentChargeRequestService } from './payment-charge-request.service';
+import { PaymentChargeRequestController } from './payment-charge-request.controller';
+import { Student } from '../studentModule/student/entities/student.entity';
+import { StudentClass } from '../studentModule/studentclass/entities/studentclass.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Payment,
       Paymenttypes,
-      Months,
       PaymentStates,
+      Months,
       Feetypes,
       Responsible,
-      Student
+      PaymentChargeRequest,
+      Student,
+      StudentClass,
     ]),
     StudentclassModule,
-    StudentModule
+    StudentModule,
   ],
-  controllers: [PaymentsController],
-  providers: [PaymentsService],
+  controllers: [PaymentsController, PaymentChargeRequestController],
+  providers: [PaymentsService, PaymentChargeRequestService],
+  exports: [PaymentsService, PaymentChargeRequestService],
 })
 export class PaymentsModule {}
