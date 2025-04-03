@@ -59,8 +59,8 @@ export class PaymentChargeRequestService {
         queryBuilder.andWhere('charge.status = :status', { status: filterDto.status });
       }
 
-      if (filterDto.dueCategory) {
-        queryBuilder.andWhere('charge.dueCategory = :dueCategory', { dueCategory: filterDto.dueCategory });
+      if (filterDto.chargeTypeId) {
+        queryBuilder.andWhere('charge.chargeTypeId = :chargeTypeId', { chargeTypeId: filterDto.chargeTypeId });
       }
 
       if (filterDto.startDate) {
@@ -109,31 +109,44 @@ export class PaymentChargeRequestService {
   }
 
   async generateCharges(generateDto: GenerateChargesDto): Promise<PaymentChargeRequest[]> {
-    const studentsByClassSection: StudentsByClassSectionDto = {
-      classId: generateDto.classId,
-      sectionId: generateDto.sectionId,
-      academicId: 1, // Default value, adjust as needed
-      branchId: 1    // Default value, adjust as needed
-    };
-
-    const students = await this.studentService.getStudentsByClassIdAndSectionId(studentsByClassSection, null);
-    if (!students || students.length === 0) {
-      throw new NotFoundException('No students found in the specified class and section');
+    // Get active students for the branch
+    const activeStudents = await this.studentService.findActiveStudentsByBranch(generateDto.branchId);
+    
+    if (!activeStudents || activeStudents.length === 0) {
+      throw new NotFoundException('No active students found in the specified branch');
     }
 
     const charges: PaymentChargeRequest[] = [];
-    for (const student of students) {
-      const charge = this.chargeRequestRepository.create({
-        student,
-        studentClass: student.studentClass[0],
-        amount: generateDto.amount,
-        dueDate: new Date(generateDto.dueDate),
-        dueCategory: generateDto.dueCategory,
-        status: ChargeStatus.PENDING
-      });
+
+    // Create charge requests for each student
+    for (const student of activeStudents) {
+      const chargeData = {
+        studentId: student.studentid,
+        studentClassId: student.studentclassid,
+        branchId: student.branchid,
+        academicId: student.academicId,
+        academicYear: student.academicYear,
+        levelId: student.levelid,
+        levelFee: student.levelfee,
+        dueDate: new Date(), // You might want to set this based on your business logic
+        chargeTypeId: generateDto.chargeTypeId,
+        status: ChargeStatus.PENDING,
+        description: `Payment charge for ${student.academicYear}`,
+        createdBy: generateDto.createdBy,
+        loginHistoryId: generateDto.loginHistoryId
+      };
+
+      // If it's a monthly charge and monthId is provided, add month-specific logic
+      if (generateDto.monthId) {
+        // Add any month-specific logic here
+        chargeData.description = `Monthly payment charge for ${student.academicYear} - Month ${generateDto.monthId}`;
+      }
+
+      const charge = this.chargeRequestRepository.create(chargeData);
       charges.push(charge);
     }
 
+    // Save all charge requests
     return await this.chargeRequestRepository.save(charges);
   }
 
@@ -150,5 +163,31 @@ export class PaymentChargeRequestService {
     }
 
     await this.chargeRequestRepository.save(overdueCharges);
+  }
+
+  async generateChargesForActiveStudents(branchId: number, academicId: number): Promise<PaymentChargeRequest[]> {
+    // Get active students for the branch
+    const activeStudents = await this.studentService.findActiveStudentsByBranch(branchId);
+    
+    // Create charge requests for each student
+    const chargeRequests = activeStudents.map(student => {
+      const charge = this.chargeRequestRepository.create({
+        studentId: student.studentid,
+        studentClassId: student.studentclassid,
+        branchId: student.branchid,
+        academicId: academicId,
+        academicYear: student.academicYear,
+        levelId: student.levelid,
+        levelFee: student.levelfee,
+        dueDate: new Date(), // You might want to set this based on your business logic
+        chargeTypeId: 1, // Default charge type ID, adjust as needed
+        status: ChargeStatus.PENDING,
+        description: `Payment charge for ${student.academicYear}`
+      });
+      return charge;
+    });
+
+    // Save all charge requests
+    return await this.chargeRequestRepository.save(chargeRequests);
   }
 } 

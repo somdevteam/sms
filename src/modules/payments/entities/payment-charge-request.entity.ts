@@ -6,59 +6,76 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToMany
+  OneToMany,
+  BaseEntity
 } from "typeorm";
 import { Student } from "../../studentModule/student/entities/student.entity";
 import { StudentClass } from "../../studentModule/studentclass/entities/studentclass.entity";
 import { Payment } from "./payment.entity";
 import { ChargeStatus } from '../enums/charge-status.enum';
-
-export enum DueCategory {
-  MONTHLY = 'MONTHLY',
-  QUARTERLY = 'QUARTERLY'
-}
+import { ChargeType } from "./charge-type.entity";
 
 @Entity()
-export class PaymentChargeRequest {
+export class PaymentChargeRequest extends BaseEntity {
   @PrimaryGeneratedColumn()
   chargeRequestId: number;
 
-  @ManyToOne(() => Student, { nullable: false })
-  @JoinColumn({ name: "studentid" })
+  @ManyToOne(() => Student, student => student.paymentCharges)
+  @JoinColumn({ name: 'studentId' })
   student: Student;
 
-  @ManyToOne(() => StudentClass, { nullable: false })
-  @JoinColumn({ name: "studentclassid" })
+  @Column()
+  studentId: number;
+
+  @ManyToOne(() => StudentClass, studentClass => studentClass.paymentCharges)
+  @JoinColumn({ name: 'studentClassId' })
   studentClass: StudentClass;
 
-  @Column("decimal", { precision: 10, scale: 2, nullable: false })
-  amount: number;
+  @Column()
+  studentClassId: number;
 
-  @Column({ type: 'date', nullable: false })
+  @Column()
+  branchId: number;
+
+  @Column()
+  academicId: number;
+
+  @Column()
+  academicYear: string;
+
+  @Column()
+  levelId: number;
+
+  @Column()
+  levelFee: number;
+
+  @Column()
   dueDate: Date;
 
-  @Column({
-    type: 'enum',
-    enum: DueCategory,
-    nullable: false
-  })
-  dueCategory: DueCategory;
+  @ManyToOne(() => ChargeType, chargeType => chargeType.charges)
+  @JoinColumn({ name: 'chargeTypeId' })
+  chargeType: ChargeType;
 
-  @Column({
-    type: 'enum',
-    enum: ChargeStatus,
-    default: ChargeStatus.PENDING
-  })
+  @Column()
+  chargeTypeId: number;
+
+  @Column()
   status: ChargeStatus;
 
   @Column({ nullable: true })
   description: string;
 
-  @CreateDateColumn({ nullable: false })
-  dateCreated: Date;
+  @Column()
+  createdBy: number;
 
-  @UpdateDateColumn({ nullable: true })
-  dateUpdated: Date;
+  @Column()
+  loginHistoryId: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @OneToMany(() => Payment, payment => payment.chargeRequest)
   payments: Payment[];

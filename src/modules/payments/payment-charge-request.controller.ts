@@ -3,9 +3,10 @@ import { PaymentChargeRequestService } from './payment-charge-request.service';
 import { CreatePaymentChargeRequestDto, UpdatePaymentChargeRequestDto, PaymentChargeRequestFilterDto, GenerateChargesDto } from './dto/payment-charge-request.dto';
 import { ApiBaseResponse } from '../../common/dto/apiresponses.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GeneratePaymentChargesDto } from './dto/generate-payment-charges.dto';
 
 @Controller('payment-charge-request')
-@UseGuards(JwtAuthGuard)
+//@UseGuards(JwtAuthGuard)
 export class PaymentChargeRequestController {
   constructor(private readonly chargeRequestService: PaymentChargeRequestService) {}
 
@@ -43,8 +44,10 @@ export class PaymentChargeRequestController {
   }
 
   @Post('generate-charges')
-  async generateCharges(@Body() generateDto: GenerateChargesDto): Promise<ApiBaseResponse> {
-    const chargeRequests = await this.chargeRequestService.generateCharges(generateDto);
-    return new ApiBaseResponse('Payment charges generated successfully', 200, chargeRequests);
+  async generateCharges(@Body() generateChargesDto: GenerateChargesDto): Promise<ApiBaseResponse> {
+    const charges = await this.chargeRequestService.generateCharges(
+      generateChargesDto
+    );
+    return new ApiBaseResponse('Payment charges generated successfully', 200, charges);
   }
 } 

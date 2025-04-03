@@ -1,8 +1,10 @@
-import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import {Responsible} from "../../responsible/entities/responsible.entity";
 import {UserEntity} from "../../../user/user.entity";
 import {StudentClass} from "../../studentclass/entities/studentclass.entity";
 import { Payment } from "../../../payments/entities/payment.entity";
+import { Branch } from '../../../branch/branch.entity';
+import { PaymentChargeRequest } from '../../../payments/entities/payment-charge-request.entity';
 
 @Entity()
 export class Student extends BaseEntity {
@@ -33,6 +35,13 @@ export class Student extends BaseEntity {
     @Column({ default: true, nullable: false })
     isActive: boolean;
 
+    // @Column({ nullable: true })
+    // branchId: number;
+
+    @ManyToOne(() => Branch, branch =>branch.student)
+    @JoinColumn({name:'branchId'})
+    branch: Branch;
+
     @ManyToOne(() => Responsible, responsible => responsible.student)
     @JoinColumn({name:'responsibleid'})
     responsible: Responsible;
@@ -42,4 +51,13 @@ export class Student extends BaseEntity {
 
     @OneToMany(()=>Payment,payment =>payment.student)
     payment: Payment;
+
+    @OneToMany(() => PaymentChargeRequest, charge => charge.student)
+    paymentCharges: PaymentChargeRequest[];
+
+    @CreateDateColumn()
+    datecreated: Date;
+
+    @UpdateDateColumn()
+    dateupdated: Date;
 }

@@ -5,6 +5,7 @@ import { Levelclass } from "src/modules/academicModule/levelclass/entities/level
 import { ClassSubject } from "../academicModule/class-subject/entities/class-subject.entity";
 import { ClassSection } from "../academicModule/class-section/entities/class-section.entity";
 import { AcademicBranch } from "../branch-academic/entities/branch-academic.entity";
+import { Student } from "../studentModule/student/entities/student.entity";
 @Entity()
 export class Branch  extends BaseEntity{
   @PrimaryGeneratedColumn()
@@ -30,4 +31,7 @@ export class Branch  extends BaseEntity{
 
   @OneToMany(() => AcademicBranch, (academicBranch) => academicBranch.branch)
   academicBranches: AcademicBranch[];
+
+  @OneToMany(() => Student, student => student.branch)
+  student: Student
 }

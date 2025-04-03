@@ -19,6 +19,7 @@ import { StudentClassService } from '../studentclass/studentclass.service';
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
+import { ActiveStudentDto } from './dto/active-student.dto';
 
 @Injectable()
 export class StudentService {
@@ -251,5 +252,42 @@ export class StudentService {
             .andWhere('academicBranch.academicId = :academicId', { academicId });
 
         return queryBuilder.getCount();
+    }
+
+    async findActiveStudentsByBranch(branchId: number): Promise<ActiveStudentDto[]> {
+        const students = await this.studentRepository
+            .createQueryBuilder('student')
+            .select([
+                'student.studentid',
+                'studentClass.studentClassId as studentclassid',
+                'student.branchId as branchid',
+                'classSection.classId as levelClassid',
+                'levelclass.levelid as levelid',
+                'level.levelFee as levelfee',
+                'academics.academicYear as academicYear',
+                'academic_branch.academicId as academicId'
+            ])
+            .leftJoin('student.studentClass', 'studentClass')
+            .leftJoin('studentClass.classSection', 'classSection')
+            .leftJoin('classSection.class', 'class')
+            .leftJoin('class.levelclass', 'levelclass')
+            .leftJoin('levelclass.level', 'level')
+            .leftJoin('classSection.branchAcademic', 'academic_branch')
+            .leftJoin('academic_branch.academic', 'academics')
+            .where('student.isActive = :isActive', { isActive: true })
+            .andWhere('student.branchId = :branchId', { branchId })
+            .andWhere('academics.isActive = :isActive', { isActive: true })
+            .getRawMany();
+
+        return students.map(student => ({
+            studentid: student.student_studentid,
+            studentclassid: student.studentclassid,
+            branchid: student.branchid,
+            levelClassid: student.levelClassid,
+            levelid: student.levelid,
+            levelfee: student.levelfee,
+            academicYear: student.academicYear,
+            academicId: student.academicId
+        }));
     }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe, Query } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -8,6 +8,7 @@ import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
 import { GetRollNumberDto } from "./dto/getRollNumber.dto";
 import * as util from "util";
 import { createFullName } from "../../../common/enum/sms.enum";
+import { ActiveStudentDto } from './dto/active-student.dto';
 
 @Controller('student')
 export class StudentController {
@@ -210,6 +211,12 @@ export class StudentController {
     console.log("Transformed data:", transformedData);
 
     return new ApiBaseResponse('success', 200, transformedData);
+  }
+
+  @Get('active-by-branch')
+  async findActiveStudentsByBranch(@Query('branchId') branchId: number): Promise<ApiBaseResponse> {
+    const students = await this.studentService.findActiveStudentsByBranch(branchId);
+    return new ApiBaseResponse('Active students retrieved successfully', 200, students);
   }
 
 }

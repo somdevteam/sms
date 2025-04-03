@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber, IsString, IsEnum, IsDateString, IsOptional } from 'class-validator';
-import { DueCategory } from '../entities/payment-charge-request.entity';
 import { ChargeStatus } from '../enums/charge-status.enum';
 
 export class CreatePaymentChargeRequestDto {
@@ -20,12 +19,20 @@ export class CreatePaymentChargeRequestDto {
   dueDate: string;
 
   @IsNotEmpty()
-  @IsEnum(DueCategory)
-  dueCategory: DueCategory;
+  @IsNumber()
+  chargeTypeId: number;
 
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  createdBy: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  loginHistoryId: number;
 }
 
 export class UpdatePaymentChargeRequestDto {
@@ -38,8 +45,8 @@ export class UpdatePaymentChargeRequestDto {
   dueDate?: string;
 
   @IsOptional()
-  @IsEnum(DueCategory)
-  dueCategory?: DueCategory;
+  @IsNumber()
+  chargeTypeId?: number;
 
   @IsOptional()
   @IsEnum(ChargeStatus)
@@ -64,8 +71,8 @@ export class PaymentChargeRequestFilterDto {
   status?: ChargeStatus;
 
   @IsOptional()
-  @IsEnum(DueCategory)
-  dueCategory?: DueCategory;
+  @IsNumber()
+  chargeTypeId?: number;
 
   @IsOptional()
   @IsDateString()
@@ -79,21 +86,21 @@ export class PaymentChargeRequestFilterDto {
 export class GenerateChargesDto {
   @IsNotEmpty()
   @IsNumber()
-  classId: number;
+  branchId: number;
 
   @IsNotEmpty()
   @IsNumber()
-  sectionId: number;
+  chargeTypeId: number;
 
-  @IsNotEmpty()
-  @IsEnum(DueCategory)
-  dueCategory: DueCategory;
-
-  @IsNotEmpty()
-  @IsDateString()
-  dueDate: string;
+  @IsOptional()
+  @IsNumber()
+  monthId?: number;
 
   @IsNotEmpty()
   @IsNumber()
-  amount: number;
+  createdBy: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  loginHistoryId: number;
 } 
