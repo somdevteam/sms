@@ -5,12 +5,14 @@ export enum UserPermissions {
     VIEW_USER = 'viewUsers',
     VIEW_FEES = 'userCanViewFees',
     ADD_FEES ='userCanAddFees',
+    viewPaymentChargeRequest='userCanViewPaymentCharge',
 }
 
 export enum FeesPermissions {
     VIEW_USER = 'viewUsers',
     VIEW_FEES = 'userCanViewFees',
     ADD_FEES ='userCanAddFees',
+    viewPaymentChargeRequest='userCanViewPaymentCharge',
 }
 export enum Month {
     'jan' = 1,

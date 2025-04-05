@@ -89,18 +89,17 @@ export class GenerateChargesDto {
   branchId: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  chargeTypeId: number;
+  chargeTypeCode: string;
 
   @IsOptional()
   @IsNumber()
   monthId?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   createdBy: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   loginHistoryId: number;
 } 

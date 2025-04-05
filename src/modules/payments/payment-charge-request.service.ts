@@ -7,23 +7,31 @@ import { StudentClassService } from '../studentModule/studentclass/studentclass.
 import { StudentService } from '../studentModule/student/student.service';
 import { StudentsByClassSectionDto } from "../studentModule/student/dto/class-section.dto";
 import { ChargeStatus } from './enums/charge-status.enum';
+import { ChargeType } from './entities/charge-type.entity';
+import { PaymentChargeResponseDto } from './dto/payment-charge-response.dto';
+import { createFullName } from "../../common/enum/sms.enum";
+import { Months } from "../../common/months.entity";
 
 @Injectable()
 export class PaymentChargeRequestService {
   constructor(
     @InjectRepository(PaymentChargeRequest)
     private chargeRequestRepository: Repository<PaymentChargeRequest>,
+    @InjectRepository(ChargeType)
+    private chargeTypeRepository: Repository<ChargeType>,
     private readonly studentClassService: StudentClassService,
     private readonly studentService: StudentService,
+    @InjectRepository(Months)
+    private monthsRepository: Repository<Months>,
   ) {}
 
-  async create(createDto: CreatePaymentChargeRequestDto): Promise<PaymentChargeRequest> {
-    const student = await this.studentService.findOne(createDto.studentId);
+  async create(createDto: PaymentChargeRequestFilterDto): Promise<PaymentChargeRequest> {
+    const student = await this.studentService.findOne(1);
     if (!student) {
       throw new NotFoundException('Student not found');
     }
 
-    const studentClass = await this.studentClassService.findOne(createDto.studentClassId);
+    const studentClass = await this.studentClassService.findOne(1);
     if (!studentClass) {
       throw new NotFoundException('Student class not found');
     }
@@ -38,13 +46,14 @@ export class PaymentChargeRequestService {
     return await this.chargeRequestRepository.save(charge);
   }
 
-  async findAll(filterDto?: PaymentChargeRequestFilterDto): Promise<PaymentChargeRequest[]> {
+  async findAll(filterDto?: PaymentChargeRequestFilterDto): Promise<PaymentChargeResponseDto[]> {
     const queryBuilder = this.chargeRequestRepository.createQueryBuilder('charge')
       .leftJoinAndSelect('charge.student', 'student')
       .leftJoinAndSelect('charge.studentClass', 'studentClass')
       .leftJoinAndSelect('studentClass.classSection', 'classSection')
       .leftJoinAndSelect('classSection.class', 'class')
-      .leftJoinAndSelect('classSection.section', 'section');
+      .leftJoinAndSelect('classSection.section', 'section')
+      .leftJoinAndSelect('charge.chargeType', 'chargeType');
 
     if (filterDto) {
       if (filterDto.classId) {
@@ -72,7 +81,26 @@ export class PaymentChargeRequestService {
       }
     }
 
-    return await queryBuilder.getMany();
+    const results = await queryBuilder.getMany();
+
+    return results.map(charge => ({
+      chargeRequestId: charge.chargeRequestId,
+      chargeType: {
+        chargeTypeId: charge.chargeType.chargeTypeId,
+        name: charge.chargeType.name,
+        description: charge.chargeType.description
+      },
+      studentFullName: createFullName(charge.student.firstname,charge.student.middlename,charge.student.lastname),
+      dueDate: charge.dueDate,
+      dateCreated: charge.createdAt,
+      academicYear: charge.academicYear,
+      status: charge.status,
+      levelFee: charge.levelFee,
+      className: charge.studentClass.classSection.class.classname,
+      sectionName: charge.studentClass.classSection.section.sectionname,
+      studentId: charge.studentId,
+      rollNumber: charge.student.rollNumber
+    }));
   }
 
   async findOne(chargeRequestId: number): Promise<PaymentChargeRequest> {
@@ -108,47 +136,70 @@ export class PaymentChargeRequestService {
     return await this.chargeRequestRepository.save(charge);
   }
 
+
   async generateCharges(generateDto: GenerateChargesDto): Promise<PaymentChargeRequest[]> {
-    // Get active students for the branch
     const activeStudents = await this.studentService.findActiveStudentsByBranch(generateDto.branchId);
-    
+
     if (!activeStudents || activeStudents.length === 0) {
       throw new NotFoundException('No active students found in the specified branch');
     }
 
     const charges: PaymentChargeRequest[] = [];
 
-    // Create charge requests for each student
-    for (const student of activeStudents) {
-      const chargeData = {
-        studentId: student.studentid,
-        studentClassId: student.studentclassid,
-        branchId: student.branchid,
-        academicId: student.academicId,
-        academicYear: student.academicYear,
-        levelId: student.levelid,
-        levelFee: student.levelfee,
-        dueDate: new Date(), // You might want to set this based on your business logic
-        chargeTypeId: generateDto.chargeTypeId,
-        status: ChargeStatus.PENDING,
-        description: `Payment charge for ${student.academicYear}`,
-        createdBy: generateDto.createdBy,
-        loginHistoryId: generateDto.loginHistoryId
-      };
+    const quarterMonthsMap = {
+      Q1: [1, 2, 3],
+      Q2: [4, 5, 6],
+      Q3: [7, 8, 9],
+      Q4: [10, 11, 12]
+    };
 
-      // If it's a monthly charge and monthId is provided, add month-specific logic
-      if (generateDto.monthId) {
-        // Add any month-specific logic here
-        chargeData.description = `Monthly payment charge for ${student.academicYear} - Month ${generateDto.monthId}`;
+    let monthsToCharge: number[] = [];
+
+    if (generateDto.chargeTypeCode === 'monthly') {
+      if (!generateDto.monthId) {
+        throw new BadRequestException('Month ID is required for monthly charges.');
       }
-
-      const charge = this.chargeRequestRepository.create(chargeData);
-      charges.push(charge);
+      monthsToCharge = [generateDto.monthId];
+    } else if (quarterMonthsMap[generateDto.chargeTypeCode]) {
+      monthsToCharge = quarterMonthsMap[generateDto.chargeTypeCode];
+    } else {
+      throw new BadRequestException('Invalid charge type code.');
     }
 
-    // Save all charge requests
+    const allMonths = await this.monthsRepository.find(); // [{ id: 1, name: 'January' }, ...]
+
+    for (const student of activeStudents) {
+      for (const month of monthsToCharge) {
+        const monthName = allMonths.find(m => m.monthid === month)?.monthname || `Month ${month}`;
+
+        const dueDate = new Date();
+        dueDate.setMonth(month - 1);
+
+        const chargeData = {
+          studentId: student.studentid,
+          studentClassId: student.studentclassid,
+          branchId: student.branchid,
+          academicId: student.academicId,
+          academicYear: student.academicYear,
+          levelId: student.levelid,
+          levelFee: student.levelfee,
+          dueDate,
+          chargeTypeCode: generateDto.chargeTypeCode,
+          status: ChargeStatus.PENDING,
+          description: `Charge for ${monthName} - ${student.academicYear}`,
+          createdBy: generateDto.createdBy,
+          loginHistoryId: generateDto.loginHistoryId,
+          month: monthName
+        };
+
+        const charge = this.chargeRequestRepository.create(chargeData);
+        charges.push(charge);
+      }
+    }
+
     return await this.chargeRequestRepository.save(charges);
   }
+
 
   async checkOverdueCharges(): Promise<void> {
     const today = new Date();
@@ -165,29 +216,47 @@ export class PaymentChargeRequestService {
     await this.chargeRequestRepository.save(overdueCharges);
   }
 
-  async generateChargesForActiveStudents(branchId: number, academicId: number): Promise<PaymentChargeRequest[]> {
-    // Get active students for the branch
-    const activeStudents = await this.studentService.findActiveStudentsByBranch(branchId);
-    
-    // Create charge requests for each student
-    const chargeRequests = activeStudents.map(student => {
-      const charge = this.chargeRequestRepository.create({
-        studentId: student.studentid,
-        studentClassId: student.studentclassid,
-        branchId: student.branchid,
-        academicId: academicId,
-        academicYear: student.academicYear,
-        levelId: student.levelid,
-        levelFee: student.levelfee,
-        dueDate: new Date(), // You might want to set this based on your business logic
-        chargeTypeId: 1, // Default charge type ID, adjust as needed
-        status: ChargeStatus.PENDING,
-        description: `Payment charge for ${student.academicYear}`
-      });
-      return charge;
-    });
+  // async generateChargesForActiveStudents(branchId: number, academicId: number): Promise<PaymentChargeRequest[]> {
+  //   // Get active students for the branch
+  //   const activeStudents = await this.studentService.findActiveStudentsByBranch(branchId);
+  //
+  //   // Create charge requests for each student
+  //   const chargeRequests = activeStudents.map(student => {
+  //     const charge = this.chargeRequestRepository.create({
+  //       studentId: student.studentid,
+  //       studentClassId: student.studentclassid,
+  //       branchId: student.branchid,
+  //       academicId: academicId,
+  //       academicYear: student.academicYear,
+  //       levelId: student.levelid,
+  //       levelFee: student.levelfee,
+  //       dueDate: new Date(), // You might want to set this based on your business logic
+  //       chargeTypeId: 1, // Default charge type ID, adjust as needed
+  //       status: ChargeStatus.PENDING,
+  //       description: `Payment charge for ${student.academicYear}`
+  //     });
+  //     return charge;
+  //   });
+  //
+  //   // Save all charge requests
+  //   return await this.chargeRequestRepository.save(chargeRequests);
+  // }
 
-    // Save all charge requests
-    return await this.chargeRequestRepository.save(chargeRequests);
+  async findAllChargeTypes(): Promise<ChargeType[]> {
+    return await this.chargeTypeRepository.find({
+      where: { isActive: true }
+    });
+  }
+
+  async findChargeTypeById(id: number): Promise<ChargeType> {
+    const chargeType = await this.chargeTypeRepository.findOne({
+      where: { chargeTypeId: id, isActive: true }
+    });
+    
+    if (!chargeType) {
+      throw new NotFoundException('Charge type not found');
+    }
+    
+    return chargeType;
   }
 } 

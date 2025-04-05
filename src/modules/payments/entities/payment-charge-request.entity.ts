@@ -53,11 +53,14 @@ export class PaymentChargeRequest extends BaseEntity {
   dueDate: Date;
 
   @ManyToOne(() => ChargeType, chargeType => chargeType.charges)
-  @JoinColumn({ name: 'chargeTypeId' })
+  @JoinColumn({ name: 'chargeTypeCode' })
   chargeType: ChargeType;
 
   @Column()
-  chargeTypeId: number;
+  chargeTypeCode: string;
+
+  @Column()
+  chargedMonth: string;
 
   @Column()
   status: ChargeStatus;

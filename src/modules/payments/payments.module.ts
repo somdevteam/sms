@@ -15,6 +15,7 @@ import { PaymentChargeRequestService } from './payment-charge-request.service';
 import { PaymentChargeRequestController } from './payment-charge-request.controller';
 import { Student } from '../studentModule/student/entities/student.entity';
 import { StudentClass } from '../studentModule/studentclass/entities/studentclass.entity';
+import { ChargeType } from './entities/charge-type.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StudentClass } from '../studentModule/studentclass/entities/studentclas
       PaymentChargeRequest,
       Student,
       StudentClass,
+      ChargeType,
     ]),
     StudentclassModule,
     StudentModule,

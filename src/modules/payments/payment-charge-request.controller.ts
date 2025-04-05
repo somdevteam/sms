@@ -8,7 +8,9 @@ import { GeneratePaymentChargesDto } from './dto/generate-payment-charges.dto';
 @Controller('payment-charge-request')
 //@UseGuards(JwtAuthGuard)
 export class PaymentChargeRequestController {
-  constructor(private readonly chargeRequestService: PaymentChargeRequestService) {}
+  constructor(
+    private readonly chargeRequestService: PaymentChargeRequestService,
+  ) {}
 
   @Post()
   async create(@Body() createDto: CreatePaymentChargeRequestDto): Promise<ApiBaseResponse> {
@@ -16,8 +18,8 @@ export class PaymentChargeRequestController {
     return new ApiBaseResponse('Payment charge request created successfully', 200, chargeRequest);
   }
 
-  @Get()
-  async findAll(@Query() filterDto: PaymentChargeRequestFilterDto): Promise<ApiBaseResponse> {
+  @Post('filter')
+  async findAll(@Body() filterDto: PaymentChargeRequestFilterDto): Promise<ApiBaseResponse> {
     const chargeRequests = await this.chargeRequestService.findAll(filterDto);
     return new ApiBaseResponse('Payment charge requests retrieved successfully', 200, chargeRequests);
   }
@@ -49,5 +51,17 @@ export class PaymentChargeRequestController {
       generateChargesDto
     );
     return new ApiBaseResponse('Payment charges generated successfully', 200, charges);
+  }
+
+  @Get('charge-types')
+  async getChargeTypes(): Promise<ApiBaseResponse> {
+    const chargeTypes = await this.chargeRequestService.findAllChargeTypes();
+    return new ApiBaseResponse('Charge types retrieved successfully', 200, chargeTypes);
+  }
+
+  @Get('charge-types/:id')
+  async getChargeType(@Param('id') id: string): Promise<ApiBaseResponse> {
+    const chargeType = await this.chargeRequestService.findChargeTypeById(+id);
+    return new ApiBaseResponse('Charge type retrieved successfully', 200, chargeType);
   }
 } 

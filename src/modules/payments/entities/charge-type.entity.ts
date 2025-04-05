@@ -10,6 +10,9 @@ export class ChargeType extends BaseEntity {
     name: string;
 
     @Column()
+    chargeTypeCode: string;
+
+    @Column()
     description: string;
 
     @Column({ default: true })
