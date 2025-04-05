@@ -8,9 +8,9 @@ import {
   UpdateDateColumn
 } from "typeorm";
 import { Paymenttypes } from "./paymenttype.entity";
-import { StudentClass } from "../../studentModule/studentclass/entities/studentclass.entity";
 import { Months } from "../../../common/months.entity";
 import { PaymentStates } from "./paymentstates.entity";
+import { StudentClass } from "src/modules/studentModule/student/entities/student-class.entity";
 
 @Entity()
 export class Payment {

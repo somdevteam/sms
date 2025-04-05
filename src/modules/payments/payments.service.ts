@@ -10,12 +10,10 @@ import { UpdatePaymentDto } from "./dto/update-payment.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Payment } from "./entities/payment.entity";
 import { Repository } from "typeorm";
-import { Branch } from "../branch/branch.entity";
 import { Paymenttypes } from "./entities/paymenttype.entity";
-import { ClassSectionService } from "../academicModule/class-section/class-section.service";
-import { StudentClassService } from "../studentModule/studentclass/studentclass.service";
 import { PaymentStates } from "./entities/paymentstates.entity";
 import { Months } from "../../common/months.entity";
+import { StudentClass } from "../studentModule/student/entities/student-class.entity";
 
 @Injectable()
 export class PaymentsService {
@@ -24,7 +22,7 @@ export class PaymentsService {
     @InjectRepository(Paymenttypes) private paymentTypesRepository: Repository<Paymenttypes>,
     @InjectRepository(PaymentStates) private paymentStateRepository: Repository<PaymentStates>,
     @InjectRepository(Months) private monthsRepository: Repository<Months>,
-    private readonly studentClassService: StudentClassService,
+    @InjectRepository(StudentClass) private studentClassRepository: Repository<StudentClass>,
   ) {
   }
 
@@ -78,7 +76,7 @@ export class PaymentsService {
   async create(payload: CreatePaymentDto) {
     const feeTypeId = await this.paymentTypesRepository.findOne({ where: { paymenttypeid: payload.paymentTypeId } });
     const feeStateId = await this.paymentStateRepository.findOne({ where: { paymentstateid: payload.paymentStateId } });
-    const studentClass = await this.studentClassService.findOne(payload.studentClassId);
+    const studentClass = await this.studentClassRepository.findOne({ where: { studentClassId: payload.studentClassId } });
 
     if (!feeTypeId || !feeStateId || !studentClass) {
       throw new ConflictException('Invalid references provided.');

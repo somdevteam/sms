@@ -1,19 +1,10 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    BaseEntity,
-    ManyToOne,
-    JoinColumn,
-    OneToMany
-} from "typeorm";
-import {Student} from "../../student/entities/student.entity";
-import {ClassSection} from "../../../academicModule/class-section/entities/class-section.entity";
-import {Class} from "../../../academicModule/class/entities/class.entity";
-import { Payment } from "../../../payments/entities/payment.entity";
-import { StudentExamMarks } from "src/modules/exam-module/student-exam-marks/entities/student-exam-marks.entity";
+import { ClassSection } from "src/modules/academicModule/class-section/entities/class-section.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
+import { BaseEntity } from "typeorm";
+import { Student } from "./student.entity";
+import { Payment } from "src/modules/payments/entities/payment.entity";
+import { StudentExamMarks } from "src/modules/exam-module/student-exam-marks/entities/student-exam-marks.entity";
 @Entity()
 export class StudentClass extends BaseEntity{
     @PrimaryGeneratedColumn()

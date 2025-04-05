@@ -2,12 +2,12 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { StudentExamMarks } from './entities/student-exam-marks.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StudentClass } from 'src/modules/studentModule/studentclass/entities/studentclass.entity';
 import { ExamsInfo } from '../exams/entities/exam-info.entity';
 import { Subject } from 'src/modules/academicModule/subject/entities/subject.entity';
 import { Student } from 'src/modules/studentModule/student/entities/student.entity';
 import { ExamResultDto } from './dto/exam-result.dto';
 import { AcademicBranch } from 'src/modules/branch-academic/entities/branch-academic.entity';
+import { StudentClass } from 'src/modules/studentModule/student/entities/student-class.entity';
 
 
 @Injectable()

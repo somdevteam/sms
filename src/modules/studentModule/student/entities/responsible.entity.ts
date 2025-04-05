@@ -6,10 +6,13 @@ import {Student} from "../../student/entities/student.entity";
 export class Responsible extends  BaseEntity {
     @PrimaryGeneratedColumn()
     responsibleid: number;
+
     @Column()
     responsiblename: string;
+
     @Column()
     phone: string;
+    
     @OneToMany(() => Student, student => student.responsible)
     student: Student[];
 

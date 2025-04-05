@@ -1,4 +1,4 @@
-import { StudentClass } from "src/modules/studentModule/studentclass/entities/studentclass.entity";
+import { StudentClass } from "src/modules/studentModule/student/entities/student-class.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ExamsInfo } from "../../exams/entities/exam-info.entity";
 import { Subject } from "src/modules/academicModule/subject/entities/subject.entity";

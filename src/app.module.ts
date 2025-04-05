@@ -15,8 +15,6 @@ import { ClassSubjectModule } from './modules/academicModule/class-subject/class
 import { ClassSectionModule } from './modules/academicModule/class-section/class-section.module';
 import { SectionModule } from './modules/academicModule/section/section.module';
 import { StudentModule } from "./modules/studentModule/student/student.module";
-import { ResponsibleModule } from "./modules/studentModule/responsible/responsible.module";
-import { StudentclassModule } from "./modules/studentModule/studentclass/studentclass.module";
 import { MenusModule } from "./modules/menus/menus.module";
 import { TabsModule } from "./modules/tabs/tabs.module";
 import { PermissionsModule } from './modules/permissions/permissions.module';
@@ -38,7 +36,6 @@ import { AppDataSource } from './db/data-source';
     UserModule, AuthModule, BranchModule,
     ClassModule, SubjectModule, LevelModule, LevelclassModule, AcademicModule, 
     ClassSubjectModule, SectionModule, ClassSectionModule, StudentModule, 
-    ResponsibleModule, StudentclassModule,
     MenusModule, TabsModule, PermissionsModule, TabPermissions,
     RolesModule, UserTypesModule, UserTypePermissions, TabPermissionsModule,
     UserRolesModule, RolePermissionsModule,

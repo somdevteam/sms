@@ -3,7 +3,7 @@ import { Branch } from "src/modules/branch/branch.entity";
 import { Class } from "src/modules/academicModule/class/entities/class.entity";
 import { Section } from "src/modules/academicModule/section/entities/section.entity";
 import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {StudentClass} from "../../../studentModule/studentclass/entities/studentclass.entity";
+import { StudentClass } from "src/modules/studentModule/student/entities/student-class.entity";
 import { AcademicBranch } from "src/modules/branch-academic/entities/branch-academic.entity";
 
 @Entity()

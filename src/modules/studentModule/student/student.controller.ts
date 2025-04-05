@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe, Query } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -43,11 +43,6 @@ export class StudentController {
     return new ApiBaseResponse('successfully uppdated', 200 , updateStudentInfo);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.studentService.remove(+id);
-  }
-
   @Get('count/:branchId/:academicId')
   async getStudentCountByBranchAndAcademic(
     @Param('branchId', ParseIntPipe) branchId: number,
@@ -65,6 +60,20 @@ export class StudentController {
     let studentData = await this.studentService.findByRollNumber(req.body.rollNumber);
     console.log(studentData);
     return new ApiBaseResponse('success', 200, studentData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('responsibles')
+  async searchResponsible(@Query('search') filter: string): Promise<ApiBaseResponse>{
+    const data = await this.studentService.searchResponsible(filter);
+    return new ApiBaseResponse('success', 200, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('studentTypes')
+  async getStudentTypes(): Promise<ApiBaseResponse>{
+    const data = await this.studentService.getStudentTypes();
+    return new ApiBaseResponse('success', 200, data);
   }
 
 }
