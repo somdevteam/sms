@@ -58,10 +58,12 @@ export class StudentService {
                 phone: responsiblePhone,
             }));
         }
+
+        const studentType = await this.studentTypeRepository.findOneBy({id: studentTypeId});
         
         const student = this.studentRepository.create({
             firstName, middleName, lastName, rollNumber, sex: gender, dob: payload.dateOfBirth, bob: pob, responsible,
-            studentType: {id: studentTypeId}
+            studentType
         });
 
         const savedStudent = await this.studentRepository.save(student);
@@ -134,9 +136,9 @@ export class StudentService {
         .leftJoin('s.responsible', 'rp')
         .select([
             's.studentId AS studentId',
-            's.firstName',
-            's.middleName',
-            's.lastName',
+            's.firstName AS firstName',
+            's.middleName AS middleName',
+            's.lastName AS lastName',
             'c.classname as className',
             'sec.sectionname as sectionName',
             's.responsibleId AS responsibleId',

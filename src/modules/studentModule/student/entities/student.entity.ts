@@ -35,7 +35,7 @@ export class Student extends BaseEntity {
     @JoinColumn({name:'responsibleid'})
     responsible: Responsible
 
-    @ManyToOne(() => StudentType, studentType => studentType.students)
+    @ManyToOne(() => StudentType, studentType => studentType.students, {nullable: true})
     @JoinColumn({name: 'studentTypeId'})
     studentType: StudentType;
 

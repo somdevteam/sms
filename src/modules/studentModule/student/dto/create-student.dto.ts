@@ -32,7 +32,7 @@ export class CreateStudentDto {
     @IsString()
     pob:string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     studentTypeId: number;
 

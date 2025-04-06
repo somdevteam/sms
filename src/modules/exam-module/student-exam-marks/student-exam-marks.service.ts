@@ -66,7 +66,7 @@ export class StudentExamMarksService {
       .leftJoinAndSelect('studentExamMarks.subject', 'subject')
       .select([
         'std.studentid AS studentId',
-        'std.firstname AS firstName',
+        'std.firstName AS firstName',
         'std.middlename AS middleName',
         'std.lastname AS lastName',
         subjectConditions,
@@ -136,9 +136,9 @@ export class StudentExamMarksService {
       .leftJoinAndSelect('studentExamMarks.subject', 'subject')
       .select([
         'stdClass.studentClassId AS studentClassId',
-        'std.firstName',
-        'std.middleName',
-        'std.lastName',
+        'std.firstName AS firstName',
+        'std.middleName AS middleName',
+        'std.lastName AS lastName',
         'GROUP_CONCAT(studentExamMarks.id) AS studentExamMarksIds',
         'GROUP_CONCAT(studentExamMarks.subject_id) AS studentExamMarksSubjectIds',
          subjectConditions,
