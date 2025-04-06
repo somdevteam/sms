@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     ConflictException,
     Inject,
     Injectable,
@@ -48,15 +49,27 @@ export class StudentService {
             throw new ConflictException('Student with this roll number already exists');
         }
 
-        let responsible: Responsible | null;
+        let responsible: Responsible | null = null;
 
         if (responsibleType === 'existing' && responsibleId) {
             responsible = await this.responsibleRepository.findOneBy({ responsibleid: responsibleId });
-        } else if (responsibleType === 'new' && responsibleName && responsiblePhone) {
-            responsible = await this.responsibleRepository.save(this.responsibleRepository.create({
-                responsiblename: responsibleName,
-                phone: responsiblePhone,
-            }));
+        } else if (responsibleType === 'new') {
+
+            if ((responsibleName && !responsiblePhone) || (!responsibleName && responsiblePhone)) {
+                throw new BadRequestException('Both responsible name and phone must be provided or both must be empty.');
+            }
+
+            const existingResponsible = await this.responsibleRepository.findOneBy({ phone: responsiblePhone });
+            if (existingResponsible) {
+                throw new BadRequestException('The phone number you provided already exists. ');
+            }
+            
+            if (responsibleName && responsiblePhone) {
+                responsible = await this.responsibleRepository.save(this.responsibleRepository.create({
+                    responsiblename: responsibleName,
+                    phone: responsiblePhone,
+                }));
+            }
         }
 
         const studentType = await this.studentTypeRepository.findOneBy({id: studentTypeId});
