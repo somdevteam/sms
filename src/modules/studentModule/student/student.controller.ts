@@ -63,9 +63,9 @@ export class StudentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('responsibles')
-  async searchResponsible(@Query('search') filter: string): Promise<ApiBaseResponse>{
-    const data = await this.studentService.searchResponsible(filter);
+  @Get('guardians')
+  async searchGuardian(@Query('search') filter: string): Promise<ApiBaseResponse>{
+    const data = await this.studentService.searchGuardian(filter);
     return new ApiBaseResponse('success', 200, data);
   }
 

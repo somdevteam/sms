@@ -3,17 +3,17 @@ import {Student} from "../../student/entities/student.entity";
 
 @Entity()
 
-export class Responsible extends  BaseEntity {
+export class Guardian extends  BaseEntity {
     @PrimaryGeneratedColumn()
-    responsibleid: number;
+    guardianId: number;
 
     @Column()
-    responsiblename: string;
+    guardianName: string;
 
     @Column()
     phone: string;
     
-    @OneToMany(() => Student, student => student.responsible)
+    @OneToMany(() => Student, student => student.guardian)
     student: Student[];
 
 }

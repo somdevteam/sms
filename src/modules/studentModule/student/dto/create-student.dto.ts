@@ -42,19 +42,19 @@ export class CreateStudentDto {
 
     @IsNotEmpty()
     @IsString()
-    responsibleType: string;
+    guardianType: string;
 
     @IsOptional()
     @IsNumber()
-    responsibleId: number;
+    guardianId: number;
 
     @IsOptional()
     @IsString()
-    responsibleName: string;
+    guardianName: string;
 
     @IsOptional()
     @IsString()
-    responsiblePhone:string;
+    guardianPhone:string;
 
     @IsNotEmpty()
     @IsNumber()
@@ -67,10 +67,6 @@ export class CreateStudentDto {
     @IsNotEmpty()
     @IsNumber()
     branchId:number
-
-    @IsOptional()
-    @IsString()
-    guardianType: string;
 
 
 

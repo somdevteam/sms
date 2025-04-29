@@ -29,7 +29,7 @@ export class UpdateStudentDto {
 
     @IsNotEmpty()
     @IsNumber()
-    responsibleId:number;
+    guardianId:number;
 
 
 }

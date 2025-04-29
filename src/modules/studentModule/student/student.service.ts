@@ -16,9 +16,9 @@ import { ClassSectionService } from '../../academicModule/class-section/class-se
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
-import { Responsible } from './entities/responsible.entity';
 import { StudentClass } from './entities/student-class.entity';
 import { StudentType } from './entities/student_type.entity';
+import { Guardian } from './entities/guardian.entity';
 
 @Injectable()
 export class StudentService {
@@ -26,14 +26,14 @@ export class StudentService {
         @InjectRepository(Student) private studentRepository: Repository<Student>,
         private readonly classSectionService: ClassSectionService,
         private readonly academicBranchService: BranchAcademicService,
-        @InjectRepository(Responsible) private responsibleRepository: Repository<Responsible>,
+        @InjectRepository(Guardian) private guardianRepository: Repository<Guardian>,
         @InjectRepository(StudentClass) private studentClassRepository: Repository<StudentClass>,
         @InjectRepository(StudentType) private studentTypeRepository: Repository<StudentType>,
     ) {}
 
     async create(payload: CreateStudentDto, currentUser: CurrentUser): Promise<Student | null> {
-        const { firstName, middleName, lastName, rollNumber, gender, pob, responsibleType, 
-                responsibleId, responsibleName, responsiblePhone, classId, sectionId ,studentTypeId} = payload;
+        const { firstName, middleName, lastName, rollNumber, gender, pob, guardianType, 
+                guardianId, guardianName, guardianPhone, classId, sectionId ,studentTypeId} = payload;
 
         if (!payload.branchId) {
             throw new NotFoundException('Branch ID is required');
@@ -49,25 +49,25 @@ export class StudentService {
             throw new ConflictException('Student with this roll number already exists');
         }
 
-        let responsible: Responsible | null = null;
+        let guardian: Guardian | null = null;
 
-        if (responsibleType === 'existing' && responsibleId) {
-            responsible = await this.responsibleRepository.findOneBy({ responsibleid: responsibleId });
-        } else if (responsibleType === 'new') {
+        if (guardianType === 'existing' && guardianId) {
+            guardian = await this.guardianRepository.findOneBy({ guardianId: guardianId });
+        } else if (guardianType === 'new') {
 
-            if ((responsibleName && !responsiblePhone) || (!responsibleName && responsiblePhone)) {
-                throw new BadRequestException('Both responsible name and phone must be provided or both must be empty.');
+            if ((guardianName && !guardianPhone) || (!guardianName && guardianPhone)) {
+                throw new BadRequestException('Both guardian name and phone must be provided or both must be empty.');
             }
 
-            const existingResponsible = await this.responsibleRepository.findOneBy({ phone: responsiblePhone });
-            if (existingResponsible) {
+            const existingGuardian = await this.guardianRepository.findOneBy({ phone: guardianPhone });
+            if (existingGuardian) {
                 throw new BadRequestException('The phone number you provided already exists. ');
             }
             
-            if (responsibleName && responsiblePhone) {
-                responsible = await this.responsibleRepository.save(this.responsibleRepository.create({
-                    responsiblename: responsibleName,
-                    phone: responsiblePhone,
+            if (guardianName && guardianPhone) {
+                guardian = await this.guardianRepository.save(this.guardianRepository.create({
+                    guardianName: guardianName,
+                    phone: guardianPhone,
                 }));
             }
         }
@@ -75,7 +75,7 @@ export class StudentService {
         const studentType = await this.studentTypeRepository.findOneBy({id: studentTypeId});
         
         const student = this.studentRepository.create({
-            firstName, middleName, lastName, rollNumber, sex: gender, dob: payload.dateOfBirth, bob: pob, responsible,
+            firstName, middleName, lastName, rollNumber, sex: gender, dob: payload.dateOfBirth, bob: pob, guardian,
             studentType
         });
 
@@ -113,9 +113,9 @@ export class StudentService {
             throw new NotFoundException('Student not found');
         }
 
-        const responsible = await this.responsibleRepository.findOneBy({responsibleid: payload.responsibleId});
-        if (!responsible) {
-            throw new NotFoundException('The responsible you selected does not exist');
+        const guardian = await this.guardianRepository.findOneBy({guardianId: payload.guardianId});
+        if (!guardian) {
+            throw new NotFoundException('The guardian you selected does not exist');
         }
 
         try {
@@ -123,7 +123,7 @@ export class StudentService {
             studentToUpdate.middleName = payload.middleName;
             studentToUpdate.lastName = payload.lastName;
             studentToUpdate.bob = payload.pob;
-            studentToUpdate.responsible = responsible;
+            studentToUpdate.guardian = guardian;
 
             await this.studentRepository.update(studentToUpdate.studentId, studentToUpdate);
             return 'Update successful';
@@ -189,8 +189,8 @@ export class StudentService {
         return queryBuilder.getCount();
     }
 
-    async searchResponsible(filter: string){
-        return await this.responsibleRepository.find({
+    async searchGuardian(filter: string){
+        return await this.guardianRepository.find({
             where:{
                 phone: Like(`%${filter}%`)
             }

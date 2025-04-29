@@ -1,7 +1,7 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
-import { Responsible } from "./responsible.entity";
 import { StudentClass } from "./student-class.entity";
 import { StudentType } from "./student_type.entity";
+import { Guardian } from "./guardian.entity";
 
 @Entity()
 
@@ -31,9 +31,9 @@ export class Student extends BaseEntity {
     @Column()
     bob: string;
 
-    @ManyToOne(() => Responsible, responsible => responsible.student)
-    @JoinColumn({name:'responsibleid'})
-    responsible: Responsible
+    @ManyToOne(() => Guardian, guardian => guardian.student)
+    @JoinColumn({name:'guardianId'})
+    guardian: Guardian
 
     @ManyToOne(() => StudentType, studentType => studentType.students, {nullable: true})
     @JoinColumn({name: 'studentTypeId'})
