@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsNumber, IsString, IsEnum, IsDateString, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsEnum,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
 import { ChargeStatus } from '../enums/charge-status.enum';
 
 export class CreatePaymentChargeRequestDto {
@@ -81,6 +88,10 @@ export class PaymentChargeRequestFilterDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+  @IsOptional()
+  page: number;
+  @IsOptional()
+  limit: number;
 }
 
 export class GenerateChargesDto {
@@ -102,4 +113,4 @@ export class GenerateChargesDto {
   @IsOptional()
   @IsNumber()
   loginHistoryId: number;
-} 
+}

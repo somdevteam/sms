@@ -1,10 +1,6 @@
 export class PaymentChargeResponseDto {
   chargeRequestId: number;
-  chargeType: {
-    chargeTypeId: number;
-    name: string;
-    description: string;
-  };
+  chargeType: string;
   studentFullName: string;
   dueDate: Date;
   dateCreated: Date;

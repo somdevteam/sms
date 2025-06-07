@@ -21,7 +21,7 @@ export class PaymentChargeRequestController {
   @Post('filter')
   async findAll(@Body() filterDto: PaymentChargeRequestFilterDto): Promise<ApiBaseResponse> {
     const chargeRequests = await this.chargeRequestService.findAll(filterDto);
-    return new ApiBaseResponse('Payment charge requests retrieved successfully', 200, chargeRequests);
+    return new ApiBaseResponse('Payment charge requests retrieved successfully', 200, chargeRequests.data);
   }
 
   @Get(':id')
