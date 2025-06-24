@@ -7,15 +7,15 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   BeforeInsert,
-  BeforeUpdate
-} from "typeorm";
-import { Paymenttypes } from "./paymenttype.entity";
-import { StudentClass } from "../../studentModule/studentclass/entities/studentclass.entity";
-import { Months } from "../../../common/months.entity";
-import { PaymentStates } from "./paymentstates.entity";
-import { Responsible } from "../../studentModule/responsible/entities/responsible.entity";
-import { Student } from "../../studentModule/student/entities/student.entity";
-import { PaymentChargeRequest } from "./payment-charge-request.entity";
+  BeforeUpdate,
+} from 'typeorm';
+import { Paymenttypes } from './paymenttype.entity';
+import { StudentClass } from '../../studentModule/studentclass/entities/studentclass.entity';
+import { Months } from '../../../common/months.entity';
+import { PaymentStates } from './paymentstates.entity';
+import { Responsible } from '../../studentModule/responsible/entities/responsible.entity';
+import { Student } from '../../studentModule/student/entities/student.entity';
+import { PaymentChargeRequest } from './payment-charge-request.entity';
 
 @Entity()
 export class Payment {
@@ -23,29 +23,32 @@ export class Payment {
   studentfeeid: number;
 
   @ManyToOne(() => Student, { nullable: true })
-  @JoinColumn({ name: "studentid" })
+  @JoinColumn({ name: 'studentid' })
   student: Student;
 
   @ManyToOne(() => StudentClass, { nullable: false })
-  @JoinColumn({ name: "studentclassid" })
+  @JoinColumn({ name: 'studentclassid' })
   studentClass: StudentClass;
 
-  @Column("decimal", { precision: 10, scale: 2, nullable: false })
+  @Column('decimal', { precision: 10, scale: 2, nullable: false })
   amount: number;
 
   @ManyToOne(() => Months, { nullable: true })
-  @JoinColumn({ name: "monthid" })
+  @JoinColumn({ name: 'monthid' })
   month: Months;
 
   @Column({ nullable: false })
   monthName: string;
 
+  @Column({ nullable: false })
+  academicYear: string;
+
   @ManyToOne(() => Paymenttypes, { nullable: false })
-  @JoinColumn({ name: "paymenttypeid" })
+  @JoinColumn({ name: 'paymenttypeid' })
   paymentType: Paymenttypes;
 
   @ManyToOne(() => PaymentStates, { nullable: false })
-  @JoinColumn({ name: "paymentstateid" })
+  @JoinColumn({ name: 'paymentstateid' })
   paymentState: PaymentStates;
 
   @Column({ nullable: false })
@@ -61,11 +64,15 @@ export class Payment {
   dateupdated: Date;
 
   @ManyToOne(() => Responsible, { nullable: true })
-  @JoinColumn({ name: "responsibleid" })
+  @JoinColumn({ name: 'responsibleid' })
   responsible: Responsible;
 
-  @ManyToOne(() => PaymentChargeRequest, chargeRequest => chargeRequest.payments, { nullable: true })
-  @JoinColumn({ name: "charge_request_id" })
+  @ManyToOne(
+    () => PaymentChargeRequest,
+    (chargeRequest) => chargeRequest.payments,
+    { nullable: true },
+  )
+  @JoinColumn({ name: 'charge_request_id' })
   chargeRequest: PaymentChargeRequest;
 
   @BeforeInsert()

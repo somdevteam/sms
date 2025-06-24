@@ -1,6 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsOptional, ValidateNested, IsNumber, IsString } from "class-validator";
-import { Type } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+  IsNumber,
+  IsString,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreatePaymentDto {
   @IsNotEmpty()
@@ -23,7 +30,7 @@ export class CreatePaymentDto {
   @IsNumber()
   paymentStateId: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   monthId: number;
 
@@ -39,13 +46,17 @@ export class CreatePaymentDto {
   @IsString()
   details?: string;
 
+  @IsOptional()
+  @IsNumber()
+  chargeRequestId?: number;
+
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   sName: string;
 
   @ApiProperty({ required: false })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   monthName: string;
 
