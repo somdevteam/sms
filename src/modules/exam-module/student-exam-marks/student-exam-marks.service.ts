@@ -65,6 +65,7 @@ export class StudentExamMarksService {
       .leftJoinAndSelect('examInfo.exam', 'exam', 'exam.examid = :examId', { examId })
       .leftJoinAndSelect('studentExamMarks.subject', 'subject')
       .select([
+        'std.rollNumber AS rollNumber',
         'std.studentid AS studentId',
         'std.firstName AS firstName',
         'std.middlename AS middleName',
@@ -136,6 +137,7 @@ export class StudentExamMarksService {
       .leftJoinAndSelect('studentExamMarks.subject', 'subject')
       .select([
         'stdClass.studentClassId AS studentClassId',
+        'std.rollNumber as rollNumber',
         'std.firstName AS firstName',
         'std.middleName AS middleName',
         'std.lastName AS lastName',
