@@ -146,7 +146,7 @@ export class StudentService {
         .leftJoin('cs.branchAcademic', 'ba')
         .leftJoin('ba.branch', 'b')
         .leftJoin('ba.academic', 'a')
-        .leftJoin('s.responsible', 'rp')
+        .leftJoin('s.guardian', 'g')
         .select([
             's.studentId AS studentId',
             's.firstName AS firstName',
@@ -154,12 +154,12 @@ export class StudentService {
             's.lastName AS lastName',
             'c.classname as className',
             'sec.sectionname as sectionName',
-            's.responsibleId AS responsibleId',
             's.bob AS pob',
             'a.academicYear AS academicYear',
             's.rollNumber AS rollNumber',
-            'rp.responsibleName AS responsibleName',
-            'rp.phone AS responsiblePhone',
+            'g.guardianId AS guardianId',
+            'g.guardianName AS guardianName',
+            'g.phone AS guardianPhone',
             'b.branchId AS branchId',
             'cs.sectionId AS sectionId',
         ])

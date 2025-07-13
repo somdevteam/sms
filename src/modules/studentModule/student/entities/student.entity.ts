@@ -31,7 +31,7 @@ export class Student extends BaseEntity {
     @Column()
     bob: string;
 
-    @ManyToOne(() => Guardian, guardian => guardian.student)
+    @ManyToOne(() => Guardian, guardian => guardian.student, {nullable: true})
     @JoinColumn({name:'guardianId'})
     guardian: Guardian
 

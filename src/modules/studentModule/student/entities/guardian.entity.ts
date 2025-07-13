@@ -3,7 +3,7 @@ import {Student} from "../../student/entities/student.entity";
 
 @Entity()
 
-export class Guardian extends  BaseEntity {
+export class Guardian extends BaseEntity {
     @PrimaryGeneratedColumn()
     guardianId: number;
 
