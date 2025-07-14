@@ -156,7 +156,7 @@ export class PaymentsService {
 
       // Validate payment state
       const paymentState = await this.paymentStateRepository.findOne({
-        where: { paymentstateid: createPaymentDto.paymentStateId },
+        where: { paymentstateid: 2 },
       });
 
       if (!paymentState) {
@@ -177,7 +177,7 @@ export class PaymentsService {
         throw new ConflictException('Payment already exists for this month');
       }
       let  chargeRequest =null;
-      if (createPaymentDto.chargeRequestId) {
+      if (createPaymentDto.chargeRequestId && createPaymentDto.isAutomatedPayment) {
          chargeRequest = await queryRunner.manager.findOne(
           PaymentChargeRequest,
           {
@@ -198,17 +198,18 @@ export class PaymentsService {
         rollNo: createPaymentDto.rollNo,
         details: createPaymentDto.details,
         datecreated: new Date(),
-        chargeRequest:chargeRequest
+        chargeRequest: createPaymentDto.isAutomatedPayment ? chargeRequest : null,
+        isAutomatedPayment: createPaymentDto.isAutomatedPayment
       });
 
       const savedPayment = await queryRunner.manager.save(payment);
 
       // Update charge request status if it exists
 
-        if (chargeRequest) {
-          chargeRequest.status = ChargeStatus.PAID;
-          await queryRunner.manager.save(chargeRequest);
-        }
+      if (chargeRequest) {
+        chargeRequest.status = ChargeStatus.PAID;
+        await queryRunner.manager.save(chargeRequest);
+      }
 
       // Return payment with related data for receipt
       const result = await queryRunner.manager.findOne(Payment, {

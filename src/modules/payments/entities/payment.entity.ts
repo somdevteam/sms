@@ -72,9 +72,11 @@ export class Payment {
     (chargeRequest) => chargeRequest.payments,
     { nullable: true },
   )
-  @JoinColumn({ name: 'charge_request_id' })
+  @JoinColumn({ name: 'charge_request_id', })
   chargeRequest: PaymentChargeRequest;
 
+  @Column()
+  isAutomatedPayment: boolean;
   @BeforeInsert()
   @BeforeUpdate()
   validateAmount() {

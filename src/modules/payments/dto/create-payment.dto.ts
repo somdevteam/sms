@@ -5,8 +5,8 @@ import {
   IsOptional,
   ValidateNested,
   IsNumber,
-  IsString,
-} from 'class-validator';
+  IsString, IsBoolean
+} from "class-validator";
 import { Type } from 'class-transformer';
 
 export class CreatePaymentDto {
@@ -49,6 +49,10 @@ export class CreatePaymentDto {
   @IsOptional()
   @IsNumber()
   chargeRequestId?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isAutomatedPayment?: boolean;
 
   @ApiProperty({ required: false })
   @IsOptional()
