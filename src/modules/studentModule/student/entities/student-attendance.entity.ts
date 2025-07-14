@@ -3,12 +3,7 @@ import { StudentClass } from "./student-class.entity";
 import { UserEntity } from "src/modules/user/user.entity";
 
 
-export enum AttendanceStatus {
-    PRESENT = 'Present',
-    ABSENT = 'Absent',
-    LATE = 'Late',
-    EXCUSED = 'Excused'
-}
+
 
 @Entity('attendance')
 export class StudentAttendance extends BaseEntity{
@@ -19,13 +14,14 @@ export class StudentAttendance extends BaseEntity{
     @JoinColumn({name: 'studentClassId'})
     studentClass: StudentClass;
 
-    @Column({ type: 'enum', enum: AttendanceStatus })
-    status: AttendanceStatus;
+    @Column()
+    status: string;
   
     @Column({ type: 'text', nullable: true })
     remark?: string;
 
     @ManyToOne(() => UserEntity, { eager: true })
+    @JoinColumn({ name: 'recordedBy' })
     recorded_by: UserEntity;
   
     @CreateDateColumn({ type: 'timestamp' })

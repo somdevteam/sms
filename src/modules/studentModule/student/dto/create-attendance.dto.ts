@@ -12,6 +12,9 @@ export class StudentAttendanceDto {
   @IsInt()
   studentId: number;
 
+  @IsInt()
+  studentClassId: number;
+
   @IsEnum(AttendanceStatus)
   status: AttendanceStatus;
 

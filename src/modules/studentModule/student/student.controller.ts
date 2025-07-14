@@ -5,6 +5,7 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
 
 @Controller('student')
 export class StudentController {
@@ -75,4 +76,10 @@ export class StudentController {
     return new ApiBaseResponse('success', 200, data);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('createStudentAttendance')
+  async createStudentAttendance(@Body() dto: CreateAttendanceDto, @Request() req: any): Promise<ApiBaseResponse> {
+    const attendanceData = await this.studentService.createStudentAttendance(dto, req.user.user.userId);
+    return new ApiBaseResponse('Attendance created successfully', 201, attendanceData);
+  }
 }

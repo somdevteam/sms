@@ -154,6 +154,7 @@ export class StudentService {
         .leftJoin('s.guardian', 'g')
         .select([
             's.studentId AS studentId',
+            'sc.studentClassId AS studentClassId',
             's.firstName AS firstName',
             's.middleName AS middleName',
             's.lastName AS lastName',
@@ -206,28 +207,27 @@ export class StudentService {
         return await this.studentTypeRepository.find();
     }
 
-    async createStudentAttendance(dto: CreateAttendanceDto): Promise<StudentAttendance[]> {
-        const { attendanceDate, attendance, classId, sectionId } = dto;
-    
-        const studentIds = attendance.map(a => a.studentId);
+    async createStudentAttendance(dto: CreateAttendanceDto,userId: number): Promise<StudentAttendance[]> {
+        const { attendanceDate, attendance, classId, sectionId,branchId } = dto;
+
+        const academicBranch = await this.academicBranchService.findActiveBranchAcademic(branchId);
+        const classSection = await this.classSectionService.getSectionIdByClassIdAndSectionId(
+            classId, sectionId, academicBranch.academicBranchId
+        );
     
         // 1. Check if attendance already exists for this class & date
         const alreadyExists = await this.attendanceRepo.findOne({
           where: {
-            created_at : attendanceDate,
+            created_at : new Date(attendanceDate),
             studentClass: {
               classSection: {
-                class: {classid: classId},
-                section: {sectionid: sectionId}
-              },
+                classSectionId: classSection.classSectionId 
+              }
             },
           },
           relations: {
             studentClass: {
-                classSection: {
-                    class: true,
-                    section: true
-                }
+                classSection: true
             }
           }
         });
@@ -240,7 +240,12 @@ export class StudentService {
         // 3. Create attendance records
         const newRecords = attendance.map((a) =>
           this.attendanceRepo.create({
-           studentClass: {},
+           studentClass: {studentClassId: a.studentClassId},
+            status: a.status,
+            remark: a.remar ?? '',
+            recorded_by: { userId },
+            created_at: new Date(attendanceDate),
+            updated_at: new Date(),
 
           })
         );
