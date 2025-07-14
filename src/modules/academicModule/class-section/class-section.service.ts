@@ -204,4 +204,21 @@ export class ClassSectionService {
     });
     return classSection.map((item) => item.section);
   }
+
+  async getClassesByBranchId(branchId: number) {
+    const academicBranch = await this.branchAcademicService.findActiveBranchAcademic(branchId);
+
+    const res = await this.classSectionRepository.find({
+      relations: {
+        branchAcademic: true,
+        class: true
+      },
+      where: {
+        branchAcademic: {academicBranchId: academicBranch.academicBranchId}
+      }
+    })
+
+    return res.map(re => re.class);
+    
+  }
 }

@@ -5,7 +5,6 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import {ApiBaseResponse} from "../../../common/dto/apiresponses.dto";
-import { GetRollNumberDto } from "./dto/getRollNumber.dto";
 
 @Controller('student')
 export class StudentController {
@@ -13,7 +12,7 @@ export class StudentController {
 
   @UseGuards(JwtAuthGuard)
   @Post('add')
-  async create(@Body() createStudentDto:CreateStudentDto,@Request() req) {
+  async create(@Body() createStudentDto:CreateStudentDto,@Request() req: any) {
      let studentData = await this.studentService.create(createStudentDto,req.user.user);
      return new ApiBaseResponse('successfully saved', 200, studentData);
   }

@@ -5,6 +5,7 @@ import { BaseEntity } from "typeorm";
 import { Student } from "./student.entity";
 import { Payment } from "src/modules/payments/entities/payment.entity";
 import { StudentExamMarks } from "src/modules/exam-module/student-exam-marks/entities/student-exam-marks.entity";
+import { StudentAttendance } from "./student-attendance.entity";
 @Entity()
 export class StudentClass extends BaseEntity{
     @PrimaryGeneratedColumn()
@@ -25,4 +26,7 @@ export class StudentClass extends BaseEntity{
 
     @OneToMany(()=> StudentExamMarks ,studentExamMarks =>studentExamMarks.studentClass)
     studentExamMarks: StudentExamMarks;
+
+    @OneToMany(() => StudentAttendance, att => att.studentClass)
+    studentAttendance: StudentAttendance[];
 }

@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query} from '@nestjs/common';
 import { ClassSectionService } from './class-section.service';
 import { CreateClassSectionDto } from './dto/create-class-section.dto';
 import { SectionByClassDto } from './dto/SectionByClas.dto';
@@ -58,4 +58,8 @@ export class ClassSectionController {
     return new ApiBaseResponse('fetched successfully',200, resp);
   }
 
+  @Get('/getclassesbybranchId')
+  async getClassesByBranchId(@Query('branchId') branchId: number) {
+    return await this.classSectionService.getClassesByBranchId(branchId);
+  }
 }

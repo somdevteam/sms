@@ -19,6 +19,8 @@ import { BranchAcademicService } from 'src/modules/branch-academic/branch-academ
 import { StudentClass } from './entities/student-class.entity';
 import { StudentType } from './entities/student_type.entity';
 import { Guardian } from './entities/guardian.entity';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { StudentAttendance } from './entities/student-attendance.entity';
 
 @Injectable()
 export class StudentService {
@@ -29,6 +31,9 @@ export class StudentService {
         @InjectRepository(Guardian) private guardianRepository: Repository<Guardian>,
         @InjectRepository(StudentClass) private studentClassRepository: Repository<StudentClass>,
         @InjectRepository(StudentType) private studentTypeRepository: Repository<StudentType>,
+
+        @InjectRepository(StudentAttendance)
+        private readonly attendanceRepo: Repository<StudentAttendance>,
     ) {}
 
     async create(payload: CreateStudentDto, currentUser: CurrentUser): Promise<Student | null> {
@@ -200,4 +205,47 @@ export class StudentService {
     async getStudentTypes(): Promise<StudentType[]> {
         return await this.studentTypeRepository.find();
     }
+
+    async createStudentAttendance(dto: CreateAttendanceDto): Promise<StudentAttendance[]> {
+        const { attendanceDate, attendance, classId, sectionId } = dto;
+    
+        const studentIds = attendance.map(a => a.studentId);
+    
+        // 1. Check if attendance already exists for this class & date
+        const alreadyExists = await this.attendanceRepo.findOne({
+          where: {
+            created_at : attendanceDate,
+            studentClass: {
+              classSection: {
+                class: {classid: classId},
+                section: {sectionid: sectionId}
+              },
+            },
+          },
+          relations: {
+            studentClass: {
+                classSection: {
+                    class: true,
+                    section: true
+                }
+            }
+          }
+        });
+    
+        if (alreadyExists) {
+          throw new BadRequestException('Attendance for this class/section on this date already exists.');
+        }
+    
+    
+        // 3. Create attendance records
+        const newRecords = attendance.map((a) =>
+          this.attendanceRepo.create({
+           studentClass: {},
+
+          })
+        );
+    
+        // 4. Save in bulk
+        return this.attendanceRepo.save(newRecords);
+      }
 }
