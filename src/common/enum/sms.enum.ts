@@ -5,12 +5,14 @@ export enum UserPermissions {
     VIEW_USER = 'viewUsers',
     VIEW_FEES = 'userCanViewFees',
     ADD_FEES ='userCanAddFees',
+    viewPaymentChargeRequest='userCanViewPaymentCharge',
 }
 
 export enum FeesPermissions {
     VIEW_USER = 'viewUsers',
     VIEW_FEES = 'userCanViewFees',
     ADD_FEES ='userCanAddFees',
+    viewPaymentChargeRequest='userCanViewPaymentCharge',
 }
 export enum Month {
     'jan' = 1,
@@ -27,4 +29,29 @@ export enum Month {
     'dec' =12
 }
 
+export enum feeTypes {
+    'CLASSFEE' = 1,
+    'REGISTRATIONFEE' = 2,
+    'EXAMFEE' = 3,
+    'GRADUATIONFEE' = 4
+}
+
+export function createFullName(firstName: string, middleName: string, lastName: string): string {
+    firstName = trimString(firstName);
+    middleName = trimString(middleName);
+    lastName = trimString(lastName);
+
+    let fullName = `${firstName} ${middleName} ${lastName}`.trim();
+
+    if (fullName) {
+        fullName = trimString(fullName).toLowerCase();
+    }
+
+    return fullName.replace(/[^a-zA-Z0-9\/ ]/g, '');
+}
+
+// Helper function to trim strings
+function trimString(str: string): string {
+    return str ? str.replace(/\s\s+/g, ' ').trim() : '';
+}
 

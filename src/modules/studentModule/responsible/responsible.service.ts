@@ -57,6 +57,10 @@ export class ResponsibleService {
         return await this.ResponsibleRepository.findOne({where: {responsibleid: id}})
     }
 
+    async findResponsibleByPhone(phoneNumber: string): Promise<Responsible> {
+        return await this.ResponsibleRepository.findOne({where: {phone: phoneNumber}})
+    }
+
     async update(id: number, payload: UpdateResponsibleDto) {
 
         let responsibleToUpdate = await this.ResponsibleRepository.findOne({

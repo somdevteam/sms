@@ -1,36 +1,103 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+  IsNumber,
+  IsString, IsBoolean
+} from "class-validator";
+import { Type } from 'class-transformer';
 
 export class CreatePaymentDto {
-  @ApiProperty({
-    required: true,
-  })
   @IsNotEmpty()
+  @IsNumber()
+  studentId: number;
+
+  @IsOptional()
+  @IsNumber()
   studentClassId: number;
-  @ApiProperty({
-    required: true,
-  })
-  @IsNotEmpty()
-  paymentTypeId: number;
-  @ApiProperty({
-    required: true,
-  })
 
   @IsNotEmpty()
-  paymentStateId: number;
-  @ApiProperty({
-    required: true,
-  })
-  @IsNotEmpty()
+  @IsNumber()
   amount: number;
 
-  @ApiProperty({
-    required: false,
-  })
-  monthId:1;
-  monthName:string
+  @IsNotEmpty()
+  @IsNumber()
+  branchId: number;
 
-  @ApiProperty({required:true})
-  rollNo:string
+  @IsNotEmpty()
+  @IsNumber()
+  paymentTypeId: number;
 
+  @IsNotEmpty()
+  @IsNumber()
+  paymentStateId: number;
+
+  @IsOptional()
+  @IsNumber()
+  monthId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  rollNo: string;
+
+  @IsOptional()
+  @IsNumber()
+  responsibleId: number;
+
+  @IsOptional()
+  @IsString()
+  details?: string;
+
+  @IsOptional()
+  @IsNumber()
+  chargeRequestId?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isAutomatedPayment?: boolean;
+
+  @IsNotEmpty()
+  @IsNumber()
+  feeTypeId: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  sName: string;
+
+  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @IsString()
+  monthName: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  className: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  sectionName: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  levelName: string;
+}
+
+export class CreateMultiplePaymentsDto {
+  @ApiProperty({ type: [CreatePaymentDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreatePaymentDto)
+  payments: CreatePaymentDto[];
+}
+
+export class GenerateReceiptDto {
+  @ApiProperty({ type: Number })
+  @IsNotEmpty()
+  paymentIds: number;
 }

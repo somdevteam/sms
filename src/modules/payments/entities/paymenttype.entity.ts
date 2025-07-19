@@ -7,7 +7,4 @@ export class Paymenttypes {
 
   @Column()
   type: string;
-
-  @Column('decimal', {nullable:true})
-  amount: number;
-}
+  }

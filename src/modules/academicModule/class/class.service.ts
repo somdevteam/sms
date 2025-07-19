@@ -30,9 +30,9 @@ export class ClassService {
       throw new NotFoundException('class not found');
     }
     return clas;
-}
+  }
 
- async create(payload: CreateClassDto) {
+  async create(payload: CreateClassDto) {
     let classname = await this.getByClassname(payload.classname);
     if (classname) {
       throw new NotAcceptableException(
@@ -56,8 +56,12 @@ export class ClassService {
     }
   }
 
-  findAll() {
-    return this.classRepository.find();
+  async findAll(): Promise<Class[]> {
+    return await this.classRepository.createQueryBuilder('class')
+      .leftJoinAndSelect('class.levelclass', 'levelclass')
+      .leftJoinAndSelect('levelclass.level', 'level')
+      .orderBy('class.classId', 'ASC')
+      .getMany();
   }
 
   async findClassesNotInLevelClassWithBranch(branchId: number): Promise<Class[]> {
@@ -93,13 +97,9 @@ export class ClassService {
         'An error occurred while creating the user.',
       );
     }
-    
-
-
-
   }
 
- async remove(id: number) {
+  async remove(id: number) {
     let foundClass = await this.getById(id);
 
     if (!foundClass) {
@@ -115,13 +115,17 @@ export class ClassService {
       .leftJoinAndSelect('ClassSection.section', 'Section')
       .getMany();
       return classes;
-      // const result = classes.map((clazz) => ({ 
-      //   classname: clazz.classname,
-      //   section: clazz.classSection.map((classSection) => ({
-      //     [`section`]: classSection.section.sectionname,
-      //   })),
-      // }));
-      // return result;
+  }
+
+  async findAllClasses(): Promise<Class[]> {
+    return await this.classRepository.createQueryBuilder('class')
+      .select([
+        'class.classid',
+        'class.classname',
+        'class.datecreated'
+      ])
+      .orderBy('class.classid', 'ASC')
+      .getMany();
   }
   async findExamClasses(examInfoId:number,branchId:number) {
     let currentAcademic = await this.branchAcademicService.findActiveBranchAcademic(branchId);

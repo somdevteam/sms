@@ -1,5 +1,7 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {IsNotEmpty, IsNumber, IsString} from "class-validator";
+import { Responsible } from "../../responsible/entities/responsible.entity";
+import { StudentClass } from "../../studentclass/entities/studentclass.entity";
 
 export class CreateStudentDto {
     studentId:number;
@@ -54,4 +56,19 @@ export class CreateStudentDto {
 
 
 
+}
+
+
+export interface StudentWithFullName {
+    studentid: number;
+    rollNumber: number;
+    firstname: string;
+    middlename: string;
+    lastname: string;
+    Sex: string;
+    dob: Date;
+    bob: string;
+    responsible: Responsible;
+    studentClass: StudentClass[];
+    fullName: string;
 }

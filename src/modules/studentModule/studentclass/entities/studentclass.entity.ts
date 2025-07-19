@@ -12,7 +12,8 @@ import {Student} from "../../student/entities/student.entity";
 import {ClassSection} from "../../../academicModule/class-section/entities/class-section.entity";
 import {Class} from "../../../academicModule/class/entities/class.entity";
 import { Payment } from "../../../payments/entities/payment.entity";
-import { StudentExamMarks } from "src/modules/exam-module/student-exam-marks/entities/student-exam-marks.entity";
+import { PaymentChargeRequest } from "../../../payments/entities/payment-charge-request.entity";
+import { StudentExamMarks } from "../../../exam-module/student-exam-marks/entities/student-exam-marks.entity";
 
 @Entity()
 export class StudentClass extends BaseEntity{
@@ -31,6 +32,9 @@ export class StudentClass extends BaseEntity{
 
     @OneToMany(()=>Payment,payment =>payment.studentClass)
     payment: Payment;
+
+    @OneToMany(() => PaymentChargeRequest, charge => charge.studentClass)
+    paymentCharges: PaymentChargeRequest[];
 
     @OneToMany(()=> StudentExamMarks ,studentExamMarks =>studentExamMarks.studentClass)
     studentExamMarks: StudentExamMarks;

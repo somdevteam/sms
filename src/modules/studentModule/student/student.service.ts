@@ -19,6 +19,7 @@ import { StudentClassService } from '../studentclass/studentclass.service';
 import { StudentsByClassSectionDto } from './dto/class-section.dto';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
 import { BranchAcademicService } from 'src/modules/branch-academic/branch-academic.service';
+import { ActiveStudentDto } from './dto/active-student.dto';
 
 @Injectable()
 export class StudentService {
@@ -101,6 +102,69 @@ export class StudentService {
     async findByRollNumber(rollNumber: number): Promise<Student> {
         return this.studentRepository.findOne({ where: { rollNumber },relations:['studentClass'] });
     }
+
+
+    async findStudentByResponsibleId(responsibleId: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .where("student.responsibleid = :responsibleId", { responsibleId })
+          .getMany();
+    }
+
+    async findStudentByMobile(responsibleId: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .where("student.responsibleid = :responsibleId", { responsibleId })
+          .getMany();
+    }
+
+    async findStudentRollNumber(rollNumber: string): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .where("student.rollNumber = :rollNumber", { rollNumber })
+          .getMany();
+    }
+
+    async findStudentByResponsibleMobile(mobile: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .leftJoinAndSelect("studentClass.classSection", "classSection")
+          .leftJoinAndSelect("classSection.class","class")
+          .leftJoinAndSelect("classSection.section","section")
+          .leftJoinAndSelect("class.levelclass","levelClass")
+          .leftJoinAndSelect("levelClass.level","level")
+          .leftJoinAndSelect("levelClass.class","class1")
+          .leftJoinAndSelect("student.responsible","responsible")
+          .where("responsible.phone = :mobile", { mobile })
+          .getMany();
+    }
+    async findStudentByStudentId(responsibleId: number): Promise<Student[ ] | undefined> {
+        return this.studentRepository.createQueryBuilder("student")
+          .leftJoinAndSelect("student.studentClass", "studentClass")
+          .where("student.responsibleid = :responsibleId", { responsibleId })
+          .getMany();
+    }
+    // async findStudentByResponsibleId(responsibleId: number): Promise<Student> {
+    //     return this.studentRepository.findOne({ where: { responsible : responsibleId  },relations:['studentClass'] });
+    // }
 
 
     async update(id: number, payload: UpdateStudentDto) {
@@ -193,5 +257,42 @@ export class StudentService {
             .andWhere('academicBranch.academicId = :academicId', { academicId });
 
         return queryBuilder.getCount();
+    }
+
+    async findActiveStudentsByBranch(branchId: number): Promise<ActiveStudentDto[]> {
+        const students = await this.studentRepository
+            .createQueryBuilder('student')
+            .select([
+                'student.studentid',
+                'studentClass.studentClassId as studentclassid',
+                'student.branchId as branchid',
+                'classSection.classId as levelClassid',
+                'levelclass.levelid as levelid',
+                'level.levelFee as levelfee',
+                'academics.academicYear as academicYear',
+                'academic_branch.academicId as academicId'
+            ])
+            .leftJoin('student.studentClass', 'studentClass')
+            .leftJoin('studentClass.classSection', 'classSection')
+            .leftJoin('classSection.class', 'class')
+            .leftJoin('class.levelclass', 'levelclass')
+            .leftJoin('levelclass.level', 'level')
+            .leftJoin('classSection.branchAcademic', 'academic_branch')
+            .leftJoin('academic_branch.academic', 'academics')
+            .where('student.isActive = :isActive', { isActive: true })
+            .andWhere('student.branchId = :branchId', { branchId })
+            .andWhere('academics.isActive = :isActive', { isActive: true })
+            .getRawMany();
+
+        return students.map(student => ({
+            studentid: student.student_studentid,
+            studentclassid: student.studentclassid,
+            branchid: student.branchid,
+            levelClassid: student.levelClassid,
+            levelid: student.levelid,
+            levelfee: student.levelfee,
+            academicYear: student.academicYear,
+            academicId: student.academicId
+        }));
     }
 }

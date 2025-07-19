@@ -19,4 +19,5 @@ export class Subject extends BaseEntity{
 
     @OneToMany(() => StudentExamMarks, studentExamMarks => studentExamMarks.subject)
     studentExamMarks: StudentExamMarks;
+
 }
