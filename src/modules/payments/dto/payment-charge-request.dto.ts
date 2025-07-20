@@ -100,6 +100,10 @@ export class GenerateChargesDto {
   branchId: number;
 
   @IsNotEmpty()
+  @IsNumber()
+  feeTypeId: number;
+
+  @IsNotEmpty()
   chargeTypeCode: string;
 
   @IsOptional()

@@ -14,6 +14,8 @@ import { StudentClass } from "../../studentModule/studentclass/entities/studentc
 import { Payment } from "./payment.entity";
 import { ChargeStatus } from '../enums/charge-status.enum';
 import { ChargeType } from "./charge-type.entity";
+import { Feetypes } from "./feetypes.entity";
+import { Branch } from "../../branch/branch.entity";
 
 @Entity()
 export class PaymentChargeRequest extends BaseEntity {
@@ -33,9 +35,6 @@ export class PaymentChargeRequest extends BaseEntity {
 
   @Column()
   studentClassId: number;
-
-  @Column()
-  branchId: number;
 
   @Column()
   academicId: number;
@@ -82,4 +81,13 @@ export class PaymentChargeRequest extends BaseEntity {
 
   @OneToMany(() => Payment, payment => payment.chargeRequest)
   payments: Payment[];
+
+  @ManyToOne(() => Feetypes, { nullable: false })
+  @JoinColumn({ name: 'feetypeid' })
+  feeType: Feetypes;
+
+  @ManyToOne(() => Branch, { nullable: true })
+  @JoinColumn({ name: 'branchid' })
+  branch: Branch;
+
 } 
