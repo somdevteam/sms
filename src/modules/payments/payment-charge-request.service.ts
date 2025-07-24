@@ -20,6 +20,8 @@ import { ChargeType } from './entities/charge-type.entity';
 import { PaymentChargeResponseDto } from './dto/payment-charge-response.dto';
 import { createFullName } from '../../common/enum/sms.enum';
 import { Months } from '../../common/months.entity';
+import { Feetypes } from "./entities/feetypes.entity";
+import { Branch } from "../branch/branch.entity";
 
 @Injectable()
 export class PaymentChargeRequestService {
@@ -32,6 +34,11 @@ export class PaymentChargeRequestService {
     private readonly studentService: StudentService,
     @InjectRepository(Months)
     private monthsRepository: Repository<Months>,
+    @InjectRepository(Feetypes)
+    private feeTypeRepository: Repository<Feetypes>,
+    @InjectRepository(Branch)
+    private branchRepository: Repository<Branch>,
+
   ) {}
 
   async create(
@@ -219,6 +226,25 @@ export class PaymentChargeRequestService {
       where: { chargeTypeCode: generateDto.chargeTypeCode },
     });
 
+    const feetypeData = await this.feeTypeRepository.findOne({
+      where: { feetypeid: generateDto.feeTypeId },
+    });
+
+    // fee type data
+    if (!feetypeData) {
+      throw new NotFoundException('Fee  type not found');
+    }
+
+    // Get branch data
+    const branch = await this.branchRepository.findOne({
+      where: { branchId: generateDto.branchId },
+    });
+
+    if (!branch) {
+      throw new NotFoundException('Branch not found');
+    }
+
+
     for (const student of activeStudents) {
       for (const month of monthsToCharge) {
         const monthName =
@@ -237,6 +263,8 @@ export class PaymentChargeRequestService {
             studentId: student.studentid,
             chargedMonth: monthName,
             academicYear: student.academicYear,
+            branch:branch,
+            feeType:feetypeData,
           },
           order: {
             createdAt: 'DESC', // Get the most recent charge if multiple exist
@@ -259,7 +287,8 @@ export class PaymentChargeRequestService {
         const chargeData = {
           studentId: student.studentid,
           studentClassId: student.studentclassid,
-          branchId: student.branchid,
+          branch:branch,
+          feeType:feetypeData,
           academicId: student.academicId,
           academicYear: student.academicYear,
           levelId: student.levelid,
