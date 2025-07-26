@@ -18,7 +18,7 @@ import { StudentService } from '../studentModule/student/student.service';
 import { ChargeStatus } from './enums/charge-status.enum';
 import { ChargeType } from './entities/charge-type.entity';
 import { PaymentChargeResponseDto } from './dto/payment-charge-response.dto';
-import { createFullName } from '../../common/enum/sms.enum';
+import { createFullName, feeTypes } from "../../common/enum/sms.enum";
 import { Months } from '../../common/months.entity';
 import { Feetypes } from "./entities/feetypes.entity";
 import { Branch } from "../branch/branch.entity";
@@ -74,7 +74,9 @@ export class PaymentChargeRequestService {
       .leftJoinAndSelect('studentClass.classSection', 'classSection')
       .leftJoinAndSelect('classSection.class', 'class')
       .leftJoinAndSelect('classSection.section', 'section')
-      .leftJoinAndSelect('charge.chargeType', 'chargeType');
+      .leftJoinAndSelect('charge.chargeType', 'chargeType')
+      .leftJoinAndSelect('charge.branch', 'branch')
+      .leftJoinAndSelect('charge.feeType', 'Feetypes');
 
     if (filterDto) {
       // Always apply class and section filters if provided
@@ -143,6 +145,9 @@ export class PaymentChargeRequestService {
         sectionName: charge.studentClass.classSection.section.sectionname,
         studentId: charge.studentId,
         rollNumber: charge.student.rollNumber,
+        amount:charge.amount,
+        branchId:charge.branch.branchId,
+        feeTypeId:charge.feeType.feetypeid
       })),
       total,
     };
@@ -284,6 +289,11 @@ export class PaymentChargeRequestService {
         const dueDate = new Date();
         dueDate.setMonth(month - 1);
 
+        let amount = feetypeData.amount;
+        if(feetypeData.feetypeid == feeTypes.CLASSFEE){
+          amount = student.levelfee;
+        }
+
         const chargeData = {
           studentId: student.studentid,
           studentClassId: student.studentclassid,
@@ -293,6 +303,7 @@ export class PaymentChargeRequestService {
           academicYear: student.academicYear,
           levelId: student.levelid,
           levelFee: student.levelfee,
+          amount:amount,
           chargedMonth: monthName,
           dueDate,
           chargeType: chargeType,

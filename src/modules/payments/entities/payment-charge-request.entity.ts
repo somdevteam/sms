@@ -49,6 +49,9 @@ export class PaymentChargeRequest extends BaseEntity {
   levelFee: number;
 
   @Column()
+  amount: number;
+
+  @Column()
   dueDate: Date;
 
   @ManyToOne(() => ChargeType, chargeType => chargeType.charges)
