@@ -20,11 +20,12 @@ import { Months } from '../../common/months.entity';
 import { Feetypes } from './entities/feetypes.entity';
 import { Responsible } from '../studentModule/responsible/entities/responsible.entity';
 import { StudentService } from '../studentModule/student/student.service';
-import { createFullName, feeTypes } from "../../common/enum/sms.enum";
+import { createFullName, feeTypes } from '../../common/enum/sms.enum';
 import { Student as StudentEntity } from '../studentModule/student/entities/student.entity';
 import { StudentClass } from '../studentModule/studentclass/entities/studentclass.entity';
 import { PaymentChargeRequest } from './entities/payment-charge-request.entity';
 import { ChargeStatus } from './enums/charge-status.enum';
+import { AccountingService } from '../accounting/accounting.service';
 
 @Injectable()
 export class PaymentsService {
@@ -47,6 +48,7 @@ export class PaymentsService {
     private studentClassRepository: Repository<StudentClass>,
     @InjectRepository(Branch)
     private branchRepository: Repository<Branch>,
+    private readonly accountingService: AccountingService,
   ) {}
 
   async getStudentByRollNumber(rollNumber: string): Promise<StudentEntity> {
@@ -191,15 +193,18 @@ export class PaymentsService {
         studentClass.studentClassId,
         createPaymentDto.monthName,
         createPaymentDto.feeTypeId,
-        createPaymentDto.branchId
+        createPaymentDto.branchId,
       );
 
       if (duplicatePayment) {
         throw new ConflictException('Payment already exists for this month');
       }
-      let  chargeRequest =null;
-      if (createPaymentDto.chargeRequestId && createPaymentDto.isAutomatedPayment) {
-         chargeRequest = await queryRunner.manager.findOne(
+      let chargeRequest = null;
+      if (
+        createPaymentDto.chargeRequestId &&
+        createPaymentDto.isAutomatedPayment
+      ) {
+        chargeRequest = await queryRunner.manager.findOne(
           PaymentChargeRequest,
           {
             where: { chargeRequestId: createPaymentDto.chargeRequestId },
@@ -208,7 +213,7 @@ export class PaymentsService {
       }
 
       let amount = createPaymentDto.amount;
-      if(feetypeData.feetypeid != feeTypes.CLASSFEE){
+      if (feetypeData.feetypeid != feeTypes.CLASSFEE) {
         amount = feetypeData.amount;
       }
 
@@ -222,14 +227,15 @@ export class PaymentsService {
         academicYear: academicYear,
         paymentType,
         paymentState,
-        feeType:feetypeData,
-        branch:branch,
+        feeType: feetypeData,
+        branch: branch,
         rollNo: createPaymentDto.rollNo,
         details: createPaymentDto.details,
         datecreated: new Date(),
-        chargeRequest: createPaymentDto.isAutomatedPayment ? chargeRequest : null,
+        chargeRequest: createPaymentDto.isAutomatedPayment
+          ? chargeRequest
+          : null,
         isAutomatedPayment: createPaymentDto.isAutomatedPayment,
-
       });
 
       const savedPayment = await queryRunner.manager.save(payment);
@@ -250,10 +256,21 @@ export class PaymentsService {
           'paymentType',
           'paymentState',
           'month',
+          'branch',
+          'feeType',
         ],
       });
 
       await queryRunner.commitTransaction();
+
+      // Record the payment transaction in accounting system
+      try {
+        await this.accountingService.recordPaymentTransaction(result);
+      } catch (error) {
+        console.error('Error recording payment transaction:', error);
+        // Don't fail the payment if accounting recording fails
+      }
+
       return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -442,9 +459,8 @@ export class PaymentsService {
           studentClass.studentClassId,
           monthData.monthname,
           null,
-          null
+          null,
         );
-
 
         // Get student
         const student = await this.studentService.findOne(paymentDto.studentId);
@@ -509,12 +525,11 @@ export class PaymentsService {
     }
   }
 
-
   private async validateDuplicatePayments(
     studentClassId: number,
     monthName: string,
-    feeTypeId:number,
-    branchId:number
+    feeTypeId: number,
+    branchId: number,
   ): Promise<boolean> {
     // Get the student class with academic year information
     const studentClass = await this.studentClassRepository
@@ -550,8 +565,8 @@ export class PaymentsService {
       })
       .andWhere('payment.monthName = :monthName', { monthName })
       .andWhere('payment.academicYear = :academicYear', { academicYear })
-      .andWhere('payment.feeType=:feeTypeId',{feeTypeId})
-      .andWhere('payment.branch=:branchId',{branchId})
+      .andWhere('payment.feeType=:feeTypeId', { feeTypeId })
+      .andWhere('payment.branch=:branchId', { branchId })
 
       .getOne();
 
