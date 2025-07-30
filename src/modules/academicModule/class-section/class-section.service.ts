@@ -170,7 +170,7 @@ export class ClassSectionService {
             where: {
                 class: { classid: classId },
                 section: { sectionid: data.sectionid },
-                branchAcademic: academicBranch,
+                branchAcademic: {academicBranchId:academicBranch.academicBranchId},
             },
         });
 
@@ -198,7 +198,7 @@ export class ClassSectionService {
     const classSection = await this.classSectionRepository.find({
       where: {
         class: { classid: classId },
-        branchAcademic: academicBranch,
+        branchAcademic: {academicBranchId:academicBranch.academicBranchId},
       },
       relations: ['section'],
     });

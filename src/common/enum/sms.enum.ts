@@ -8,6 +8,14 @@ export enum UserPermissions {
     viewPaymentChargeRequest='userCanViewPaymentCharge',
 }
 
+export enum PaymentPermissions {
+    VIEWACCOUNTDASHBOARD = 'userCanViewAccountingDashboard',
+}
+
+export enum AccountPermissions {
+    VIEWACCOUNTDASHBOARD = 'userCanViewAccountingDashboard',
+}
+
 export enum FeesPermissions {
     VIEW_USER = 'viewUsers',
     VIEW_FEES = 'userCanViewFees',

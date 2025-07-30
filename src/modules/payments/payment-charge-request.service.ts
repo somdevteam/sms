@@ -268,7 +268,7 @@ export class PaymentChargeRequestService {
             studentId: student.studentid,
             chargedMonth: monthName,
             academicYear: student.academicYear,
-            branch:branch,
+            branch: {branchId:branch.branchId},
             feeType:feetypeData,
           },
           order: {
