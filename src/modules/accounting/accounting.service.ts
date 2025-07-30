@@ -468,6 +468,280 @@ export class AccountingService {
     }
   }
 
+  // Default Account Creation for New Branch
+  async createDefaultAccountsForBranch(branchId: number): Promise<Account[]> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Validate branch exists
+      const branch = await this.branchRepository.findOne({
+        where: { branchId: branchId },
+      });
+
+      if (!branch) {
+        throw new NotFoundException('Branch not found');
+      }
+
+      // Check if accounts already exist for this branch
+      const existingAccounts = await this.accountRepository.find({
+        where: { branchId: branchId },
+      });
+
+      if (existingAccounts.length > 0) {
+        throw new ConflictException('Default accounts already exist for this branch');
+      }
+
+      const defaultAccounts = [
+        // Asset Accounts (1000-1999)
+        {
+          accountNumber: `${branchId}1001`,
+          accountName: 'Cash',
+          description: 'Cash on hand and in bank',
+          accountType: AccountType.ASSET,
+          accountCategory: AccountCategory.CASH,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}1002`,
+          accountName: 'Bank Account',
+          description: 'Main bank account',
+          accountType: AccountType.ASSET,
+          accountCategory: AccountCategory.BANK,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}1003`,
+          accountName: 'Accounts Receivable',
+          description: 'Money owed by students and others',
+          accountType: AccountType.ASSET,
+          accountCategory: AccountCategory.ACCOUNTS_RECEIVABLE,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}1004`,
+          accountName: 'Prepaid Expenses',
+          description: 'Expenses paid in advance',
+          accountType: AccountType.ASSET,
+          accountCategory: AccountCategory.PREPAID_EXPENSES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}1005`,
+          accountName: 'Fixed Assets',
+          description: 'School buildings, equipment, and furniture',
+          accountType: AccountType.ASSET,
+          accountCategory: AccountCategory.FIXED_ASSETS,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+
+        // Liability Accounts (2000-2999)
+        {
+          accountNumber: `${branchId}2001`,
+          accountName: 'Accounts Payable',
+          description: 'Money owed to suppliers and vendors',
+          accountType: AccountType.LIABILITY,
+          accountCategory: AccountCategory.ACCOUNTS_PAYABLE,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}2002`,
+          accountName: 'Accrued Expenses',
+          description: 'Expenses incurred but not yet paid',
+          accountType: AccountType.LIABILITY,
+          accountCategory: AccountCategory.ACCRUED_EXPENSES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}2003`,
+          accountName: 'Loans Payable',
+          description: 'Bank loans and other borrowings',
+          accountType: AccountType.LIABILITY,
+          accountCategory: AccountCategory.LOANS_PAYABLE,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+
+        // Equity Accounts (3000-3999)
+        {
+          accountNumber: `${branchId}3001`,
+          accountName: 'Owner Capital',
+          description: 'Initial investment by school owners',
+          accountType: AccountType.EQUITY,
+          accountCategory: AccountCategory.OWNER_CAPITAL,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}3002`,
+          accountName: 'Retained Earnings',
+          description: 'Accumulated profits from previous years',
+          accountType: AccountType.EQUITY,
+          accountCategory: AccountCategory.RETAINED_EARNINGS,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+
+        // Revenue Accounts (4000-4999)
+        {
+          accountNumber: `${branchId}4001`,
+          accountName: 'Student Fees',
+          description: 'Tuition and other student fees',
+          accountType: AccountType.REVENUE,
+          accountCategory: AccountCategory.STUDENT_FEES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}4002`,
+          accountName: 'Exam Fees',
+          description: 'Examination and testing fees',
+          accountType: AccountType.REVENUE,
+          accountCategory: AccountCategory.EXAM_FEES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}4003`,
+          accountName: 'Graduation Fees',
+          description: 'Graduation ceremony and certificate fees',
+          accountType: AccountType.REVENUE,
+          accountCategory: AccountCategory.GRADUATION_FEES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}4004`,
+          accountName: 'Other Income',
+          description: 'Miscellaneous income sources',
+          accountType: AccountType.REVENUE,
+          accountCategory: AccountCategory.OTHER_INCOME,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+
+        // Expense Accounts (5000-5999)
+        {
+          accountNumber: `${branchId}5001`,
+          accountName: 'Teacher Salaries',
+          description: 'Salaries and wages for teaching staff',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.TEACHER_SALARIES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5002`,
+          accountName: 'Staff Salaries',
+          description: 'Salaries and wages for administrative staff',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.STAFF_SALARIES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5003`,
+          accountName: 'Maintenance',
+          description: 'Building and equipment maintenance',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.MAINTENANCE,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5004`,
+          accountName: 'Utilities',
+          description: 'Electricity, water, internet, and phone bills',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.UTILITIES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5005`,
+          accountName: 'Rent',
+          description: 'Building and property rental expenses',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.RENT,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5006`,
+          accountName: 'Office Supplies',
+          description: 'Stationery, books, and office materials',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.OFFICE_SUPPLIES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5007`,
+          accountName: 'Marketing',
+          description: 'Advertising and promotional expenses',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.MARKETING,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5008`,
+          accountName: 'Insurance',
+          description: 'Property and liability insurance',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.INSURANCE,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+        {
+          accountNumber: `${branchId}5009`,
+          accountName: 'Other Expenses',
+          description: 'Miscellaneous operating expenses',
+          accountType: AccountType.EXPENSE,
+          accountCategory: AccountCategory.OTHER_EXPENSES,
+          openingBalance: 0,
+          branchId: branchId,
+        },
+      ];
+
+      // Create all default accounts
+      const createdAccounts = [];
+      for (const accountData of defaultAccounts) {
+        const account = this.accountRepository.create({
+          ...accountData,
+          currentBalance: accountData.openingBalance,
+        });
+        const savedAccount = await queryRunner.manager.save(account);
+        createdAccounts.push(savedAccount);
+      }
+
+      await queryRunner.commitTransaction();
+      return createdAccounts;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Error creating default accounts: ${error.message}`,
+      );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   // Helper Methods
   private validateDoubleEntry(journalEntries: JournalEntryLineDto[]): void {
     const totalDebits = journalEntries

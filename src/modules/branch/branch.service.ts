@@ -11,11 +11,13 @@ import { Repository } from 'typeorm';
 import { BranchDTO } from './dto/branch.dto';
 import { UpdateBranchDTO } from './dto/update-branch.dto';
 import { CurrentUser } from 'src/common/dto/currentuser.dto';
+import { AccountingService } from '../accounting/accounting.service';
 
 @Injectable()
 export class BranchService {
   constructor(
     @InjectRepository(Branch) private branchRepository: Repository<Branch>,
+    private readonly accountingService: AccountingService,
   ) {}
 
  async getById(id: number): Promise<Branch> {
@@ -83,7 +85,19 @@ export class BranchService {
     branch.isActive = payload.isactive;
     branch.branchLocation = payload.branchLocation;
     branch.dateCreated = new Date();
-      return await this.branchRepository.save(branch);
+    
+    const savedBranch = await this.branchRepository.save(branch);
+
+    // Create default accounts for the new branch
+    try {
+      await this.accountingService.createDefaultAccountsForBranch(savedBranch.branchId);
+    } catch (accountingError) {
+      console.error('Error creating default accounts:', accountingError);
+      // Don't fail branch creation if account creation fails
+      // The accounts can be created manually later
+    }
+
+    return savedBranch;
     } catch (error) {
       if (error) {
         throw new ConflictException(

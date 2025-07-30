@@ -103,6 +103,20 @@ export class AccountingController {
     return new ApiBaseResponse('Account deleted successfully', 200, null);
   }
 
+  @Post('accounts/default/:branchId')
+  @ApiOperation({ summary: 'Create default accounts for a new branch' })
+  @ApiResponse({ status: 201, description: 'Default accounts created successfully' })
+  async createDefaultAccountsForBranch(
+    @Param('branchId') branchId: string,
+  ): Promise<ApiBaseResponse> {
+    const accounts = await this.accountingService.createDefaultAccountsForBranch(+branchId);
+    return new ApiBaseResponse(
+      'Default accounts created successfully',
+      201,
+      accounts,
+    );
+  }
+
   // Journal Entry Endpoints
   @Post('journal-entries')
   @ApiOperation({ summary: 'Create a new journal entry' })
