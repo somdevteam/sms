@@ -11,6 +11,7 @@ import {
   BeforeUpdate,
 } from 'typeorm';
 import { Branch } from '../../branch/branch.entity';
+import { JournalEntry } from "./journal-entry.entity";
 
 export enum AccountType {
   ASSET = 'ASSET',
