@@ -214,7 +214,7 @@ export class PaymentsService {
 
       let amount = createPaymentDto.amount;
       if (feetypeData.feetypeid != feeTypes.CLASSFEE) {
-        amount = feetypeData.amount;
+        amount = Number(feetypeData.amount);
       }
 
       // Create new payment
@@ -261,15 +261,13 @@ export class PaymentsService {
         ],
       });
 
-      await queryRunner.commitTransaction();
+      // Record the payment transaction in accounting system within the same transaction
+      await this.accountingService.recordPaymentTransactionWithinTransaction(
+        queryRunner,
+        result,
+      );
 
-      // Record the payment transaction in accounting system
-      try {
-        await this.accountingService.recordPaymentTransaction(result);
-      } catch (error) {
-        console.error('Error recording payment transaction:', error);
-        // Don't fail the payment if accounting recording fails
-      }
+      await queryRunner.commitTransaction();
 
       return result;
     } catch (error) {
@@ -476,7 +474,7 @@ export class PaymentsService {
         payment.monthName = monthData.monthname;
         payment.paymentType = feeType;
         payment.paymentState = feeState;
-        payment.amount = paymentDto.amount;
+        payment.amount = Number(paymentDto.amount);
         payment.datecreated = new Date();
         payment.responsible = responsible;
         payment.rollNo = paymentDto.rollNo;
@@ -486,6 +484,35 @@ export class PaymentsService {
 
       // Save all payments in a single transaction
       const savedPayments = await queryRunner.manager.save(paymentEntities);
+
+      // Get all payments with relations for accounting
+      const paymentsWithRelations = await Promise.all(
+        savedPayments.map((payment) =>
+          queryRunner.manager.findOne(Payment, {
+            where: { studentfeeid: payment.studentfeeid },
+            relations: [
+              'student',
+              'student.responsible',
+              'paymentType',
+              'paymentState',
+              'month',
+              'branch',
+              'feeType',
+            ],
+          }),
+        ),
+      );
+
+      // Record accounting transactions for all payments within the same transaction
+      const validPayments = paymentsWithRelations.filter(
+        (payment) => payment !== null,
+      );
+      if (validPayments.length > 0) {
+        await this.accountingService.recordMultiplePaymentTransactionsWithinTransaction(
+          queryRunner,
+          validPayments,
+        );
+      }
 
       // Generate receipts
       const receipts = savedPayments.map((payment) => ({

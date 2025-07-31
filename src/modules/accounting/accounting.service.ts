@@ -170,58 +170,12 @@ export class AccountingService {
     await queryRunner.startTransaction();
 
     try {
-      // Validate double-entry bookkeeping
-      this.validateDoubleEntry(createJournalEntryDto.journalEntries);
-
-      // Generate transaction number
-      const transactionNumber = await this.generateTransactionNumber(
-        createJournalEntryDto.branchId,
-      );
-
-      // Create transaction
-      const transaction = this.transactionRepository.create({
-        transactionNumber,
-        transactionDate: new Date(createJournalEntryDto.transactionDate),
-        description: createJournalEntryDto.description,
-        totalAmount: this.calculateTotalAmount(
-          createJournalEntryDto.journalEntries,
-        ),
-        status: TransactionStatus.POSTED,
-        notes: createJournalEntryDto.notes,
-        branchId: createJournalEntryDto.branchId,
-        paymentId: createJournalEntryDto.paymentId,
-      });
-
-      const savedTransaction = await queryRunner.manager.save(transaction);
-
-      // Create journal entries
-      const journalEntries = createJournalEntryDto.journalEntries.map((entry) =>
-        this.journalEntryRepository.create({
-          transactionNumber: `${transactionNumber}-${entry.accountId}`,
-          transactionDate: new Date(createJournalEntryDto.transactionDate),
-          transactionType: entry.transactionType,
-          amount: entry.amount,
-          description: entry.description,
-          entryType: createJournalEntryDto.entryType || JournalEntryType.MANUAL,
-          referenceNumber: createJournalEntryDto.referenceNumber,
-          notes: createJournalEntryDto.notes,
-          accountId: entry.accountId,
-          branchId: createJournalEntryDto.branchId,
-          paymentId: createJournalEntryDto.paymentId,
-          transactionId: savedTransaction.transactionId,
-        }),
-      );
-
-      await queryRunner.manager.save(journalEntries);
-
-      // Update account balances
-      await this.updateAccountBalances(
+      const result = await this.createJournalEntryWithinTransaction(
         queryRunner,
-        createJournalEntryDto.journalEntries,
+        createJournalEntryDto,
       );
-
       await queryRunner.commitTransaction();
-      return savedTransaction;
+      return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (
@@ -237,6 +191,63 @@ export class AccountingService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async createJournalEntryWithinTransaction(
+    queryRunner: any,
+    createJournalEntryDto: CreateJournalEntryDto,
+  ): Promise<Transaction> {
+    // Validate double-entry bookkeeping
+    this.validateDoubleEntry(createJournalEntryDto.journalEntries);
+
+    // Generate transaction number
+    const transactionNumber = await this.generateTransactionNumber(
+      createJournalEntryDto.branchId,
+    );
+
+    // Create transaction
+    const transaction = this.transactionRepository.create({
+      transactionNumber,
+      transactionDate: new Date(createJournalEntryDto.transactionDate),
+      description: createJournalEntryDto.description,
+      totalAmount: this.calculateTotalAmount(
+        createJournalEntryDto.journalEntries,
+      ),
+      status: TransactionStatus.POSTED,
+      notes: createJournalEntryDto.notes,
+      branchId: createJournalEntryDto.branchId,
+      paymentId: createJournalEntryDto.paymentId,
+    });
+
+    const savedTransaction = await queryRunner.manager.save(transaction);
+
+    // Create journal entries
+    const journalEntries = createJournalEntryDto.journalEntries.map((entry) =>
+      this.journalEntryRepository.create({
+        transactionNumber: `${transactionNumber}-${entry.accountId}`,
+        transactionDate: new Date(createJournalEntryDto.transactionDate),
+        transactionType: entry.transactionType,
+        amount: entry.amount,
+        description: entry.description,
+        entryType: createJournalEntryDto.entryType || JournalEntryType.MANUAL,
+        referenceNumber: createJournalEntryDto.referenceNumber,
+        notes: createJournalEntryDto.notes,
+        accountId: entry.accountId,
+        branchId: createJournalEntryDto.branchId,
+        paymentId: createJournalEntryDto.paymentId,
+        transactionId: savedTransaction.transactionId,
+      }),
+    );
+
+    await queryRunner.manager.save(journalEntries);
+
+    // Update account balances
+    await this.updateAccountBalances(
+      queryRunner,
+      createJournalEntryDto.journalEntries,
+    );
+
+    return savedTransaction;
   }
 
   async findAllJournalEntries(
@@ -279,13 +290,16 @@ export class AccountingService {
       let debitBalance = 0;
       let creditBalance = 0;
 
+      // Ensure currentBalance is a number
+      const currentBalance = Number(account.currentBalance) || 0;
+
       if (
         account.accountType === AccountType.ASSET ||
         account.accountType === AccountType.EXPENSE
       ) {
-        debitBalance = account.currentBalance;
+        debitBalance = currentBalance;
       } else {
-        creditBalance = account.currentBalance;
+        creditBalance = currentBalance;
       }
 
       return {
@@ -394,15 +408,15 @@ export class AccountingService {
     });
 
     const totalAssets = assets.reduce(
-      (sum, account) => sum + account.currentBalance,
+      (sum, account) => sum + (Number(account.currentBalance) || 0),
       0,
     );
     const totalLiabilities = liabilities.reduce(
-      (sum, account) => sum + account.currentBalance,
+      (sum, account) => sum + (Number(account.currentBalance) || 0),
       0,
     );
     const totalEquity = equity.reduce(
-      (sum, account) => sum + account.currentBalance,
+      (sum, account) => sum + (Number(account.currentBalance) || 0),
       0,
     );
 
@@ -424,47 +438,72 @@ export class AccountingService {
     await queryRunner.startTransaction();
 
     try {
-      // Get the appropriate accounts for this payment
-      const cashAccount = await this.getCashAccount(payment.branch.branchId);
-      const revenueAccount = await this.getRevenueAccount(
-        payment.feeType.description,
-        payment.branch.branchId,
+      await this.recordPaymentTransactionWithinTransaction(
+        queryRunner,
+        payment,
       );
-
-      // Create journal entries for the payment
-      const journalEntries: JournalEntryLineDto[] = [
-        {
-          accountId: cashAccount.accountId,
-          transactionType: TransactionType.DEBIT,
-          amount: payment.amount,
-          description: `Payment received for ${payment.feeType.description} - ${payment.student.firstname} ${payment.student.lastname}`,
-        },
-        {
-          accountId: revenueAccount.accountId,
-          transactionType: TransactionType.CREDIT,
-          amount: payment.amount,
-          description: `Revenue from ${payment.feeType.description} - ${payment.student.firstname} ${payment.student.lastname}`,
-        },
-      ];
-
-      const createJournalEntryDto: CreateJournalEntryDto = {
-        transactionDate: payment.datecreated.toISOString().split('T')[0],
-        description: `Student Payment - ${payment.feeType.description}`,
-        entryType: JournalEntryType.PAYMENT,
-        referenceNumber: `PAY-${payment.studentfeeid}`,
-        notes: `Payment for student ${payment.student.firstname} ${payment.student.lastname}`,
-        branchId: payment.branch.branchId,
-        paymentId: payment.studentfeeid,
-        journalEntries,
-      };
-
-      await this.createJournalEntry(createJournalEntryDto);
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async recordPaymentTransactionWithinTransaction(
+    queryRunner: any,
+    payment: Payment,
+  ): Promise<void> {
+    // Get the appropriate accounts for this payment
+    const cashAccount = await this.getCashAccount(payment.branch.branchId);
+    const revenueAccount = await this.getRevenueAccount(
+      payment.feeType.description,
+      payment.branch.branchId,
+    );
+
+    // Create journal entries for the payment
+    const journalEntries: JournalEntryLineDto[] = [
+      {
+        accountId: cashAccount.accountId,
+        transactionType: TransactionType.DEBIT,
+        amount: Number(payment.amount),
+        description: `Payment received for ${payment.feeType.description} - ${payment.student.firstname} ${payment.student.lastname}`,
+      },
+      {
+        accountId: revenueAccount.accountId,
+        transactionType: TransactionType.CREDIT,
+        amount: Number(payment.amount),
+        description: `Revenue from ${payment.feeType.description} - ${payment.student.firstname} ${payment.student.lastname}`,
+      },
+    ];
+
+    const createJournalEntryDto: CreateJournalEntryDto = {
+      transactionDate: payment.datecreated.toISOString().split('T')[0],
+      description: `Student Payment - ${payment.feeType.description}`,
+      entryType: JournalEntryType.PAYMENT,
+      referenceNumber: `PAY-${payment.studentfeeid}`,
+      notes: `Payment for student ${payment.student.firstname} ${payment.student.lastname}`,
+      branchId: payment.branch.branchId,
+      paymentId: payment.studentfeeid,
+      journalEntries,
+    };
+
+    await this.createJournalEntryWithinTransaction(
+      queryRunner,
+      createJournalEntryDto,
+    );
+  }
+
+  async recordMultiplePaymentTransactionsWithinTransaction(
+    queryRunner: any,
+    payments: Payment[],
+  ): Promise<void> {
+    for (const payment of payments) {
+      await this.recordPaymentTransactionWithinTransaction(
+        queryRunner,
+        payment,
+      );
     }
   }
 
@@ -490,7 +529,9 @@ export class AccountingService {
       });
 
       if (existingAccounts.length > 0) {
-        throw new ConflictException('Default accounts already exist for this branch');
+        throw new ConflictException(
+          'Default accounts already exist for this branch',
+        );
       }
 
       const defaultAccounts = [
@@ -760,7 +801,7 @@ export class AccountingService {
   }
 
   private calculateTotalAmount(journalEntries: JournalEntryLineDto[]): number {
-    return journalEntries.reduce((sum, entry) => sum + entry.amount, 0);
+    return journalEntries.reduce((sum, entry) => sum + Number(entry.amount), 0);
   }
 
   private async generateTransactionNumber(branchId: number): Promise<string> {
@@ -795,25 +836,37 @@ export class AccountingService {
         throw new NotFoundException(`Account ${entry.accountId} not found`);
       }
 
+      // Ensure currentBalance is a number
+      const currentBalance = Number(account.currentBalance) || 0;
+      const entryAmount = Number(entry.amount);
+
+      let newBalance: number;
+
       if (entry.transactionType === TransactionType.DEBIT) {
         if (
           account.accountType === AccountType.ASSET ||
           account.accountType === AccountType.EXPENSE
         ) {
-          account.currentBalance += entry.amount;
+          newBalance = currentBalance + entryAmount;
         } else {
-          account.currentBalance -= entry.amount;
+          newBalance = currentBalance - entryAmount;
         }
       } else {
         if (
           account.accountType === AccountType.ASSET ||
           account.accountType === AccountType.EXPENSE
         ) {
-          account.currentBalance -= entry.amount;
+          newBalance = currentBalance - entryAmount;
         } else {
-          account.currentBalance += entry.amount;
+          newBalance = currentBalance + entryAmount;
         }
       }
+
+      account.currentBalance = newBalance;
+
+      console.log(
+        `Account ${account.accountName} (${account.accountType}): ${currentBalance} ${entry.transactionType} ${entryAmount} = ${newBalance}`,
+      );
 
       await queryRunner.manager.save(account);
     }
