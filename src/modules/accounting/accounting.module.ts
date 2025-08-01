@@ -6,6 +6,7 @@ import { AccountingSeedService } from './accounting-seed.service';
 import { Account } from './entities/account.entity';
 import { JournalEntry } from './entities/journal-entry.entity';
 import { Transaction } from './entities/transaction.entity';
+import { Expense } from './entities/expense.entity';
 import { Branch } from '../branch/branch.entity';
 import { Payment } from '../payments/entities/payment.entity';
 
@@ -15,6 +16,7 @@ import { Payment } from '../payments/entities/payment.entity';
       Account,
       JournalEntry,
       Transaction,
+      Expense,
       Branch,
       Payment,
     ]),

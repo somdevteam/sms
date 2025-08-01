@@ -3,17 +3,23 @@ export enum UserPermissions {
     VIEW_PERMISSION = 'viewPermission',
     CREATE_USER = 'createUser',
     VIEW_USER = 'viewUsers',
+
+}
+
+export enum PaymentPermissions {
     VIEW_FEES = 'userCanViewFees',
     ADD_FEES ='userCanAddFees',
     viewPaymentChargeRequest='userCanViewPaymentCharge',
 }
 
-export enum PaymentPermissions {
-    VIEWACCOUNTDASHBOARD = 'userCanViewAccountingDashboard',
-}
-
 export enum AccountPermissions {
     VIEWACCOUNTDASHBOARD = 'userCanViewAccountingDashboard',
+    ADDACCOUNT ='userCanAddAccount',
+    EDITACCOUNT ='userCanEditAccount',
+    DELETEACCOUNT ='userCanDeleteAccount',
+    VIEWJOURNALENTRIES ='userCanViewJournalEntries',
+    VIEWFINANCIALREPORTS ='userCanViewFinancialReports',
+    VIEWEXPENSELIST ='userCanViewExpenseList',
 }
 
 export enum FeesPermissions {

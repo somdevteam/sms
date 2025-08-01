@@ -14,6 +14,8 @@ import { AccountingService } from './accounting.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { CreateJournalEntryDto } from './dto/create-journal-entry.dto';
+import { CreateExpenseDto } from './dto/create-expense.dto';
+import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ApiBaseResponse } from '../../common/dto/apiresponses.dto';
 import {
   IsDateString,
@@ -105,11 +107,15 @@ export class AccountingController {
 
   @Post('accounts/default/:branchId')
   @ApiOperation({ summary: 'Create default accounts for a new branch' })
-  @ApiResponse({ status: 201, description: 'Default accounts created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Default accounts created successfully',
+  })
   async createDefaultAccountsForBranch(
     @Param('branchId') branchId: string,
   ): Promise<ApiBaseResponse> {
-    const accounts = await this.accountingService.createDefaultAccountsForBranch(+branchId);
+    const accounts =
+      await this.accountingService.createDefaultAccountsForBranch(+branchId);
     return new ApiBaseResponse(
       'Default accounts created successfully',
       201,
@@ -378,5 +384,183 @@ export class AccountingController {
     if (!dateString) return true;
     const regex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
     return regex.test(dateString) && !isNaN(new Date(dateString).getTime());
+  }
+
+  @Get('expense-categories')
+  async getExpenseCategories(): Promise<ApiBaseResponse> {
+    const categories = [
+      { value: 'SALARY', label: 'Salary' },
+      { value: 'SUPPLIES', label: 'Supplies' },
+      { value: 'UTILITIES', label: 'Utilities' },
+      { value: 'MAINTENANCE', label: 'Maintenance' },
+      { value: 'MARKETING', label: 'Marketing' },
+      { value: 'RENT', label: 'Rent' },
+      { value: 'INSURANCE', label: 'Insurance' },
+      { value: 'OTHER', label: 'Other' },
+    ];
+    return new ApiBaseResponse(
+      'Expense categories retrieved successfully',
+      200,
+      categories,
+    );
+  }
+
+  @Get('payment-methods')
+  async getPaymentMethods(): Promise<ApiBaseResponse> {
+    const methods = [
+      { value: 'CASH', label: 'Cash' },
+      { value: 'BANK_TRANSFER', label: 'Bank Transfer' },
+      { value: 'CHECK', label: 'Check' },
+      { value: 'CREDIT_CARD', label: 'Credit Card' },
+      { value: 'DEBIT_CARD', label: 'Debit Card' },
+    ];
+    return new ApiBaseResponse(
+      'Payment methods retrieved successfully',
+      200,
+      methods,
+    );
+  }
+
+  // Expense Management Endpoints
+  @Post('expenses')
+  @ApiOperation({ summary: 'Create a new expense' })
+  @ApiResponse({ status: 201, description: 'Expense created successfully' })
+  async createExpense(
+    @Body() createExpenseDto: CreateExpenseDto,
+  ): Promise<ApiBaseResponse> {
+    const expense = await this.accountingService.createExpense(
+      createExpenseDto,
+    );
+    return new ApiBaseResponse('Expense created successfully', 201, expense);
+  }
+
+  @Get('expenses')
+  @ApiOperation({ summary: 'Get all expenses' })
+  @ApiResponse({ status: 200, description: 'Expenses retrieved successfully' })
+  async findAllExpenses(
+    @Query('branchId') branchId?: number,
+  ): Promise<ApiBaseResponse> {
+    const expenses = await this.accountingService.findAllExpenses(branchId);
+    return new ApiBaseResponse(
+      'Expenses retrieved successfully',
+      200,
+      expenses,
+    );
+  }
+
+  @Get('expenses/:id')
+  @ApiOperation({ summary: 'Get expense by ID' })
+  @ApiResponse({ status: 200, description: 'Expense retrieved successfully' })
+  async findExpenseById(@Param('id') id: string): Promise<ApiBaseResponse> {
+    const expense = await this.accountingService.findExpenseById(+id);
+    return new ApiBaseResponse('Expense retrieved successfully', 200, expense);
+  }
+
+  @Patch('expenses/:id')
+  @ApiOperation({ summary: 'Update expense' })
+  @ApiResponse({ status: 200, description: 'Expense updated successfully' })
+  async updateExpense(
+    @Param('id') id: string,
+    @Body() updateExpenseDto: UpdateExpenseDto,
+  ): Promise<ApiBaseResponse> {
+    const expense = await this.accountingService.updateExpense(
+      +id,
+      updateExpenseDto,
+    );
+    return new ApiBaseResponse('Expense updated successfully', 200, expense);
+  }
+
+  @Delete('expenses/:id')
+  @ApiOperation({ summary: 'Delete expense' })
+  @ApiResponse({ status: 200, description: 'Expense deleted successfully' })
+  async deleteExpense(@Param('id') id: string): Promise<ApiBaseResponse> {
+    await this.accountingService.deleteExpense(+id);
+    return new ApiBaseResponse('Expense deleted successfully', 200, null);
+  }
+
+  @Post('expenses/:id/approve')
+  @ApiOperation({ summary: 'Approve expense' })
+  @ApiResponse({ status: 200, description: 'Expense approved successfully' })
+  async approveExpense(@Param('id') id: string): Promise<ApiBaseResponse> {
+    const expense = await this.accountingService.approveExpense(+id);
+    return new ApiBaseResponse('Expense approved successfully', 200, expense);
+  }
+
+  @Post('expenses/:id/pay')
+  @ApiOperation({ summary: 'Pay expense' })
+  @ApiResponse({ status: 200, description: 'Expense paid successfully' })
+  async payExpense(@Param('id') id: string): Promise<ApiBaseResponse> {
+    const expense = await this.accountingService.payExpense(+id);
+    return new ApiBaseResponse('Expense paid successfully', 200, expense);
+  }
+
+  @Get('expense-accounts')
+  @ApiOperation({ summary: 'Get expense accounts for branch' })
+  @ApiResponse({
+    status: 200,
+    description: 'Expense accounts retrieved successfully',
+  })
+  async getExpenseAccounts(
+    @Query('branchId') branchId: number,
+  ): Promise<ApiBaseResponse> {
+    const accounts = await this.accountingService.getExpenseAccounts(branchId);
+    return new ApiBaseResponse(
+      'Expense accounts retrieved successfully',
+      200,
+      accounts,
+    );
+  }
+
+  @Get('payment-accounts')
+  @ApiOperation({ summary: 'Get payment accounts for branch' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment accounts retrieved successfully',
+  })
+  async getPaymentAccounts(
+    @Query('branchId') branchId: number,
+  ): Promise<ApiBaseResponse> {
+    const accounts = await this.accountingService.getPaymentAccounts(branchId);
+    return new ApiBaseResponse(
+      'Payment accounts retrieved successfully',
+      200,
+      accounts,
+    );
+  }
+
+  @Get('cash-position')
+  @ApiOperation({ summary: 'Get current cash position' })
+  @ApiResponse({
+    status: 200,
+    description: 'Cash position retrieved successfully',
+  })
+  async getCashPosition(
+    @Query('branchId') branchId: number,
+  ): Promise<ApiBaseResponse> {
+    const cashPosition = await this.accountingService.getCashPosition(branchId);
+    return new ApiBaseResponse(
+      'Cash position retrieved successfully',
+      200,
+      cashPosition,
+    );
+  }
+
+  @Get('financial-position')
+  @ApiOperation({ summary: 'Get comprehensive financial position' })
+  @ApiResponse({
+    status: 200,
+    description: 'Financial position retrieved successfully',
+  })
+  async getFinancialPosition(
+    @Query('branchId') branchId: number,
+  ): Promise<ApiBaseResponse> {
+    const financialPosition = await this.accountingService.getFinancialPosition(
+      branchId,
+    );
+    return new ApiBaseResponse(
+      'Financial position retrieved successfully',
+      200,
+      financialPosition,
+    );
   }
 }

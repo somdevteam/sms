@@ -24,8 +24,11 @@ import {
   CreateJournalEntryDto,
   JournalEntryLineDto,
 } from './dto/create-journal-entry.dto';
+import { CreateExpenseDto } from './dto/create-expense.dto';
+import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Branch } from '../branch/branch.entity';
 import { Payment } from '../payments/entities/payment.entity';
+import { Expense, ExpenseStatus } from './entities/expense.entity';
 
 @Injectable()
 export class AccountingService {
@@ -40,6 +43,8 @@ export class AccountingService {
     private branchRepository: Repository<Branch>,
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
+    @InjectRepository(Expense)
+    private expenseRepository: Repository<Expense>,
     private dataSource: DataSource,
   ) {}
 
@@ -200,10 +205,33 @@ export class AccountingService {
     // Validate double-entry bookkeeping
     this.validateDoubleEntry(createJournalEntryDto.journalEntries);
 
-    // Generate transaction number
-    const transactionNumber = await this.generateTransactionNumber(
-      createJournalEntryDto.branchId,
-    );
+    // Generate transaction number within the transaction context
+    const today = new Date();
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+
+    // Find the last transaction number for today and this branch within the transaction
+    const lastTransaction = await queryRunner.manager
+      .createQueryBuilder(Transaction, 'transaction')
+      .select('transaction.transactionNumber')
+      .where('transaction.branchId = :branchId', {
+        branchId: createJournalEntryDto.branchId,
+      })
+      .andWhere('transaction.transactionNumber LIKE :pattern', {
+        pattern: `TXN-${createJournalEntryDto.branchId}-${dateStr}-%`,
+      })
+      .orderBy('transaction.transactionNumber', 'DESC')
+      .getOne();
+
+    let sequence = 1;
+    if (lastTransaction) {
+      const lastNumber = lastTransaction.transactionNumber;
+      const lastSequence = parseInt(lastNumber.slice(-4));
+      sequence = lastSequence + 1;
+    }
+
+    const transactionNumber = `TXN-${
+      createJournalEntryDto.branchId
+    }-${dateStr}-${sequence.toString().padStart(4, '0')}`;
 
     // Create transaction
     const transaction = this.transactionRepository.create({
@@ -379,6 +407,93 @@ export class AccountingService {
       totalRevenue,
       totalExpenses,
       netIncome,
+      description:
+        'This shows profit/loss for the specified period. For current cash position, use getCashPosition().',
+    };
+  }
+
+  // New method to get current cash position
+  async getCashPosition(branchId: number): Promise<any> {
+    const cashAccounts = await this.accountRepository.find({
+      where: {
+        branchId,
+        accountType: AccountType.ASSET,
+        accountCategory: AccountCategory.CASH,
+        isActive: true,
+      },
+    });
+
+    const bankAccounts = await this.accountRepository.find({
+      where: {
+        branchId,
+        accountType: AccountType.ASSET,
+        accountCategory: AccountCategory.BANK,
+        isActive: true,
+      },
+    });
+
+    const allCashAccounts = [...cashAccounts, ...bankAccounts];
+
+    const totalCash = allCashAccounts.reduce(
+      (sum, account) => sum + (Number(account.currentBalance) || 0),
+      0,
+    );
+
+    return {
+      cashAccounts: allCashAccounts.map((account) => ({
+        accountId: account.accountId,
+        accountNumber: account.accountNumber,
+        accountName: account.accountName,
+        currentBalance: Number(account.currentBalance) || 0,
+        accountCategory: account.accountCategory,
+      })),
+      totalCash,
+      description: 'Current cash position across all cash and bank accounts',
+    };
+  }
+
+  // New method to get comprehensive financial position
+  async getFinancialPosition(branchId: number): Promise<any> {
+    // Get cash position
+    const cashPosition = await this.getCashPosition(branchId);
+
+    // Get all asset accounts
+    const assetAccounts = await this.accountRepository.find({
+      where: {
+        branchId,
+        accountType: AccountType.ASSET,
+        isActive: true,
+      },
+    });
+
+    // Get all liability accounts
+    const liabilityAccounts = await this.accountRepository.find({
+      where: {
+        branchId,
+        accountType: AccountType.LIABILITY,
+        isActive: true,
+      },
+    });
+
+    const totalAssets = assetAccounts.reduce(
+      (sum, account) => sum + (Number(account.currentBalance) || 0),
+      0,
+    );
+
+    const totalLiabilities = liabilityAccounts.reduce(
+      (sum, account) => sum + (Number(account.currentBalance) || 0),
+      0,
+    );
+
+    const netWorth = totalAssets - totalLiabilities;
+
+    return {
+      cashPosition,
+      totalAssets,
+      totalLiabilities,
+      netWorth,
+      description:
+        'Comprehensive financial position including cash, assets, liabilities, and net worth',
     };
   }
 
@@ -808,10 +923,16 @@ export class AccountingService {
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
 
-    const lastTransaction = await this.transactionRepository.findOne({
-      where: { branchId },
-      order: { transactionId: 'DESC' },
-    });
+    // Find the last transaction number for today and this branch
+    const lastTransaction = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('transaction.transactionNumber')
+      .where('transaction.branchId = :branchId', { branchId })
+      .andWhere('transaction.transactionNumber LIKE :pattern', {
+        pattern: `TXN-${branchId}-${dateStr}-%`,
+      })
+      .orderBy('transaction.transactionNumber', 'DESC')
+      .getOne();
 
     let sequence = 1;
     if (lastTransaction) {
@@ -1004,5 +1125,425 @@ export class AccountingService {
     }
 
     return result;
+  }
+
+  // Expense Management Methods
+  async createExpense(createExpenseDto: CreateExpenseDto): Promise<Expense> {
+    const maxRetries = 3;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        // Validate branch exists
+        const branch = await this.branchRepository.findOne({
+          where: { branchId: createExpenseDto.branchId },
+        });
+
+        if (!branch) {
+          throw new NotFoundException('Branch not found');
+        }
+
+        // Validate expense account exists and is an expense account
+        const expenseAccount = await this.accountRepository.findOne({
+          where: { accountId: createExpenseDto.expenseAccountId },
+        });
+
+        if (!expenseAccount) {
+          throw new NotFoundException('Expense account not found');
+        }
+
+        if (expenseAccount.accountType !== AccountType.EXPENSE) {
+          throw new BadRequestException(
+            'Expense account must be of type EXPENSE',
+          );
+        }
+
+        // Validate payment account exists and is an asset account
+        const paymentAccount = await this.accountRepository.findOne({
+          where: { accountId: createExpenseDto.paymentAccountId },
+        });
+
+        if (!paymentAccount) {
+          throw new NotFoundException('Payment account not found');
+        }
+
+        if (paymentAccount.accountType !== AccountType.ASSET) {
+          throw new BadRequestException(
+            'Payment account must be of type ASSET',
+          );
+        }
+
+        // Create expense
+        const expense = this.expenseRepository.create({
+          ...createExpenseDto,
+          expenseDate: new Date(createExpenseDto.expenseDate),
+          status: createExpenseDto.status || ExpenseStatus.PENDING,
+        });
+
+        const savedExpense = await queryRunner.manager.save(expense);
+
+        // If status is PAID, create journal entries
+        if (savedExpense.status === ExpenseStatus.PAID) {
+          await this.createExpenseJournalEntries(queryRunner, savedExpense);
+        }
+
+        await queryRunner.commitTransaction();
+        return savedExpense;
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+
+        // If it's a duplicate key error and we haven't exceeded retries, try again
+        if (
+          error.message &&
+          error.message.includes('Duplicate entry') &&
+          retryCount < maxRetries - 1
+        ) {
+          retryCount++;
+          console.log(
+            `Retrying expense creation (attempt ${
+              retryCount + 1
+            }/${maxRetries})`,
+          );
+          await queryRunner.release();
+          // Add a small delay to reduce conflict likelihood
+          await new Promise((resolve) => setTimeout(resolve, 100 * retryCount));
+          continue;
+        }
+
+        if (
+          error instanceof NotFoundException ||
+          error instanceof BadRequestException
+        ) {
+          throw error;
+        }
+        throw new InternalServerErrorException(
+          'Failed to create expense: ' + error.message,
+        );
+      } finally {
+        await queryRunner.release();
+      }
+    }
+
+    throw new InternalServerErrorException(
+      'Failed to create expense after multiple retries',
+    );
+  }
+
+  async findAllExpenses(branchId?: number): Promise<Expense[]> {
+    const queryBuilder = this.expenseRepository
+      .createQueryBuilder('expense')
+      .leftJoinAndSelect('expense.branch', 'branch')
+      .leftJoinAndSelect('expense.expenseAccount', 'expenseAccount')
+      .leftJoinAndSelect('expense.paymentAccount', 'paymentAccount')
+      .leftJoinAndSelect('expense.transaction', 'transaction')
+      .orderBy('expense.expenseDate', 'DESC');
+
+    if (branchId) {
+      queryBuilder.where('expense.branchId = :branchId', { branchId });
+    }
+
+    return await queryBuilder.getMany();
+  }
+
+  async findExpenseById(expenseId: number): Promise<Expense> {
+    const expense = await this.expenseRepository.findOne({
+      where: { expenseId },
+      relations: ['branch', 'expenseAccount', 'paymentAccount', 'transaction'],
+    });
+
+    if (!expense) {
+      throw new NotFoundException('Expense not found');
+    }
+
+    return expense;
+  }
+
+  async updateExpense(
+    expenseId: number,
+    updateExpenseDto: UpdateExpenseDto,
+  ): Promise<Expense> {
+    const maxRetries = 3;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        const expense = await this.expenseRepository.findOne({
+          where: { expenseId },
+        });
+
+        if (!expense) {
+          throw new NotFoundException('Expense not found');
+        }
+
+        // Update expense
+        Object.assign(expense, updateExpenseDto);
+        if (updateExpenseDto.expenseDate) {
+          expense.expenseDate = new Date(updateExpenseDto.expenseDate);
+        }
+
+        const updatedExpense = await queryRunner.manager.save(expense);
+
+        // If status changed to PAID, create journal entries
+        if (
+          updatedExpense.status === ExpenseStatus.PAID &&
+          expense.status !== ExpenseStatus.PAID
+        ) {
+          await this.createExpenseJournalEntries(queryRunner, updatedExpense);
+        }
+
+        await queryRunner.commitTransaction();
+        return updatedExpense;
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+
+        // If it's a duplicate key error and we haven't exceeded retries, try again
+        if (
+          error.message &&
+          error.message.includes('Duplicate entry') &&
+          retryCount < maxRetries - 1
+        ) {
+          retryCount++;
+          console.log(
+            `Retrying expense update (attempt ${retryCount + 1}/${maxRetries})`,
+          );
+          await queryRunner.release();
+          // Add a small delay to reduce conflict likelihood
+          await new Promise((resolve) => setTimeout(resolve, 100 * retryCount));
+          continue;
+        }
+
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        throw new InternalServerErrorException(
+          'Failed to update expense: ' + error.message,
+        );
+      } finally {
+        await queryRunner.release();
+      }
+    }
+
+    throw new InternalServerErrorException(
+      'Failed to update expense after multiple retries',
+    );
+  }
+
+  async deleteExpense(expenseId: number): Promise<void> {
+    const expense = await this.expenseRepository.findOne({
+      where: { expenseId },
+    });
+
+    if (!expense) {
+      throw new NotFoundException('Expense not found');
+    }
+
+    // Check if expense has been posted (has transaction)
+    if (expense.transactionId) {
+      throw new BadRequestException(
+        'Cannot delete expense that has been posted to accounting',
+      );
+    }
+
+    await this.expenseRepository.remove(expense);
+  }
+
+  async approveExpense(expenseId: number): Promise<Expense> {
+    const expense = await this.expenseRepository.findOne({
+      where: { expenseId },
+    });
+
+    if (!expense) {
+      throw new NotFoundException('Expense not found');
+    }
+
+    if (expense.status !== ExpenseStatus.PENDING) {
+      throw new BadRequestException('Expense is not in pending status');
+    }
+
+    expense.status = ExpenseStatus.APPROVED;
+    return await this.expenseRepository.save(expense);
+  }
+
+  async payExpense(expenseId: number): Promise<Expense> {
+    const maxRetries = 3;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        const expense = await this.expenseRepository.findOne({
+          where: { expenseId },
+        });
+
+        if (!expense) {
+          throw new NotFoundException('Expense not found');
+        }
+
+        if (expense.status === ExpenseStatus.PAID) {
+          throw new BadRequestException('Expense is already paid');
+        }
+
+        expense.status = ExpenseStatus.PAID;
+        const updatedExpense = await queryRunner.manager.save(expense);
+
+        // Create journal entries for the expense
+        await this.createExpenseJournalEntries(queryRunner, updatedExpense);
+
+        await queryRunner.commitTransaction();
+        return updatedExpense;
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+
+        // If it's a duplicate key error and we haven't exceeded retries, try again
+        if (
+          error.message &&
+          error.message.includes('Duplicate entry') &&
+          retryCount < maxRetries - 1
+        ) {
+          retryCount++;
+          console.log(
+            `Retrying expense payment (attempt ${
+              retryCount + 1
+            }/${maxRetries})`,
+          );
+          await queryRunner.release();
+          // Add a small delay to reduce conflict likelihood
+          await new Promise((resolve) => setTimeout(resolve, 100 * retryCount));
+          continue;
+        }
+
+        if (
+          error instanceof NotFoundException ||
+          error instanceof BadRequestException
+        ) {
+          throw error;
+        }
+        throw new InternalServerErrorException(
+          'Failed to pay expense: ' + error.message,
+        );
+      } finally {
+        await queryRunner.release();
+      }
+    }
+
+    throw new InternalServerErrorException(
+      'Failed to pay expense after multiple retries',
+    );
+  }
+
+  private async createExpenseJournalEntries(
+    queryRunner: any,
+    expense: Expense,
+  ): Promise<void> {
+    // Generate transaction number within the transaction context
+    const today = new Date();
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+
+    // Find the last transaction number for today and this branch within the transaction
+    const lastTransaction = await queryRunner.manager
+      .createQueryBuilder(Transaction, 'transaction')
+      .select('transaction.transactionNumber')
+      .where('transaction.branchId = :branchId', { branchId: expense.branchId })
+      .andWhere('transaction.transactionNumber LIKE :pattern', {
+        pattern: `TXN-${expense.branchId}-${dateStr}-%`,
+      })
+      .orderBy('transaction.transactionNumber', 'DESC')
+      .getOne();
+
+    let sequence = 1;
+    if (lastTransaction) {
+      const lastNumber = lastTransaction.transactionNumber;
+      const lastSequence = parseInt(lastNumber.slice(-4));
+      sequence = lastSequence + 1;
+    }
+
+    const transactionNumber = `TXN-${expense.branchId}-${dateStr}-${sequence
+      .toString()
+      .padStart(4, '0')}`;
+
+    // Create transaction
+    const transaction = this.transactionRepository.create({
+      transactionNumber,
+      transactionDate: expense.expenseDate,
+      description: `Expense: ${expense.description}`,
+      totalAmount: expense.amount,
+      status: TransactionStatus.POSTED,
+      branchId: expense.branchId,
+      createdBy: expense.createdBy,
+    });
+
+    const savedTransaction = await queryRunner.manager.save(transaction);
+
+    // Create journal entries
+    const journalEntries: JournalEntryLineDto[] = [
+      {
+        accountId: expense.expenseAccountId,
+        transactionType: TransactionType.DEBIT,
+        amount: expense.amount,
+        description: `Expense: ${expense.description}`,
+      },
+      {
+        accountId: expense.paymentAccountId,
+        transactionType: TransactionType.CREDIT,
+        amount: expense.amount,
+        description: `Payment for: ${expense.description}`,
+      },
+    ];
+
+    // Create journal entry transaction
+    const createJournalEntryDto: CreateJournalEntryDto = {
+      transactionDate:
+        typeof expense.expenseDate === 'string'
+          ? expense.expenseDate
+          : expense.expenseDate.toISOString().split('T')[0],
+      description: `Expense: ${expense.description}`,
+      entryType: JournalEntryType.EXPENSE,
+      referenceNumber: expense.expenseNumber,
+      notes: expense.notes,
+      branchId: expense.branchId,
+      journalEntries,
+    };
+
+    await this.createJournalEntryWithinTransaction(
+      queryRunner,
+      createJournalEntryDto,
+    );
+
+    // Update expense with transaction ID
+    expense.transactionId = savedTransaction.transactionId;
+    await queryRunner.manager.save(expense);
+  }
+
+  async getExpenseAccounts(branchId: number): Promise<Account[]> {
+    return await this.accountRepository.find({
+      where: {
+        branchId,
+        accountType: AccountType.EXPENSE,
+        isActive: true,
+      },
+      order: { accountName: 'ASC' },
+    });
+  }
+
+  async getPaymentAccounts(branchId: number): Promise<Account[]> {
+    return await this.accountRepository.find({
+      where: {
+        branchId,
+        accountType: AccountType.ASSET,
+        isActive: true,
+      },
+      order: { accountName: 'ASC' },
+    });
   }
 }
